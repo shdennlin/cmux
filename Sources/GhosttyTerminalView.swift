@@ -12365,6 +12365,12 @@ final class GhosttySurfaceScrollView: NSView {
         // Make the portal presentable before asking Ghostty to realize its drawable.
         surfaceView.setVisibleInUI(visible)
         isHidden = !visible
+        if !wasVisible, visible {
+            // Transform-only, so the portal's frame-derived geometry and the
+            // Ghostty grid are both untouched. Clipped by this view's
+            // masksToBounds, which keeps a split's neighbour covered.
+            SurfaceSwitchSlideAnimation.playIfArmed(on: scrollView.layer)
+        }
         surfaceView.terminalSurface?.setRendererPortalVisible(visible)
         synchronizeCloudTerminalReconnectOverlay()
         if wasVisible != visible, lastRequestedPortalOcclusionVisible != visible {
