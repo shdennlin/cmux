@@ -1,3 +1,4 @@
+import CmuxFoundation
 internal import Foundation
 
 /// The v1 sidebar metadata commands (`set_status` / `report_meta` /
@@ -60,10 +61,13 @@ extension ControlCommandCoordinator {
 
         let parsedURL: URL?
         if let rawURL = sidebarNormalizedOptionValue(parsed.options["url"] ?? parsed.options["link"]) {
-            guard let candidate = URL(string: rawURL),
-                  let scheme = candidate.scheme?.lowercased(),
-                  scheme == "http" || scheme == "https" else {
-                return "ERROR: Invalid metadata URL '\(rawURL)' — expected http(s) URL"
+            // Shared with the row renderer so the stored-vs-clickable contract
+            // cannot drift: a URL this accepts is one the row will draw.
+            let urlPolicy = SidebarMetadataURLPolicy(
+                appScheme: context?.controlSidebarAppURLScheme
+            )
+            guard let candidate = URL(string: rawURL), urlPolicy.allows(candidate) else {
+                return urlPolicy.rejectionMessage(rawURL: rawURL)
             }
             parsedURL = candidate
         } else {

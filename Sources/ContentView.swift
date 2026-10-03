@@ -12745,14 +12745,20 @@ struct VerticalTabsSidebar: View, Equatable {
             }
             NSWorkspace.shared.open(url)
         }
+        // A row link naming this build's own scheme is a cmux navigation target,
+        // so route it through the dispatcher `application(_:open:)` already uses
+        // rather than handing it to LaunchServices. The round trip comes back as
+        // an external open and activates the app, which costs a Space switch when
+        // the window is fullscreen; LaunchServices can also hand the link to a
+        // different build that claims the same scheme. Web links still go out.
+        let openRowLink: @MainActor (URL) -> Void = { url in
+            if AppDelegate.shared?.handleCmuxExternalURLs(from: [url]) == true { return }
+            NSWorkspace.shared.open(url)
+        }
         let rowActions = SidebarAppKitRowActions(
             commands: commands,
-            onOpenStatusURL: { url in
-                NSWorkspace.shared.open(url)
-            },
-            onOpenWorkspaceDescriptionURL: { url in
-                NSWorkspace.shared.open(url)
-            },
+            onOpenStatusURL: { url in openRowLink(url) },
+            onOpenWorkspaceDescriptionURL: { url in openRowLink(url) },
             onOpenPullRequest: { [prefer = input.settings.openPullRequestLinksInCmuxBrowser] url in
                 openInBrowser(url, prefer)
             },

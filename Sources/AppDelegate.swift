@@ -6639,9 +6639,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         return nil
     }
 
-    func focusMainWindow(windowId: UUID) -> Bool {
+    func focusMainWindow(
+        windowId: UUID,
+        activation: MainWindowVisibilityController.Activation = .runningApplication([.activateAllWindows])
+    ) -> Bool {
         guard let window = mainWindowRouteSnapshot(windowId: windowId)?.window else { return false }
-        let didFocus = mainWindowVisibilityController.focus(window, reason: .focusMainWindow)
+        let didFocus = mainWindowVisibilityController.focus(
+            window,
+            reason: .focusMainWindow,
+            activation: activation
+        )
         if didFocus {
             publishCmuxWindowLifecycle(name: "window.focused", windowId: windowId, origin: "focus_request")
         }
