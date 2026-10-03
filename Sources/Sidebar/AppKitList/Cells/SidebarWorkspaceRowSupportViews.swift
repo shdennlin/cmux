@@ -121,16 +121,19 @@ final class SidebarRowMarkdownTextView: NSTextView, NSTextViewDelegate {
         font: NSFont,
         color: NSColor,
         explicitURL: URL? = nil,
+        underlinesLink: Bool = true,
         onOpenURL: @escaping (URL) -> Void
     ) {
         reset()
         self.onOpenURL = onOpenURL
         delegate = self
         lineHeight = ceil(layoutManager?.defaultLineHeight(for: font) ?? font.pointSize)
-        linkTextAttributes = [
-            .foregroundColor: color,
-            .underlineStyle: NSUnderlineStyle.single.rawValue,
-        ]
+        // The link stays a link whether or not it is underlined: the underline
+        // is the affordance, drawn while the pointer is over the row, so a
+        // sidebar full of linked rows is not a sidebar full of underlines.
+        linkTextAttributes = underlinesLink
+            ? [.foregroundColor: color, .underlineStyle: NSUnderlineStyle.single.rawValue]
+            : [.foregroundColor: color]
 
         let mutable: NSMutableAttributedString
         if let rendered = SidebarMarkdownRenderer(markdown: markdown).workspaceDescription {
@@ -151,7 +154,13 @@ final class SidebarRowMarkdownTextView: NSTextView, NSTextViewDelegate {
             mutable.removeAttribute(.underlineStyle, range: fullRange)
             if Self.isAllowedMetadataURL(explicitURL), fullRange.length > 0 {
                 mutable.addAttribute(.link, value: explicitURL, range: fullRange)
-                mutable.addAttribute(.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: fullRange)
+                if underlinesLink {
+                    mutable.addAttribute(
+                        .underlineStyle,
+                        value: NSUnderlineStyle.single.rawValue,
+                        range: fullRange
+                    )
+                }
                 toolTip = explicitURL.absoluteString
             }
             textStorage?.setAttributedString(mutable)
@@ -270,6 +279,15 @@ final class SidebarRowIconTextLine: NSView {
     private let secondTextView = SidebarRowTextView(lines: 1)
     private var iconSize: CGFloat = 0
     private var stacked = false
+    /// Per-line pointer tracking. The enclosing cell's hover covers the whole
+    /// workspace row, so using it underlined every linked line in that row at
+    /// once; the affordance has to follow the pointer to the one line it is
+    /// actually over.
+    private var lineTrackingArea: NSTrackingArea?
+    private var isPointerOverLine = false
+    /// Re-applies the link affordance when the pointer enters or leaves,
+    /// without rebuilding the whole line. Set while a line carries a link.
+    private var applyLinkAffordance: ((Bool) -> Void)?
 
     override var isFlipped: Bool { true }
 
@@ -292,6 +310,51 @@ final class SidebarRowIconTextLine: NSView {
         fatalError("init(coder:) has not been implemented")
     }
 
+    override func updateTrackingAreas() {
+        super.updateTrackingAreas()
+        if let lineTrackingArea {
+            removeTrackingArea(lineTrackingArea)
+        }
+        let next = NSTrackingArea(
+            rect: bounds,
+            options: [.activeAlways, .inVisibleRect, .mouseEnteredAndExited],
+            owner: self,
+            userInfo: nil
+        )
+        addTrackingArea(next)
+        lineTrackingArea = next
+    }
+
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        guard window != nil else { return }
+        updateTrackingAreas()
+        reconcilePointerFromCurrentLocation()
+    }
+
+    override func mouseEntered(with event: NSEvent) {
+        setPointerOverLine(true)
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        setPointerOverLine(false)
+    }
+
+    /// These lines are pooled and reconfigured in place, so a line can take a
+    /// new entry while the pointer already sits on it and would otherwise wait
+    /// for the next crossing to notice.
+    private func reconcilePointerFromCurrentLocation() {
+        guard let window else { return setPointerOverLine(false) }
+        let windowPoint = window.convertPoint(fromScreen: NSEvent.mouseLocation)
+        setPointerOverLine(bounds.contains(convert(windowPoint, from: nil)))
+    }
+
+    private func setPointerOverLine(_ inside: Bool) {
+        guard isPointerOverLine != inside else { return }
+        isPointerOverLine = inside
+        applyLinkAffordance?(inside)
+    }
+
     func configureMetadataEntry(
         _ entry: SidebarStatusEntry,
         model: SidebarWorkspaceRowModel,
@@ -299,6 +362,7 @@ final class SidebarRowIconTextLine: NSView {
         onOpenURL: @escaping (URL) -> Void
     ) {
         resetPrimaryContent()
+        applyLinkAffordance = nil
         stacked = false
         secondTextView.isHidden = true
         iconLabel.isHidden = true
@@ -336,9 +400,23 @@ final class SidebarRowIconTextLine: NSView {
                 font: font,
                 color: color,
                 explicitURL: entry.url,
+                underlinesLink: isPointerOverLine,
                 onOpenURL: onOpenURL
             )
             if entry.helpText != nil { markdownTextView.toolTip = entry.sidebarToolTip(linkURL: entry.url) }
+            if entry.url != nil {
+                applyLinkAffordance = { [weak self] hovering in
+                    guard let self else { return }
+                    self.markdownTextView.configure(
+                        markdown: entry.sidebarDisplayText,
+                        font: font,
+                        color: color,
+                        explicitURL: entry.url,
+                        underlinesLink: hovering,
+                        onOpenURL: onOpenURL
+                    )
+                }
+            }
         } else if let url = entry.url {
             textView.isHidden = true
             metadataButton.isHidden = false
@@ -346,15 +424,26 @@ final class SidebarRowIconTextLine: NSView {
                 title: entry.sidebarDisplayText,
                 font: font,
                 color: color,
-                underlined: true,
+                underlined: isPointerOverLine,
                 toolTip: entry.sidebarToolTip(linkURL: url),
                 onClick: { onOpenURL(url) }
             )
+            applyLinkAffordance = { [weak self] hovering in
+                self?.metadataButton.configure(
+                    title: entry.sidebarDisplayText,
+                    font: font,
+                    color: color,
+                    underlined: hovering,
+                    toolTip: entry.sidebarToolTip(linkURL: url),
+                    onClick: { onOpenURL(url) }
+                )
+            }
         } else {
             metadataButton.isHidden = true
             textView.isHidden = false
             textView.configurePlainText(entry.sidebarDisplayText, font: font, color: color, toolTip: entry.sidebarToolTip(linkURL: nil))
         }
+        reconcilePointerFromCurrentLocation()
         needsLayout = true
     }
 
