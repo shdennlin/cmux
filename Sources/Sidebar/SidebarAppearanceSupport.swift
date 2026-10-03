@@ -510,6 +510,21 @@ func sidebarWorkspaceRowBackgroundStyle(
         }
         return .clear
 
+    case .border:
+        if isActive {
+            // Outline only: keep the row transparent so the workspace colour
+            // (and any custom status colours) stay visible while selected.
+            return SidebarWorkspaceRowBackgroundStyle(
+                color: customBackground,
+                opacity: customBackground == nil ? 0 : 0.7,
+                edgeColor: selectedBackground
+            )
+        }
+        if let customBackground {
+            return SidebarWorkspaceRowBackgroundStyle(color: customBackground, opacity: 0.7)
+        }
+        return .clear
+
     case .solidFill:
         if isActive {
             return SidebarWorkspaceRowBackgroundStyle(

@@ -16285,6 +16285,8 @@ struct TabItemView: View, Equatable {
         switch activeTabIndicatorStyle {
         case .leftRail:
             return style.edgeColor == nil ? 0 : 1
+        case .border:
+            return isActive ? 1.5 : 0
         case .solidFill:
             return isActive ? 1.5 : 0
         }
@@ -16294,6 +16296,8 @@ struct TabItemView: View, Equatable {
         switch activeTabIndicatorStyle {
         case .leftRail:
             return style.edgeColor.map { Color(nsColor: $0) } ?? .clear
+        case .border:
+            return style.edgeColor.map { Color(nsColor: $0) } ?? .clear
         case .solidFill:
             guard isActive else { return .clear }
             return Color.primary.opacity(0.5)
@@ -16301,7 +16305,9 @@ struct TabItemView: View, Equatable {
     }
 
     private var usesInvertedActiveForeground: Bool {
-        isActive
+        // .border draws no fill, so the row keeps the sidebar background and
+        // inverting the foreground would discard caller-supplied status colours.
+        isActive && activeTabIndicatorStyle != .border
     }
 
     private var activePrimaryTextColor: Color {

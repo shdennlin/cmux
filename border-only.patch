@@ -1,0 +1,124 @@
+diff --git a/Packages/macOS/CmuxSettings/Sources/CmuxSettings/Values/WorkspaceIndicatorStyle.swift b/Packages/macOS/CmuxSettings/Sources/CmuxSettings/Values/WorkspaceIndicatorStyle.swift
+index 086b6b46e..e225e1676 100644
+--- a/Packages/macOS/CmuxSettings/Sources/CmuxSettings/Values/WorkspaceIndicatorStyle.swift
++++ b/Packages/macOS/CmuxSettings/Sources/CmuxSettings/Values/WorkspaceIndicatorStyle.swift
+@@ -2,7 +2,7 @@ import Foundation
+ 
+ /// Visual style for the active-workspace indicator in the sidebar.
+ public enum WorkspaceIndicatorStyle: String, CaseIterable, Sendable, SettingCodable {
+-    case leftRail, solidFill
++    case leftRail, solidFill, border
+ 
+     /// Maps raw strings written by earlier iterations of the indicator
+     /// setting onto the closest modern case, exactly as the legacy
+@@ -15,7 +15,7 @@ public enum WorkspaceIndicatorStyle: String, CaseIterable, Sendable, SettingCoda
+         switch string {
+         case "rail":
+             return .leftRail
+-        case "border", "wash", "lift", "typography", "washRail", "blueWashColorRail":
++        case "wash", "lift", "typography", "washRail", "blueWashColorRail":
+             return .solidFill
+         default:
+             return nil
+diff --git a/Packages/macOS/CmuxSettingsUI/Sources/CmuxSettingsUI/Sections/WorkspaceColorsSection.swift b/Packages/macOS/CmuxSettingsUI/Sources/CmuxSettingsUI/Sections/WorkspaceColorsSection.swift
+index 25a7b30f1..deb8f2b53 100644
+--- a/Packages/macOS/CmuxSettingsUI/Sources/CmuxSettingsUI/Sections/WorkspaceColorsSection.swift
++++ b/Packages/macOS/CmuxSettingsUI/Sources/CmuxSettingsUI/Sections/WorkspaceColorsSection.swift
+@@ -303,6 +303,7 @@ public struct WorkspaceColorsSection: View {
+         switch style {
+         case .leftRail: return String(localized: "sidebar.activeTabIndicator.leftRail", defaultValue: "Left Rail")
+         case .solidFill: return String(localized: "sidebar.activeTabIndicator.solidFill", defaultValue: "Solid Fill")
++        case .border: return String(localized: "sidebar.activeTabIndicator.border", defaultValue: "Border Only")
+         }
+     }
+ }
+diff --git a/Sources/ContentView.swift b/Sources/ContentView.swift
+index 6ff1a2a8d..fbe16db54 100644
+--- a/Sources/ContentView.swift
++++ b/Sources/ContentView.swift
+@@ -16041,6 +16041,8 @@ struct TabItemView: View, Equatable {
+         switch activeTabIndicatorStyle {
+         case .leftRail:
+             return style.edgeColor == nil ? 0 : 1
++        case .border:
++            return isActive ? 1.5 : 0
+         case .solidFill:
+             return isActive ? 1.5 : 0
+         }
+@@ -16050,6 +16052,8 @@ struct TabItemView: View, Equatable {
+         switch activeTabIndicatorStyle {
+         case .leftRail:
+             return style.edgeColor.map { Color(nsColor: $0) } ?? .clear
++        case .border:
++            return style.edgeColor.map { Color(nsColor: $0) } ?? .clear
+         case .solidFill:
+             guard isActive else { return .clear }
+             return Color.primary.opacity(0.5)
+@@ -16057,7 +16061,9 @@ struct TabItemView: View, Equatable {
+     }
+ 
+     private var usesInvertedActiveForeground: Bool {
+-        isActive
++        // .border draws no fill, so the row keeps the sidebar background and
++        // inverting the foreground would discard caller-supplied status colours.
++        isActive && activeTabIndicatorStyle != .border
+     }
+ 
+     private var activePrimaryTextColor: Color {
+diff --git a/Sources/Sidebar/AppKitList/Cells/SidebarWorkspaceRowCellView.swift b/Sources/Sidebar/AppKitList/Cells/SidebarWorkspaceRowCellView.swift
+index 07709901e..231d852f5 100644
+--- a/Sources/Sidebar/AppKitList/Cells/SidebarWorkspaceRowCellView.swift
++++ b/Sources/Sidebar/AppKitList/Cells/SidebarWorkspaceRowCellView.swift
+@@ -920,8 +920,12 @@ final class SidebarWorkspaceRowTableCellView: NSTableCellView {
+                 hex: entry.color,
+                 isDark: palette.colorScheme == .dark
+             )
++            // .border paints no fill, so the selection highlight cannot
++            // swallow an explicit tint -- only the filling styles need the
++            // legacy override.
++            let selectionFillsRow = model.settings.activeTabIndicatorStyle != .border
+             let entryColor: NSColor
+-            if model.isActive {
++            if model.isActive && selectionFillsRow {
+                 entryColor = explicitColor != nil
+                     ? palette.selectedForeground(1.0)
+                     : palette.secondary(0.95).withAlphaComponent(0.84)
+diff --git a/Sources/Sidebar/SidebarAppearanceSupport.swift b/Sources/Sidebar/SidebarAppearanceSupport.swift
+index e263383b6..ce36f2b4d 100644
+--- a/Sources/Sidebar/SidebarAppearanceSupport.swift
++++ b/Sources/Sidebar/SidebarAppearanceSupport.swift
+@@ -508,6 +508,21 @@ func sidebarWorkspaceRowBackgroundStyle(
+         }
+         return .clear
+ 
++    case .border:
++        if isActive {
++            // Outline only: keep the row transparent so the workspace colour
++            // (and any custom status colours) stay visible while selected.
++            return SidebarWorkspaceRowBackgroundStyle(
++                color: customBackground,
++                opacity: customBackground == nil ? 0 : 0.7,
++                edgeColor: selectedBackground
++            )
++        }
++        if let customBackground {
++            return SidebarWorkspaceRowBackgroundStyle(color: customBackground, opacity: 0.7)
++        }
++        return .clear
++
+     case .solidFill:
+         if isActive {
+             return SidebarWorkspaceRowBackgroundStyle(
+diff --git a/Sources/WorkspaceIndicatorStyle+Display.swift b/Sources/WorkspaceIndicatorStyle+Display.swift
+index 6cadde7b3..50d810ecd 100644
+--- a/Sources/WorkspaceIndicatorStyle+Display.swift
++++ b/Sources/WorkspaceIndicatorStyle+Display.swift
+@@ -11,6 +11,8 @@ extension WorkspaceIndicatorStyle {
+             return String(localized: "sidebar.activeTabIndicator.leftRail", defaultValue: "Left Rail")
+         case .solidFill:
+             return String(localized: "sidebar.activeTabIndicator.solidFill", defaultValue: "Solid Fill")
++        case .border:
++            return String(localized: "sidebar.activeTabIndicator.border", defaultValue: "Border Only")
+         }
+     }
+ }
