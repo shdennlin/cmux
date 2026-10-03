@@ -1,16 +1,12 @@
 //! Tab drag outcomes that create a pane: drop a tab on a pane edge (a new
 //! split) or between strip columns (a new column).
 //!
-//! Each outcome is one atomic resource commit. The mutation runs on a clone
-//! of the live [`State`] with the same in-memory helpers the existing split
-//! and move paths use, the complete tree is projected into one durable
-//! patch, and the clone replaces the live state only after that patch
-//! commits. A failed commit therefore leaves nothing behind.
-//!
-//! When the tab's origin pane survives on the same screen, the drag records
-//! one layout-undo entry that moves the tab back and removes the created
-//! pane; undo never closes the tab. Other drags fence that screen's undo
-//! history and report `undoable: false`.
+//! Each outcome is one atomic resource commit: the mutation runs on a clone
+//! of the live [`State`] with the split and move helpers, and the clone
+//! replaces the live state only after its projected patch commits, so a
+//! failed commit leaves nothing behind. A drag whose origin pane survives on
+//! the same screen records one undo entry that moves the tab back (undo never
+//! closes the tab); other drags fence that screen's undo (`undoable: false`).
 
 use super::sticky_columns::reduce_column_sticky;
 use super::*;
@@ -621,13 +617,7 @@ pub(crate) fn apply_tab_drag(
                     screen.insert_layout_column_after(
                         anchor,
                         ids.base_column,
-                        LayoutColumn {
-                            id: ids.split,
-                            width,
-                            root: Node::Leaf(ids.pane),
-                            zellij_auto_layout: Some(vec![ids.pane]),
-                            sticky: None,
-                        },
+                        LayoutColumn::single(ids.split, width, ids.pane),
                     ),
                     "column anchor disappeared from its layout"
                 );
