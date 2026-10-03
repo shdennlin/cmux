@@ -1,3 +1,5 @@
+import CmuxFoundation
+import CmuxCloud
 import CmuxControlSocket
 import Foundation
 import CmuxSidebar
@@ -289,6 +291,13 @@ extension TerminalController: ControlSidebarContext {
             return .keyNotFound
         }
         return .removed
+    }
+
+    /// This build's own URL scheme, so a sidebar metadata row may link back
+    /// into cmux. Derived from the bundle identifier and the environment, both
+    /// safe to read off the main actor.
+    nonisolated var controlSidebarAppURLScheme: String {
+        AuthEnvironment.callbackScheme
     }
 
     nonisolated func controlSidebarIsValidLogLevel(_ raw: String) -> Bool {

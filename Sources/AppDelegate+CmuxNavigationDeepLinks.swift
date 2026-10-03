@@ -124,7 +124,14 @@ extension AppDelegate {
 
         prepareForExplicitOpenIntentAtStartup()
         setActiveMainWindow(window)
-        _ = focusMainWindow(windowId: context.windowId)
+        // A link handed over by another app arrives with cmux in the background and
+        // has to be brought forward; one clicked inside cmux does not, and paying
+        // for the activation anyway drops a fullscreen window out of its Space.
+        // Either way the window still gets ordered front and made key below.
+        _ = focusMainWindow(
+            windowId: context.windowId,
+            activation: .ifInactive([.activateAllWindows])
+        )
         context.tabManager.focusTab(
             workspaceId,
             surfaceId: targetPanelId,

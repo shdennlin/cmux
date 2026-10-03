@@ -1,3 +1,5 @@
+import CmuxFoundation
+import CmuxCloud
 import AppKit
 
 /// One wrapping/truncating text line (or block) with measured height.
@@ -210,7 +212,7 @@ final class SidebarRowTextView: NSTextField {
         let layout = linkHitLayout(textRectSize: textRect.size)
         let textPoint = NSPoint(x: point.x - textRect.minX, y: point.y - textRect.minY)
         guard let characterIndex = layout.characterIndex(at: textPoint) else { return nil }
-        return webURL(from: attributedStringValue.attribute(
+        return actionableURL(from: attributedStringValue.attribute(
             .sidebarRowLink, at: characterIndex, effectiveRange: nil
         ))
     }
@@ -230,7 +232,7 @@ final class SidebarRowTextView: NSTextField {
         var nextLinkDescriptors: [LinkDescriptor] = []
         mutable.enumerateAttribute(.link, in: fullRange) { value, range, _ in
             guard value != nil else { return }
-            runs.append((webURL(from: value), range))
+            runs.append((actionableURL(from: value), range))
         }
         for run in runs {
             mutable.removeAttribute(.link, range: run.range)
@@ -376,9 +378,11 @@ final class SidebarRowTextView: NSTextField {
         return layout
     }
 
-    /// Matches the control-socket metadata URL contract in
-    /// `upsertSidebarMetadata`: only HTTP(S) destinations are actionable.
-    private func webURL(from value: Any?) -> URL? {
+    /// Applies the same ``SidebarMetadataURLPolicy`` the socket validated with
+    /// and the row attributed the link with. This is the gate that decides
+    /// whether a link is hit-testable, so a destination the other two admit
+    /// but this one refuses is stored, drawn, and silently not clickable.
+    private func actionableURL(from value: Any?) -> URL? {
         let resolved: URL?
         switch value {
         case let candidate as URL:
@@ -390,7 +394,8 @@ final class SidebarRowTextView: NSTextField {
         default:
             resolved = nil
         }
-        guard let resolved, let scheme = resolved.scheme?.lowercased() else { return nil }
-        return scheme == "http" || scheme == "https" ? resolved : nil
+        guard let resolved else { return nil }
+        let policy = SidebarMetadataURLPolicy(appScheme: AuthEnvironment.callbackScheme)
+        return policy.allows(resolved) ? resolved : nil
     }
 }
