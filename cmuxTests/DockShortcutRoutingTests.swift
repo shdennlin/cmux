@@ -732,6 +732,39 @@ struct DockShortcutRoutingTests {
         }
     }
 
+    @Test("Actions handled after the legacy branch still own a Ctrl+Tab they are bound to")
+    @MainActor
+    func laterConfiguredActionPrecedesLegacyDockTabShortcut() async throws {
+        try await AppContextSerialGate.withExclusiveAppContext {
+            try await Self.withHarness { harness in
+                let firstPanel = try #require(
+                    harness.dock.newSurface(kind: .terminal, inPane: harness.rootPane, focus: true)
+                )
+                let secondPanel = try #require(
+                    harness.dock.newSurface(kind: .terminal, inPane: harness.rootPane, focus: true)
+                )
+                // A third panel makes Focus Last (back to here) and legacy
+                // next-surface cycling (on to secondPanel) land on different panels.
+                _ = try #require(
+                    harness.dock.newSurface(kind: .terminal, inPane: harness.rootPane, focus: true)
+                )
+                harness.dock.focusPanel(firstPanel)
+
+                let controlTab = DockRoutingStoredShortcut(
+                    key: "\t",
+                    command: false,
+                    shift: false,
+                    option: false,
+                    control: true
+                )
+                KeyboardShortcutSettings.setShortcut(controlTab, for: .focusHistoryLast)
+
+                _ = Self.dispatch(controlTab, in: harness)
+                #expect(harness.dock.focusedPanelId != secondPanel)
+            }
+        }
+    }
+
     @Test("Ghostty split-navigation shortcuts target the focused Dock")
     @MainActor
     func ghosttySplitNavigationTargetsFocusedDock() async throws {

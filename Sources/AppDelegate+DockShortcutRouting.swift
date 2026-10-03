@@ -368,14 +368,23 @@ extension AppDelegate {
         matchTabShortcut(
             event: event,
             shortcut: StoredShortcut(key: "\t", command: false, shift: false, option: false, control: true)
-        )
+        ) && !legacyTabStrokeIsClaimedByConfiguredAction(event: event)
     }
 
     func matchesLegacyPreviousSurfaceShortcut(event: NSEvent) -> Bool {
         matchTabShortcut(
             event: event,
             shortcut: StoredShortcut(key: "\t", command: false, shift: true, option: false, control: true)
-        )
+        ) && !legacyTabStrokeIsClaimedByConfiguredAction(event: event)
+    }
+
+    /// The legacy Ctrl+Tab branch runs before most configured actions, so it
+    /// yields whenever one of them is bound to the same stroke (for example
+    /// Focus Last on Ctrl+Tab) and lets that action's own branch handle it.
+    private func legacyTabStrokeIsClaimedByConfiguredAction(event: NSEvent) -> Bool {
+        KeyboardShortcutSettings.Action.allCases.contains { action in
+            matchConfiguredShortcut(event: event, action: action)
+        }
     }
 
     func ghosttyGotoSplitShortcut(for direction: NavigationDirection) -> StoredShortcut? {
