@@ -27,6 +27,15 @@ final class MainWindowVisibilityController {
     enum Activation {
         case none
         case runningApplication(NSApplication.ActivationOptions)
+        /// Activates only while the app is not already frontmost.
+        ///
+        /// An activation the app does not need is not free. `.activateAllWindows`
+        /// asks macOS to bring every window of the app forward, and a fullscreen
+        /// window owns a Space of its own, so satisfying that request forces a
+        /// switch away from it. A caller that is already running inside the app --
+        /// a click in the sidebar, rather than a link handed over by another app --
+        /// wants the window ordering without that cost.
+        case ifInactive(NSApplication.ActivationOptions)
     }
 
     enum ActivationTiming {
@@ -512,6 +521,9 @@ final class MainWindowVisibilityController {
         case .none:
             break
         case .runningApplication(let options):
+            dependencies.activateRunningApplication(options)
+        case .ifInactive(let options):
+            guard !dependencies.isApplicationActive() else { break }
             dependencies.activateRunningApplication(options)
         }
     }

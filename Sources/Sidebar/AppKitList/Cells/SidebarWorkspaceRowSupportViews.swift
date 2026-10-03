@@ -1,4 +1,5 @@
 import AppKit
+import CmuxCloud
 import CmuxFoundation
 import CmuxSidebar
 import CmuxWorkspaces
@@ -243,11 +244,12 @@ final class SidebarRowMarkdownTextView: NSTextView, NSTextViewDelegate {
         return nil
     }
 
-    /// Matches the control-socket metadata URL contract in
-    /// `upsertSidebarMetadata`: only HTTP(S) metadata destinations are accepted.
+    /// Applies the same ``SidebarMetadataURLPolicy`` the control socket used
+    /// when it stored the URL, so a destination it accepted is one this draws
+    /// as a link. The rule used to be a second literal here, tied to the
+    /// socket's only by a comment.
     private static func isAllowedMetadataURL(_ url: URL) -> Bool {
-        guard let scheme = url.scheme?.lowercased() else { return false }
-        return scheme == "http" || scheme == "https"
+        SidebarMetadataURLPolicy(appScheme: AuthEnvironment.callbackScheme).allows(url)
     }
 }
 
