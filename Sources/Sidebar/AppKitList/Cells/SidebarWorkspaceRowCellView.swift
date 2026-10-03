@@ -782,13 +782,18 @@ final class SidebarWorkspaceRowTableCellView: NSTableCellView {
         badgeVisible: Bool,
         spinnerVisible: Bool
     ) {
+        // Same reasoning as the metadata tints: the washed-out treatment exists
+        // so the badge stays legible on a filled selection. .border leaves the
+        // row unfilled, so the accent badge reads fine and stays recognisable.
+        let selectionFillsRow = model.settings.activeTabIndicatorStyle != .border
+        let dimsForSelection = model.isActive && selectionFillsRow
         let badgeFill = cmuxNotificationBadgeNSColor(
             hex: model.settings.notificationBadgeColorHex,
-            fallback: model.isActive
+            fallback: dimsForSelection
                 ? palette.primaryText.withAlphaComponent(0.25)
                 : palette.accentColor
         )
-        let badgeText: NSColor = model.isActive ? palette.primaryText : .white
+        let badgeText: NSColor = dimsForSelection ? palette.primaryText : .white
         let badgeFont = NSFont.systemFont(ofSize: model.scaled(9), weight: .semibold)
 
         let leadingBadgeVisible = badgeVisible && model.settings.notificationBadgePosition == .leading
@@ -921,8 +926,12 @@ final class SidebarWorkspaceRowTableCellView: NSTableCellView {
                 hex: entry.color,
                 isDark: palette.colorScheme == .dark
             )
+            // .border paints no fill, so the selection highlight cannot
+            // swallow an explicit tint -- only the filling styles need the
+            // legacy override.
+            let selectionFillsRow = model.settings.activeTabIndicatorStyle != .border
             let entryColor: NSColor
-            if model.isActive {
+            if model.isActive && selectionFillsRow {
                 entryColor = explicitColor != nil
                     ? palette.selectedForeground(1.0)
                     : palette.secondary(0.95).withAlphaComponent(0.84)
