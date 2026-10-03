@@ -369,6 +369,7 @@ extension Array where Element == CuratedSettingEntry {
                 synonyms: "sidebar.notificationBadgePosition notification unread badge position left right leading trailing side"
             ),
             .init(section: .sidebarAppearance, id: "show-metadata", title: String(localized: "settings.app.showMetadata", defaultValue: "Show Custom Metadata in Sidebar"), synonyms: "Show Custom Metadata in Sidebar sidebar.showCustomMetadata metadata meta report_meta status custom block"),
+            .init(section: .sidebarAppearance, id: "expand-all-metadata", title: String(localized: "settings.app.expandAllMetadata", defaultValue: "Always Show All Custom Metadata"), paths: ["sidebar.expandAllCustomMetadata"], synonyms: "Always Show All Custom Metadata sidebar.expandAllCustomMetadata show more show less expand collapse all metadata rows toggle"),
             .init(
                 section: .sidebarAppearance,
                 id: "compact-agent-status",

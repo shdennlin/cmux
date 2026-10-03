@@ -915,7 +915,13 @@ final class SidebarWorkspaceRowTableCellView: NSTableCellView {
     private func configureMetadata(model: SidebarWorkspaceRowModel, palette: SidebarRowPalette) {
         let allEntries = model.settings.visibleAuxiliaryDetails.showsMetadata
             ? model.snapshot.metadataEntries : []
-        let visible = model.isMetadataExpanded ? allEntries : Array(allEntries.prefix(3))
+        let entryCollapse = SidebarMetadataCollapse(
+            totalCount: allEntries.count,
+            collapsedLimit: SidebarMetadataCollapse.entryLimit,
+            isExpanded: model.isMetadataExpanded,
+            expandsAll: model.settings.expandsAllCustomMetadata
+        )
+        let visible = entryCollapse.visibleItems(of: allEntries)
         Self.pool(&metadataRows, count: visible.count, parent: contentContainer) { SidebarRowIconTextLine() }
         for (index, entry) in visible.enumerated() {
             // Legacy parity: on the selected row an explicit entry color
@@ -949,7 +955,7 @@ final class SidebarWorkspaceRowTableCellView: NSTableCellView {
         }
         let toggleFont = NSFont.systemFont(ofSize: model.scaled(10), weight: .semibold)
         let toggleColor = palette.secondary(0.9, inactiveOpacity: 0.9)
-        metadataToggleButton.isHidden = allEntries.count <= 3
+        metadataToggleButton.isHidden = !entryCollapse.showsToggle
         if !metadataToggleButton.isHidden {
             metadataToggleButton.configure(
                 title: model.isMetadataExpanded
@@ -961,8 +967,14 @@ final class SidebarWorkspaceRowTableCellView: NSTableCellView {
         }
         let allBlocks = model.settings.visibleAuxiliaryDetails.showsMetadata
             ? model.snapshot.metadataBlocks : []
-        let blocks = model.isMarkdownExpanded ? allBlocks : Array(allBlocks.prefix(1))
-        markdownToggleButton.isHidden = allBlocks.count <= 1
+        let blockCollapse = SidebarMetadataCollapse(
+            totalCount: allBlocks.count,
+            collapsedLimit: SidebarMetadataCollapse.blockLimit,
+            isExpanded: model.isMarkdownExpanded,
+            expandsAll: model.settings.expandsAllCustomMetadata
+        )
+        let blocks = blockCollapse.visibleItems(of: allBlocks)
+        markdownToggleButton.isHidden = !blockCollapse.showsToggle
         if !markdownToggleButton.isHidden {
             markdownToggleButton.configure(
                 title: model.isMarkdownExpanded

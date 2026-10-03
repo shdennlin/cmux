@@ -207,6 +207,14 @@ public struct SidebarCatalogSection: SettingCatalogSection {
         userDefaultsKey: "sidebarShowStatusPills"
     )
 
+    /// Draw every custom metadata row instead of collapsing the overflow
+    /// behind Show more / Show less.
+    public let expandAllCustomMetadata = DefaultsKey<Bool>(
+        id: "sidebar.expandAllCustomMetadata",
+        defaultValue: false,
+        userDefaultsKey: "sidebarExpandAllCustomMetadata"
+    )
+
     public let rightMaxWidth = DefaultsKey<Double>(
         id: "sidebar.rightMaxWidth",
         defaultValue: RightSidebarWidthSettings.noOverrideValue,

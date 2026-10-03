@@ -16393,6 +16393,7 @@ struct TabItemView: View, Equatable {
                         activeForegroundColor: activeSecondaryColor(0.95),
                         activeSecondaryForegroundColor: activeSecondaryColor(0.65),
                         fontScale: fontScale,
+                        expandsAll: settings.expandsAllCustomMetadata,
                         onFocus: { updateSelection() }
                     )
                     .transition(.opacity)
@@ -16404,6 +16405,7 @@ struct TabItemView: View, Equatable {
                         activeForegroundColor: activeSecondaryColor(0.8),
                         activeSecondaryForegroundColor: activeSecondaryColor(0.65),
                         fontScale: fontScale,
+                        expandsAll: settings.expandsAllCustomMetadata,
                         onFocus: { updateSelection() }
                     )
                     .transition(.opacity)
@@ -17091,10 +17093,11 @@ private struct SidebarMetadataRows: View {
     let activeForegroundColor: Color
     let activeSecondaryForegroundColor: Color
     let fontScale: CGFloat
+    /// `sidebar.expandAllCustomMetadata`: every entry, no toggle.
+    let expandsAll: Bool
     let onFocus: () -> Void
 
     @State private var isExpanded: Bool = false
-    private let collapsedEntryLimit = 3
 
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
@@ -17124,9 +17127,17 @@ private struct SidebarMetadataRows: View {
         .safeHelp(helpText)
     }
 
+    private var collapse: SidebarMetadataCollapse {
+        SidebarMetadataCollapse(
+            totalCount: entries.count,
+            collapsedLimit: SidebarMetadataCollapse.entryLimit,
+            isExpanded: isExpanded,
+            expandsAll: expandsAll
+        )
+    }
+
     private var visibleEntries: [SidebarStatusEntry] {
-        guard !isExpanded, entries.count > collapsedEntryLimit else { return entries }
-        return Array(entries.prefix(collapsedEntryLimit))
+        collapse.visibleItems(of: entries)
     }
 
     private var helpText: String {
@@ -17135,7 +17146,7 @@ private struct SidebarMetadataRows: View {
     }
 
     private var shouldShowToggle: Bool {
-        entries.count > collapsedEntryLimit
+        collapse.showsToggle
     }
 }
 
@@ -17254,10 +17265,11 @@ private struct SidebarMetadataMarkdownBlocks: View {
     let activeForegroundColor: Color
     let activeSecondaryForegroundColor: Color
     let fontScale: CGFloat
+    /// `sidebar.expandAllCustomMetadata`: every block, no toggle.
+    let expandsAll: Bool
     let onFocus: () -> Void
 
     @State private var isExpanded: Bool = false
-    private let collapsedBlockLimit = 1
 
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
@@ -17286,13 +17298,21 @@ private struct SidebarMetadataMarkdownBlocks: View {
         }
     }
 
+    private var collapse: SidebarMetadataCollapse {
+        SidebarMetadataCollapse(
+            totalCount: blocks.count,
+            collapsedLimit: SidebarMetadataCollapse.blockLimit,
+            isExpanded: isExpanded,
+            expandsAll: expandsAll
+        )
+    }
+
     private var visibleBlocks: [SidebarMetadataBlock] {
-        guard !isExpanded, blocks.count > collapsedBlockLimit else { return blocks }
-        return Array(blocks.prefix(collapsedBlockLimit))
+        collapse.visibleItems(of: blocks)
     }
 
     private var shouldShowToggle: Bool {
-        blocks.count > collapsedBlockLimit
+        collapse.showsToggle
     }
 }
 

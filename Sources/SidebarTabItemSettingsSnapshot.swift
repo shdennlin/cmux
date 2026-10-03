@@ -36,6 +36,9 @@ struct SidebarTabItemSettingsSnapshot: Equatable {
     let brightenInDarkMode: Bool
     let notificationBadgeColorHex: String?
     let visibleAuxiliaryDetails: SidebarWorkspaceAuxiliaryDetailVisibility
+    /// `sidebar.expandAllCustomMetadata`: draw every metadata entry and
+    /// markdown block, with no Show more / Show less toggle.
+    let expandsAllCustomMetadata: Bool
     let iMessageModeEnabled: Bool
     let workspaceTodoChecklistStyle: WorkspaceTodoChecklistStyle
     /// The resolved cmux accent. Rows draw selection, progress, drop
@@ -100,6 +103,7 @@ struct SidebarTabItemSettingsSnapshot: Equatable {
             showPorts: details.showPorts,
             hideAllDetails: hidesAllDetails
         )
+        expandsAllCustomMetadata = settings.value(for: sidebar.expandAllCustomMetadata)
 
         activeTabIndicatorStyle = settings.value(for: workspaceColors.indicatorStyle)
         loadingSpinnerPosition = settings.value(for: sidebar.loadingSpinnerPosition)

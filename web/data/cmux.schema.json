@@ -1740,6 +1740,11 @@
           "default": true,
           "description": "Show custom metadata pills."
         },
+        "expandAllCustomMetadata": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show every custom metadata row instead of the first three status entries and the first markdown block behind a Show more link. Useful when a tool reports one row per agent and every row matters."
+        },
         "compactAgentStatus": {
           "type": "boolean",
           "default": false,
