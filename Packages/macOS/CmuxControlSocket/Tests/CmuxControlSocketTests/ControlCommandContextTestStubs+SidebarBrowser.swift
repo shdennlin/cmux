@@ -27,6 +27,9 @@ extension ControlBrowserPanelContext {
 }
 
 extension ControlSidebarContext {
+    /// The default build's scheme; the metadata URL policy accepts it beside http(s).
+    nonisolated var controlSidebarAppURLScheme: String { "cmux" }
+
     /// Test default for the worker-lane hop primitive: run the body on the
     /// main actor (inline when the test is already there, else a synchronous
     /// dispatch), mirroring the app's `v2MainSync` semantics.

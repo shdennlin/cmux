@@ -145,6 +145,12 @@ public protocol ControlSidebarContext: AnyObject {
     func controlSidebarClearMetadataBlock(tabArg: String?, key: String) -> ControlSidebarClearMetaBlockResolution
 
     /// Whether a raw log level token is valid (`SidebarLogLevel` raw values).
+    /// This build's own URL scheme (`cmux`, `cmux-dev-plus`, ...), which a
+    /// sidebar metadata URL may use besides http(s) so a row can link back
+    /// into cmux. `nonisolated` on purpose: the metadata upsert validates on
+    /// the worker lane and must not take a main hop to read it.
+    nonisolated var controlSidebarAppURLScheme: String { get }
+
     nonisolated func controlSidebarIsValidLogLevel(_ raw: String) -> Bool
 
     /// Appends a log entry (`log`); `false` when the tab can't resolve.
