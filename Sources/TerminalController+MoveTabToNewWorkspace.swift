@@ -175,7 +175,7 @@ extension TerminalController {
                 result = .err(code: "not_found", message: SurfaceSplitOffMessage.sourcePaneNotFound, data: ["surface_id": surfaceId.uuidString])
                 return
             }
-            guard ws.activeBonsplitController.tabs(inPane: sourcePane).count > 1 else {
+            guard ws.bonsplitController(owningPane: sourcePane).tabs(inPane: sourcePane).count > 1 else {
                 result = .err(code: "invalid_state", message: SurfaceSplitOffMessage.wouldEmptySourcePane, data: [
                     "surface_id": surfaceId.uuidString,
                     "pane_id": sourcePane.id.uuidString

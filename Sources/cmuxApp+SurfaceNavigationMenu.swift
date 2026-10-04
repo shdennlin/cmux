@@ -76,6 +76,7 @@ extension cmuxApp {
                     NSSound.beep()
                 }
             }
+            .disabled(!(activeTabManager.selectedWorkspace?.canMoveSurfaceBetweenPanes ?? true))
         }
     }
 }

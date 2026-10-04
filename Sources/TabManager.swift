@@ -472,6 +472,9 @@ class TabManager: ObservableObject {
     private let defaultWorkspaceWorkingDirectoryProvider: () -> String
     let workspaceCustomizationStore: WorkspaceCustomizationStore
     private var lastFocusHistoryIncludesPanesAndTabs: Bool
+    /// Last top tabs setting applied to this manager's workspaces; gates the
+    /// `UserDefaults.didChangeNotification` firehose to real transitions.
+    private var lastTopTabsEnabled: Bool
     let nativeSSHConnectionBroker: NativeSSHConnectionBroker
     let agentChatResumeIntentRecorder: any AgentChatResumeIntentRecording
 
@@ -606,6 +609,7 @@ class TabManager: ObservableObject {
         self.workspaceCustomizationStore = workspaceCustomizationStore ?? WorkspaceCustomizationStore()
         let focusHistoryScopeKey = SettingCatalog().app.focusHistoryIncludesPanesAndTabs
         self.lastFocusHistoryIncludesPanesAndTabs = settings.value(for: focusHistoryScopeKey)
+        self.lastTopTabsEnabled = settings.value(for: SettingCatalog().app.workspaceTopTabs)
         self.focusHistoryNavigation = FocusHistoryModel(
             now: focusHistoryNow,
             navigationScope: {
@@ -762,6 +766,7 @@ class TabManager: ObservableObject {
             MainActor.assumeIsolated { [weak self] in
                 self?.sidebarMetadataSettingsDidChange()
                 self?.focusHistoryScopeSettingsDidChange()
+                self?.topTabsSettingDidChange()
                 self?.refreshTabCloseButtonVisibility()
                 self?.refreshTabBarVisibility()
                 self?.refreshWindowTitle()
@@ -811,6 +816,15 @@ class TabManager: ObservableObject {
         sidebarGitMetadataService.sidebarGitMetadataWatchSettingsDidChange()
         pullRequestProbing.sidebarPullRequestPollingSettingsDidChange()
         refreshRemotePortScanningEnablement()
+    }
+
+    private func topTabsSettingDidChange() {
+        let enabled = settings.value(for: settingsCatalog.app.workspaceTopTabs)
+        guard enabled != lastTopTabsEnabled else { return }
+        lastTopTabsEnabled = enabled
+        for workspace in tabs {
+            workspace.applyTopTabsEnabled(enabled)
+        }
     }
 
     private func focusHistoryScopeSettingsDidChange() {
@@ -2830,11 +2844,19 @@ class TabManager: ObservableObject {
     }
 
     func canCloseOtherTabsInFocusedPane() -> Bool {
-        closeOtherTabsInFocusedPanePlan() != nil
+        if let workspace = selectedWorkspace, workspace.isTopTabsEnabled {
+            return workspace.topTabs.count > 1
+        }
+        return closeOtherTabsInFocusedPanePlan() != nil
     }
 
     func closeOtherTabsInFocusedPaneWithConfirmation() {
         guard !closeConfirmationInFlight else { return }
+        if let workspace = selectedWorkspace, workspace.isTopTabsEnabled {
+            let others = workspace.topTabs.map(\.id).filter { $0 != workspace.selectedTopTabId }
+            closeTopTabsWithConfirmation(others, in: workspace)
+            return
+        }
         guard let plan = closeOtherTabsInFocusedPanePlan() else { return }
 
         let warningStore = CloseTabWarningStore(defaults: closeTabWarningDefaults)
@@ -2862,6 +2884,38 @@ class TabManager: ObservableObject {
         for panelId in plan.panelIds {
             plan.workspace.markCloseHistoryEligible(panelId: panelId)
             _ = plan.workspace.closePanel(panelId, force: true)
+        }
+    }
+
+    /// Closes top tabs, asking first only when one of them runs a process.
+    func closeTopTabsWithConfirmation(_ ids: [UUID], in workspace: Workspace) {
+        guard !closeConfirmationInFlight, !ids.isEmpty else { return }
+        let hasActiveProcess = ids.contains { workspace.topTabNeedsCloseConfirmation($0) }
+        if hasActiveProcess {
+            let warningStore = CloseTabWarningStore(defaults: closeTabWarningDefaults)
+            var warningKinds = warningStore.warningKinds(requiresConfirmation: true, source: .shortcut)
+            warningKinds.insert(.safety)
+            let titles = ids.map { workspace.topTabTitle($0) }
+            let title = ids.count == 1
+                ? String(localized: "dialog.closeTopTab.title", defaultValue: "Close this tab?")
+                : String(localized: "dialog.closeTopTabs.title", defaultValue: "Close \(ids.count) tabs?")
+            let message = String(
+                localized: "dialog.closeTopTab.message",
+                defaultValue: "A process is still running. Closing ends it."
+            )
+            guard confirmClose(
+                title: title,
+                message: message,
+                scrollableDetails: titles.map { "• \($0)" }.joined(separator: "\n"),
+                acceptCmdD: false,
+                dontAskAgain: warningKinds
+            ) else { return }
+        }
+        for id in ids {
+            for panelId in workspace.panelIds(inTopTab: id) {
+                workspace.markCloseHistoryEligible(panelId: panelId)
+            }
+            workspace.closeTopTab(id: id)
         }
     }
 
@@ -3179,9 +3233,9 @@ class TabManager: ObservableObject {
             return nil
         }
 
-        let tabsInPane = workspace.activeBonsplitController.tabs(inPane: paneId)
+        let tabsInPane = workspace.bonsplitController(owningPane: paneId).tabs(inPane: paneId)
         guard !tabsInPane.isEmpty else { return nil }
-        guard let selectedTabId = workspace.activeBonsplitController.selectedTab(inPane: paneId)?.id ?? tabsInPane.first?.id else {
+        guard let selectedTabId = workspace.bonsplitController(owningPane: paneId).selectedTab(inPane: paneId)?.id ?? tabsInPane.first?.id else {
             return nil
         }
 
@@ -3439,7 +3493,7 @@ class TabManager: ObservableObject {
         }
 
         let bonsplitTabCount = tab.activeBonsplitController.allPaneIds.reduce(0) { partial, paneId in
-            partial + tab.activeBonsplitController.tabs(inPane: paneId).count
+            partial + tab.bonsplitController(owningPane: paneId).tabs(inPane: paneId).count
         }
         let panelKind: String = {
             guard let panel = tab.panels[panelId] else { return "missing" }
@@ -3484,8 +3538,8 @@ class TabManager: ObservableObject {
 
         let candidatePane = workspace.activeBonsplitController.focusedPaneId ?? workspace.activeBonsplitController.allPaneIds.first
         if let candidatePane,
-           let selectedTabId = workspace.activeBonsplitController.selectedTab(inPane: candidatePane)?.id
-                ?? workspace.activeBonsplitController.tabs(inPane: candidatePane).first?.id,
+           let selectedTabId = workspace.bonsplitController(owningPane: candidatePane).selectedTab(inPane: candidatePane)?.id
+                ?? workspace.bonsplitController(owningPane: candidatePane).tabs(inPane: candidatePane).first?.id,
            let panelId = workspace.panelIdFromSurfaceId(selectedTabId),
            workspace.panels[panelId] != nil {
             return panelId
@@ -4598,11 +4652,24 @@ class TabManager: ObservableObject {
     /// Create a new terminal surface in the focused pane of the selected workspace
     func newSurface() {
         // Cmd+T should always focus the newly created surface.
+        if let workspace = selectedWorkspace, workspace.isTopTabsEnabled {
+            // A new top tab leaves the current tab's zoom alone.
+            workspace.addTopTab(select: true, inheritingDirectoryFrom: workspace.focusedPanelId)
+            return
+        }
         selectedWorkspace?.clearSplitZoom()
         selectedWorkspace?.newTerminalSurfaceInFocusedPane(focus: true)
     }
 
     func newSurface(initialInput: String) {
+        if let workspace = selectedWorkspace, workspace.isTopTabsEnabled {
+            workspace.addTopTab(
+                select: true,
+                inheritingDirectoryFrom: workspace.focusedPanelId,
+                initialInput: initialInput
+            )
+            return
+        }
         selectedWorkspace?.clearSplitZoom()
         selectedWorkspace?.newTerminalSurfaceInFocusedPane(focus: true, initialInput: initialInput)
     }
@@ -5178,6 +5245,8 @@ class TabManager: ObservableObject {
             closeWorkspace(workspace, recordHistory: false)
             return false
         }
+        // The workspace may have been closed under the other top tabs setting.
+        workspace.applyTopTabsEnabled(settings.value(for: settingsCatalog.app.workspaceTopTabs))
         guard !workspace.panels.isEmpty else {
             closeWorkspace(workspace, recordHistory: false)
             return false
@@ -5287,14 +5356,14 @@ class TabManager: ObservableObject {
         _ snapshot: ClosedBrowserPanelRestoreSnapshot,
         in workspace: Workspace
     ) -> UUID? {
-        if let originalPane = workspace.activeBonsplitController.allPaneIds.first(where: { $0.id == snapshot.originalPaneId }),
+        if let originalPane = workspace.allTopTabPaneIds.first(where: { $0.id == snapshot.originalPaneId }),
            let browserPanel = workspace.newBrowserSurface(
                inPane: originalPane,
                url: snapshot.url,
                focus: true,
                preferredProfileID: snapshot.profileID
            ) {
-            let tabCount = workspace.activeBonsplitController.tabs(inPane: originalPane).count
+            let tabCount = workspace.bonsplitController(owningPane: originalPane).tabs(inPane: originalPane).count
             let maxIndex = max(0, tabCount - 1)
             let targetIndex = min(max(snapshot.originalTabIndex, 0), maxIndex)
             _ = workspace.reorderSurface(panelId: browserPanel.id, toIndex: targetIndex)
@@ -5303,8 +5372,8 @@ class TabManager: ObservableObject {
 
         if let orientation = snapshot.fallbackSplitOrientation,
            let fallbackAnchorPaneId = snapshot.fallbackAnchorPaneId,
-           let anchorPane = workspace.activeBonsplitController.allPaneIds.first(where: { $0.id == fallbackAnchorPaneId }),
-           let anchorTab = workspace.activeBonsplitController.selectedTab(inPane: anchorPane) ?? workspace.activeBonsplitController.tabs(inPane: anchorPane).first,
+           let anchorPane = workspace.allTopTabPaneIds.first(where: { $0.id == fallbackAnchorPaneId }),
+           let anchorTab = workspace.bonsplitController(owningPane: anchorPane).selectedTab(inPane: anchorPane) ?? workspace.bonsplitController(owningPane: anchorPane).tabs(inPane: anchorPane).first,
            let anchorPanelId = workspace.panelIdFromSurfaceId(anchorTab.id),
            let browserPanelId = workspace.withSplitSpaceAdmissionBypass({
                workspace.newBrowserSplit(
@@ -5667,7 +5736,7 @@ class TabManager: ObservableObject {
                     var selectedTerminalSurfaceNilCount = 0
 
                     for paneId in paneIds {
-                        guard let selected = tab.activeBonsplitController.selectedTab(inPane: paneId) else {
+                        guard let selected = tab.bonsplitController(owningPane: paneId).selectedTab(inPane: paneId) else {
                             missingSelectedTabCount += 1
                             continue
                         }
@@ -5722,7 +5791,7 @@ class TabManager: ObservableObject {
                         window.contentView?.displayIfNeeded()
                     }
                     for paneId in tab.activeBonsplitController.allPaneIds {
-                        guard let selected = tab.activeBonsplitController.selectedTab(inPane: paneId),
+                        guard let selected = tab.bonsplitController(owningPane: paneId).selectedTab(inPane: paneId),
                               let terminal = tab.panel(for: selected.id) as? TerminalPanel else {
                             continue
                         }
@@ -5947,8 +6016,8 @@ class TabManager: ObservableObject {
 
             let paneStateTrace: String = {
                 tab.activeBonsplitController.allPaneIds.map { paneId in
-                    let tabs = tab.activeBonsplitController.tabs(inPane: paneId)
-                    let selected = tab.activeBonsplitController.selectedTab(inPane: paneId)
+                    let tabs = tab.bonsplitController(owningPane: paneId).tabs(inPane: paneId)
+                    let selected = tab.bonsplitController(owningPane: paneId).selectedTab(inPane: paneId)
                     let selectedId = selected.map { String(describing: $0.id) } ?? "nil"
                     let selectedPanelId = selected.flatMap { tab.panelIdFromSurfaceId($0.id) }
                     let selectedPanelLive: String = {
@@ -7238,6 +7307,15 @@ extension TabManager {
                 restoredPanelIdsByWorkspaceIndex: restoredPanelIdsByWorkspaceIndex,
                 ambiguousOriginalWorkspaceIds: excludingWorkspaceIds
             )
+        }
+
+        // A session saved under the other top tabs setting is brought in line
+        // here: legacy multi-surface panes split into tabs, or extra tabs move
+        // to their own workspaces.
+        let topTabsEnabled = settings.value(for: settingsCatalog.app.workspaceTopTabs)
+        lastTopTabsEnabled = topTabsEnabled
+        for workspace in tabs {
+            workspace.applyTopTabsEnabled(topTabsEnabled)
         }
 
         if let selectedTabId {

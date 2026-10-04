@@ -222,7 +222,7 @@ struct TerminalPanelView: View {
         }
         // See the resolver in WorkspaceContentView: selectedTab would
         // subscribe this update to every tab title in the pane.
-        return workspace.activeBonsplitController.selectedTabId(inPane: currentPane) == tabId
+        return workspace.bonsplitController(owningPane: currentPane).selectedTabId(inPane: currentPane) == tabId
     }
 
     private var effectiveTerminalAgentContext: String {

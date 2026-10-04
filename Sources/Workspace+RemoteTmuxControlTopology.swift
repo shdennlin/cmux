@@ -392,7 +392,7 @@ extension Workspace {
                 return (remote.pane.panel.id, remote.pane.panel)
             }
             if let paneID = activeBonsplitController.allPaneIds.first(where: { $0.id == requestedPaneID }),
-               let tab = activeBonsplitController.selectedTab(inPane: paneID),
+               let tab = bonsplitController(owningPane: paneID).selectedTab(inPane: paneID),
                let panelID = panelIdFromSurfaceId(tab.id),
                !isRemoteTmuxControlContainer(panelID),
                let panel = terminalPanel(for: panelID) {
@@ -424,7 +424,7 @@ extension Workspace {
             guard let paneID = activeBonsplitController.allPaneIds.first(where: {
                 $0.id == routedPaneID
             }),
-            let selectedTab = activeBonsplitController.selectedTab(inPane: paneID),
+            let selectedTab = bonsplitController(owningPane: paneID).selectedTab(inPane: paneID),
             let panelID = panelIdFromSurfaceId(selectedTab.id) else {
                 return nil
             }

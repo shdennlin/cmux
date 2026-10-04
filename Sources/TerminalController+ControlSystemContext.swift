@@ -202,8 +202,10 @@ extension TerminalController: ControlSystemContext {
         // Dock panes live in separate Bonsplit trees, so they cannot be placed
         // faithfully in this workspace tree. Fail closed when a Dock contributes
         // panes rather than emitting a partial layout whose leaves disagree
-        // with the authoritative flat `panes` array.
+        // with the authoritative flat `panes` array. The same holds for
+        // background top tabs: the layout describes only the visible one.
         let layout = dockPaneSummaries.isEmpty
+            && workspace.allTopTabPaneIds.count == workspace.activeBonsplitController.allPaneIds.count
             ? systemTreeLayoutNode(from: workspace.activeBonsplitController.treeSnapshot())
             : nil
 

@@ -107,8 +107,7 @@ enum BrowserSplitContainer {
         case .workspace(let workspace):
             guard let pane = workspace.activeBonsplitController.allPaneIds.first(
                 where: { $0.id == requestedPaneID }
-            ), let tabID = workspace.activeBonsplitController.selectedTab(
-                inPane: pane
+            ), let tabID = workspace.bonsplitController(owningPane: pane).selectedTab(inPane: pane
             )?.id else {
                 return nil
             }

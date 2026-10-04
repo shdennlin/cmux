@@ -66,8 +66,7 @@ extension Workspace {
             panelTitles[replacementPanel.id] = replacementPanel.displayTitle
             bindSurface(replacementTab.id, toPanelId: replacementPanel.id)
 
-            activeBonsplitController.updateTab(
-                replacementTab.id,
+            bonsplitController(owningTab: replacementTab.id).updateTab(replacementTab.id,
                 title: replacementPanel.displayTitle,
                 icon: .some(replacementPanel.displayIcon),
                 iconImageData: .some(nil),
@@ -82,7 +81,7 @@ extension Workspace {
             publishCmuxSurfaceCreated(replacementPanel.id, paneId: originalPane, kind: "terminal", origin: "placeholder_repair", focused: false)
 
             for extraPlaceholder in placeholderTabs.dropFirst() {
-                activeBonsplitController.closeTab(extraPlaceholder.id)
+                bonsplitController(owningTab: extraPlaceholder.id).closeTab(extraPlaceholder.id)
             }
         } else {
     #if DEBUG
@@ -94,7 +93,7 @@ extension Workspace {
             _ = newTerminalSurface(inPane: originalPane, focus: false)
             for tab in controller.tabs(inPane: originalPane) {
                 if panelIdFromSurfaceId(tab.id) == nil {
-                    activeBonsplitController.closeTab(tab.id)
+                    bonsplitController(owningTab: tab.id).closeTab(tab.id)
                 }
             }
         }

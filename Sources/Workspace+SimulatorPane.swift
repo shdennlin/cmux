@@ -62,7 +62,7 @@ extension Workspace {
         panels[panel.id] = panel
         panelTitles[panel.id] = panel.displayTitle
 
-        guard let tabId = activeBonsplitController.createTab(
+        guard let tabId = bonsplitController(owningPane: paneId).createTab(
             title: panel.displayTitle,
             icon: panel.displayIcon,
             kind: SurfaceKind.simulator.rawValue,
@@ -79,7 +79,7 @@ extension Workspace {
 
         bindSurface(tabId, toPanelId: panel.id)
         if let targetIndex {
-            _ = activeBonsplitController.reorderTab(tabId, toIndex: targetIndex)
+            _ = bonsplitController(owningTab: tabId).reorderTab(tabId, toIndex: targetIndex)
         }
         publishCmuxSurfaceCreated(
             panel.id,
@@ -90,8 +90,8 @@ extension Workspace {
         )
 
         if shouldFocus {
-            activeBonsplitController.focusPane(paneId)
-            activeBonsplitController.selectTab(tabId)
+            bonsplitController(owningPane: paneId).focusPane(paneId)
+            bonsplitController(owningTab: tabId).selectTab(tabId)
             applyTabSelection(tabId: tabId, inPane: paneId)
         } else if let previousFocusedPanelId {
             preserveFocusAfterNonFocusSplit(
@@ -120,7 +120,7 @@ extension Workspace {
               !isRemoteTmuxMirror,
               let sourceTabId = surfaceIdFromPanelId(panelId),
               let sourcePaneId = activeBonsplitController.allPaneIds.first(where: { paneId in
-                  activeBonsplitController.tabs(inPane: paneId).contains(where: { $0.id == sourceTabId })
+                  bonsplitController(owningPane: paneId).tabs(inPane: paneId).contains(where: { $0.id == sourceTabId })
               }),
               admitsSplitSpacePreflight(
                   splitting: sourcePaneId,
@@ -152,8 +152,7 @@ extension Workspace {
         isProgrammaticSplit = true
         defer { isProgrammaticSplit = false }
         guard let newPaneId = withSplitSpaceDividerPosition(initialDividerPosition, {
-            activeBonsplitController.splitPane(
-                sourcePaneId,
+            bonsplitController(owningPane: sourcePaneId).splitPane(sourcePaneId,
                 orientation: orientation,
                 withTab: tab,
                 insertFirst: insertFirst,

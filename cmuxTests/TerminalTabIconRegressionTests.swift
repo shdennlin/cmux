@@ -43,6 +43,30 @@ struct TerminalTabIconRegressionTests {
         try expectNoAgentMark(workspace: workspace, panel: panel, tabId: tabId)
     }
 
+    // With top tabs on, a tab in a background top tab belongs to a controller
+    // that is not the active one. Its mark has to land there all the same, or
+    // the tab keeps looking like a plain terminal while an agent runs in it.
+    @MainActor
+    @Test func agentInBackgroundTopTabGetsItsMark() throws {
+        let workspace = Workspace()
+        let backgroundPanel = try #require(workspace.focusedTerminalPanel)
+        let backgroundTabId = try #require(workspace.surfaceIdFromPanelId(backgroundPanel.id))
+        let backgroundController = workspace.topTabs[0].controller
+        _ = try #require(workspace.addTopTab(select: true, inheritingDirectoryFrom: backgroundPanel.id))
+        #expect(workspace.activeBonsplitController !== backgroundController)
+        let expectedAsset = try #require(TerminalTabAgentIconResolver().assetName(forStatusKey: "claude_code"))
+
+        workspace.updatePanelShellActivityState(panelId: backgroundPanel.id, state: .commandRunning)
+        workspace.recordAgentPID(
+            key: "claude_code.background-top-tab",
+            pid: pid_t(ProcessInfo.processInfo.processIdentifier),
+            panelId: backgroundPanel.id,
+            refreshPorts: false
+        )
+
+        #expect(backgroundController.tab(backgroundTabId)?.iconAsset == expectedAsset)
+    }
+
     // #13299: a tab whose title merely looks like an agent command gets no
     // agent mark. Only a detected agent process or a running restored agent
     // names the tab.

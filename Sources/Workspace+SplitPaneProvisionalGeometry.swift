@@ -37,8 +37,8 @@ extension Workspace {
                 in: activeBonsplitController.treeSnapshot()
               ),
               let transactionID = UUID(uuidString: split.id) else { return }
-        let originalTabs = activeBonsplitController.tabs(inPane: originalPane)
-        let newTabs = activeBonsplitController.tabs(inPane: newPane)
+        let originalTabs = bonsplitController(owningPane: originalPane).tabs(inPane: originalPane)
+        let newTabs = bonsplitController(owningPane: newPane).tabs(inPane: newPane)
         let originalTerminals = presentedTerminalHostedViews(forTabs: originalTabs)
         let newTerminals = presentedTerminalHostedViews(forTabs: newTabs)
         // The base is a terminal that was presented in the original pane. When

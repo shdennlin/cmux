@@ -44,10 +44,13 @@ extension Workspace {
     /// Reconciles a terminal tab's provider mark after agent lifecycle state changes.
     func syncTerminalTabAgentIconAsset(forPanelId panelId: UUID) {
         guard panels[panelId] is TerminalPanel,
-              let tabID = surfaceIdFromPanelId(panelId),
-              let tab = activeBonsplitController.tab(tabID) else { return }
+              let tabID = surfaceIdFromPanelId(panelId) else { return }
+        // The owning controller, not the active one: with top tabs a background
+        // tab's surface lives in a controller that is not active.
+        let controller = bonsplitController(containing: panelId) ?? activeBonsplitController
+        guard let tab = controller.tab(tabID) else { return }
         let asset = terminalTabAgentIconAsset(forPanelId: panelId)
         guard tab.iconAsset != asset else { return }
-        activeBonsplitController.updateTab(tabID, iconAsset: .some(asset))
+        controller.updateTab(tabID, iconAsset: .some(asset))
     }
 }

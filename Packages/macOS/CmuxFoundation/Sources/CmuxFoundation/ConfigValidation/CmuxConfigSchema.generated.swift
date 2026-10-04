@@ -791,6 +791,11 @@ enum CmuxEmbeddedConfigSchema {
           "default": false,
           "description": "When true, creating a split resizes the panes in that split's row or column to equal sizes. When false, a new split halves the pane it was created from."
         },
+        "workspaceTopTabs": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true, each workspace shows tabs above its split area and every tab owns its own split layout, so Split divides only the current tab. When false, a workspace has one split layout with tabs inside each pane."
+        },
         "preferredEditor": {
           "type": "string",
           "default": "",

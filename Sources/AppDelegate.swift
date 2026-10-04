@@ -5860,7 +5860,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         guard destinationWorkspace.acceptsSurface(from: sourceWorkspace, panelID: panelId) else { return false }
 
         let resolvedTargetPane = targetPane.flatMap { pane in
-            destinationWorkspace.activeBonsplitController.allPaneIds.first(where: { $0 == pane })
+            destinationWorkspace.allTopTabPaneIds.first(where: { $0 == pane })
         } ?? destinationWorkspace.activeBonsplitController.focusedPaneId
             ?? destinationWorkspace.activeBonsplitController.allPaneIds.first
 
@@ -6877,7 +6877,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         focus: Bool
     ) {
         let rollbackPane = sourcePane.flatMap { pane in
-            workspace.activeBonsplitController.allPaneIds.first(where: { $0 == pane })
+            workspace.allTopTabPaneIds.first(where: { $0 == pane })
         } ?? workspace.activeBonsplitController.focusedPaneId
             ?? workspace.activeBonsplitController.allPaneIds.first
         guard let rollbackPane else { return }
@@ -12105,7 +12105,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
         for (workspaceIndex, workspace) in workspaces.enumerated() {
             for paneId in workspace.activeBonsplitController.allPaneIds {
-                for tab in workspace.activeBonsplitController.tabs(inPane: paneId) {
+                for tab in workspace.bonsplitController(owningPane: paneId).tabs(inPane: paneId) {
                     guard let panelId = workspace.panelIdFromSurfaceId(tab.id),
                           workspace.panel(for: tab.id) is TerminalPanel else {
                         continue
@@ -12878,11 +12878,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             ?? workspace.activeBonsplitController.allPaneIds.first
         guard let trackedPaneId else { return }
 
-        let titles: [String] = workspace.activeBonsplitController.tabs(inPane: trackedPaneId).compactMap { tab in
+        let titles: [String] = workspace.bonsplitController(owningPane: trackedPaneId).tabs(inPane: trackedPaneId).compactMap { tab in
             guard let panelId = workspace.panelIdFromSurfaceId(tab.id) else { return nil }
             return workspace.panelTitle(panelId: panelId)
         }
-        let selectedTitle = workspace.activeBonsplitController.selectedTab(inPane: trackedPaneId)
+        let selectedTitle = workspace.bonsplitController(owningPane: trackedPaneId).selectedTab(inPane: trackedPaneId)
             .flatMap { workspace.panelIdFromSurfaceId($0.id) }
             .flatMap { workspace.panelTitle(panelId: $0) } ?? ""
 
@@ -13128,7 +13128,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         var browserPane: PaneID?
         var terminalPane: PaneID?
         for paneId in paneIds {
-            guard let selected = tab.activeBonsplitController.selectedTab(inPane: paneId),
+            guard let selected = tab.bonsplitController(owningPane: paneId).selectedTab(inPane: paneId),
                   let panelId = tab.panelIdFromSurfaceId(selected.id) else { continue }
             if panelId == browserPanelId {
                 browserPane = paneId

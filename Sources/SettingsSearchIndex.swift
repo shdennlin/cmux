@@ -260,6 +260,7 @@ enum SettingsSearchIndex {
         "app.workspaceInheritWorkingDirectory": settingID(for: .app, idSuffix: "workspace-inherit-working-directory"),
         "app.minimalMode": settingID(for: .app, idSuffix: "minimal-mode"),
         "app.keepWorkspaceOpenWhenClosingLastSurface": settingID(for: .app, idSuffix: "keep-workspace-open"),
+        "app.workspaceTopTabs": settingID(for: .app, idSuffix: "workspace-top-tabs"),
         "app.focusPaneOnFirstClick": settingID(for: .app, idSuffix: "focus-pane-first-click"),
         "app.paneResizeStepPixels": settingID(for: .keyboardShortcuts, idSuffix: "pane-resize-step"),
         "fileDrop.defaultBehavior": settingID(for: .app, idSuffix: "file-drops"),

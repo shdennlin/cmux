@@ -89,7 +89,7 @@ private struct WorkspacePanelContentHostView: View {
                 // selectedTabId, not selectedTab: building a Tab reads every
                 // TabItem property, which subscribes this update to the tab's
                 // title. Portal ownership only needs identity.
-                return workspace.activeBonsplitController.selectedTabId(inPane: paneId) == tabId
+                return workspace.bonsplitController(owningPane: paneId).selectedTabId(inPane: paneId) == tabId
             },
             onFocus: onFocus,
             onRequestPanelFocus: onRequestPanelFocus,
@@ -226,7 +226,7 @@ struct WorkspaceContentView: View {
             workspace.activeBonsplitController.onFileDrop = { [weak workspace] urls, paneId in
                 guard let workspace else { return false }
                 // Find the focused panel in this pane and drop the files into it.
-                guard let tabId = workspace.activeBonsplitController.selectedTab(inPane: paneId)?.id,
+                guard let tabId = workspace.bonsplitController(owningPane: paneId).selectedTab(inPane: paneId)?.id,
                       let panelId = workspace.panelIdFromSurfaceId(tabId),
                       let panel = workspace.terminalInputTarget(forPanelID: panelId)?.panel else { return false }
                 return panel.hostedView.handleDroppedURLs(urls)
@@ -246,7 +246,7 @@ struct WorkspaceContentView: View {
                 // Gated focus for the ring/active state only: the main pane yields
                 // its focus ring while the right sidebar (Dock) owns focus.
                 let isFocused = isFocusedPanel && !rightSidebarOwnsInputFocus
-                let selectedTab = workspace.activeBonsplitController.selectedTab(inPane: paneId)
+                let selectedTab = workspace.bonsplitController(owningPane: paneId).selectedTab(inPane: paneId)
                 let isSelectedInPane = selectedTab?.id == tab.id
                 let isVisibleInUI = Self.panelVisibleInUI(
                     isWorkspaceVisible: isWorkspaceVisible,
@@ -339,7 +339,7 @@ struct WorkspaceContentView: View {
                         onTriggerFlash: { workspace.triggerDebugFlash(panelId: panel.id) }
                     )
                     .onTapGesture {
-                        workspace.activeBonsplitController.focusPane(paneId)
+                        workspace.bonsplitController(owningPane: paneId).focusPane(paneId)
                     }
                 }
             } else if workspace.cloudVMID != nil {
@@ -351,7 +351,7 @@ struct WorkspaceContentView: View {
             // Empty pane content
             EmptyPanelView(workspace: workspace, paneId: paneId)
                 .onTapGesture {
-                    workspace.activeBonsplitController.focusPane(paneId)
+                    workspace.bonsplitController(owningPane: paneId).focusPane(paneId)
                 }
         }
         .internalOnlyTabDrag()
@@ -437,7 +437,12 @@ struct WorkspaceContentView: View {
                     appearance: appearance, windowAppearance: windowAppearance
                 )
             } else {
-                bonsplitView
+                VStack(spacing: 0) {
+                    if workspace.isTopTabsEnabled && workspace.topTabs.count > 1 {
+                        WorkspaceTopTabStripView(workspace: workspace)
+                    }
+                    bonsplitView
+                }
             }
         }
         .overlay {
@@ -462,7 +467,7 @@ struct WorkspaceContentView: View {
         let workspaceManualUnreadPanelId = workspace.representativePanelIdForWorkspaceManualUnread()
 
         for paneId in workspace.activeBonsplitController.allPaneIds {
-            for tab in workspace.activeBonsplitController.tabs(inPane: paneId) {
+            for tab in workspace.bonsplitController(owningPane: paneId).tabs(inPane: paneId) {
                 let panelId = workspace.panelIdFromSurfaceId(tab.id)
                 let expectedKind = panelId.flatMap { workspace.panelKind(panelId: $0) }
                 let expectedPinned = panelId.map { workspace.isPanelPinned($0) } ?? false
@@ -482,8 +487,7 @@ struct WorkspaceContentView: View {
                 if tab.showsNotificationBadge != shouldShow ||
                     tab.isPinned != expectedPinned ||
                     (expectedKind != nil && tab.kind != expectedKind) {
-                    workspace.activeBonsplitController.updateTab(
-                        tab.id,
+                    workspace.bonsplitController(owningTab: tab.id).updateTab(tab.id,
                         kind: kindUpdate,
                         showsNotificationBadge: shouldShow,
                         isPinned: expectedPinned
@@ -494,7 +498,10 @@ struct WorkspaceContentView: View {
     }
 
     private var splitZoomRenderIdentity: String {
-        workspace.activeBonsplitController.zoomedPaneId.map { "zoom:\($0.id.uuidString)" } ?? "unzoomed"
+        // The selected top tab is part of the identity: switching tabs swaps
+        // the controller, so the Bonsplit subtree is rebuilt for the new tab.
+        let zoom = workspace.activeBonsplitController.zoomedPaneId.map { "zoom:\($0.id.uuidString)" } ?? "unzoomed"
+        return "\(workspace.selectedTopTabId.uuidString):\(zoom)"
     }
 
     static let tmuxPaneOverlayGeometry = TmuxPaneOverlayGeometry(
@@ -804,7 +811,7 @@ struct EmptyPanelView: View {
     }
 
     private func focusPane() {
-        workspace.activeBonsplitController.focusPane(paneId)
+        workspace.bonsplitController(owningPane: paneId).focusPane(paneId)
     }
 
     private func createTerminal() {
