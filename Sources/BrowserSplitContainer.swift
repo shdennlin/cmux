@@ -105,9 +105,9 @@ enum BrowserSplitContainer {
     private func selectedPanelID(inPane requestedPaneID: UUID) -> UUID? {
         switch self {
         case .workspace(let workspace):
-            guard let pane = workspace.bonsplitController.allPaneIds.first(
+            guard let pane = workspace.activeBonsplitController.allPaneIds.first(
                 where: { $0.id == requestedPaneID }
-            ), let tabID = workspace.bonsplitController.selectedTab(
+            ), let tabID = workspace.activeBonsplitController.selectedTab(
                 inPane: pane
             )?.id else {
                 return nil
@@ -130,7 +130,7 @@ enum BrowserSplitContainer {
         case .workspace(let workspace):
             return BrowserRightSidePaneResolver().preferredPane(
                 from: sourcePane,
-                in: workspace.bonsplitController
+                in: workspace.activeBonsplitController
             )
         case .dock(let dock):
             return BrowserRightSidePaneResolver().preferredPane(

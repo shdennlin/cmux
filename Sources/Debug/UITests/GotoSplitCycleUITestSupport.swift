@@ -69,7 +69,7 @@ struct GotoSplitCycleUITestSupport {
             writeData([
                 "paneCount": String(allPaneIds.count),
                 "allPaneIds": allPaneIds.joined(separator: ","),
-                "focusedPaneId": tab.bonsplitController.focusedPaneId?.description ?? "",
+                "focusedPaneId": tab.activeBonsplitController.focusedPaneId?.description ?? "",
                 "ghosttyGotoSplitPreviousShortcut": previousShortcutDisplay,
                 "ghosttyGotoSplitNextShortcut": nextShortcutDisplay,
                 "setupComplete": "true",
@@ -110,7 +110,7 @@ struct GotoSplitCycleUITestSupport {
 
     private func stateSnapshot(for workspace: Workspace) -> [String: String] {
         var updates: [String: String] = [
-            "focusedPaneId": workspace.bonsplitController.focusedPaneId?.description ?? ""
+            "focusedPaneId": workspace.activeBonsplitController.focusedPaneId?.description ?? ""
         ]
 
         if let focusedPanelId = workspace.focusedPanelId {

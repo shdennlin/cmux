@@ -22,7 +22,7 @@ extension Workspace {
         var unsupportedSurfaceCount = 0
         let baseCwd = currentDirectory
         let root = try captureLayoutNode(
-            from: bonsplitController.treeSnapshot(),
+            from: activeBonsplitController.treeSnapshot(),
             baseCwd: baseCwd,
             unsupportedSurfaceCount: &unsupportedSurfaceCount
         )
@@ -86,7 +86,7 @@ extension Workspace {
         }
         var surfaces: [CmuxSurfaceDefinition] = []
         surfaces.reserveCapacity(max(pane.tabs.count, 1))
-        for tab in bonsplitController.tabs(inPane: PaneID(id: paneUUID)) {
+        for tab in activeBonsplitController.tabs(inPane: PaneID(id: paneUUID)) {
             guard let panelId = panelIdFromSurfaceId(tab.id),
                   let panel = panels[panelId] else {
                 unsupportedSurfaceCount += 1

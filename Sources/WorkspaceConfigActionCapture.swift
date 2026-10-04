@@ -94,7 +94,7 @@ extension Workspace {
                 ttyDeviceByPanelId[panelId] = device
             }
         }
-        let layoutSnapshot = bonsplitController.treeSnapshot()
+        let layoutSnapshot = activeBonsplitController.treeSnapshot()
         let liveCommandsByTTY = try await TerminalForegroundCommandCapture.liveCommands(
             forTTYDevices: Set(ttyDeviceByPanelId.values)
         )
@@ -160,10 +160,10 @@ extension Workspace {
                 return nil
             }
         case .pane(let pane):
-            guard let paneId = bonsplitController.allPaneIds.first(where: { $0.id.uuidString == pane.id }) else {
+            guard let paneId = activeBonsplitController.allPaneIds.first(where: { $0.id.uuidString == pane.id }) else {
                 return nil
             }
-            let surfaces = bonsplitController.tabs(inPane: paneId).compactMap { tab -> CmuxSurfaceDefinition? in
+            let surfaces = activeBonsplitController.tabs(inPane: paneId).compactMap { tab -> CmuxSurfaceDefinition? in
                 guard let panelId = panelIdFromSurfaceId(tab.id) else { return nil }
                 return configCaptureSurfaceDefinition(
                     panelId: panelId,

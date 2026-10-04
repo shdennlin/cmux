@@ -105,7 +105,7 @@ struct BrowserEphemeralRestorationTests {
     func sessionSnapshotExcludesNonPersistentBrowser() throws {
         let manager = TabManager()
         let workspace = try #require(manager.selectedWorkspace)
-        let pane = try #require(workspace.bonsplitController.focusedPaneId)
+        let pane = try #require(workspace.activeBonsplitController.focusedPaneId)
         let browser = try #require(workspace.newBrowserSurface(
             inPane: pane,
             url: URL(string: "https://example.com/authenticated-handoff"),
@@ -121,7 +121,7 @@ struct BrowserEphemeralRestorationTests {
     @Test
     func duplicatePreservesNonPersistentStore() throws {
         let workspace = Workspace()
-        let paneID = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
         let websiteDataStore = WKWebsiteDataStore.nonPersistent()
         let browserPanel = try #require(workspace.newBrowserSurface(
             inPane: paneID,
@@ -165,7 +165,7 @@ struct BrowserEphemeralRestorationTests {
         let expectedURL = try #require(
             URL(string: "https://example.com/authenticated-handoff")
         )
-        let paneID = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
         let browserPanel = try #require(workspace.newBrowserSurface(
             inPane: paneID,
             url: expectedURL,
@@ -173,18 +173,18 @@ struct BrowserEphemeralRestorationTests {
             websiteDataStore: .nonPersistent()
         ))
         let tabID = try #require(workspace.surfaceIdFromPanelId(browserPanel.id))
-        let tab = try #require(workspace.bonsplitController.tab(tabID))
+        let tab = try #require(workspace.activeBonsplitController.tab(tabID))
         var legacySnapshot: ClosedBrowserPanelRestoreSnapshot?
         workspace.onClosedBrowserPanel = { legacySnapshot = $0 }
         workspace.markCloseHistoryEligible(panelId: browserPanel.id)
 
         #expect(workspace.splitTabBar(
-            workspace.bonsplitController,
+            workspace.activeBonsplitController,
             shouldCloseTab: tab,
             inPane: paneID
         ))
         workspace.splitTabBar(
-            workspace.bonsplitController,
+            workspace.activeBonsplitController,
             didCloseTab: tabID,
             fromPane: paneID
         )

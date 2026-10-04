@@ -56,7 +56,7 @@ struct WorkspaceCreationWorkingDirectorySpawnPolicyTests {
         let fixture = try InheritanceFixture(GhosttyWorkingDirectoryInheritance(tab: false))
         defer { fixture.tearDown() }
         let workspace = try fixture.sourceWorkspace()
-        let pane = try #require(workspace.bonsplitController.focusedPaneId)
+        let pane = try #require(workspace.activeBonsplitController.focusedPaneId)
         let source = try #require(workspace.focusedTerminalPanel).id
 
         let tab = workspace.newTerminalSurface(inPane: pane, inheritWorkingDirectoryFallback: true)
@@ -75,7 +75,7 @@ struct WorkspaceCreationWorkingDirectorySpawnPolicyTests {
         let fixture = try InheritanceFixture(GhosttyWorkingDirectoryInheritance(split: false))
         defer { fixture.tearDown() }
         let workspace = try fixture.sourceWorkspace()
-        let pane = try #require(workspace.bonsplitController.focusedPaneId)
+        let pane = try #require(workspace.activeBonsplitController.focusedPaneId)
         let source = try #require(workspace.focusedTerminalPanel).id
 
         let splitPanel = fixture.manager.createSplitOutcome(

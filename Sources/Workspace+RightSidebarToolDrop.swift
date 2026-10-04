@@ -13,7 +13,7 @@ extension Workspace {
         switch destination {
         case .insert(let pane, _), .split(let pane, _, _): target = pane
         }
-        guard bonsplitController.allPaneIds.contains(target) else { return false }
+        guard activeBonsplitController.allPaneIds.contains(target) else { return false }
         if case .split(let pane, let orientation, _) = destination,
            !admitsSplitSpacePreflight(splitting: pane, orientation: orientation) {
             return false
@@ -24,14 +24,14 @@ extension Workspace {
         let placed: Bool
         switch destination {
         case .insert(let pane, let index):
-            placed = bonsplitController.moveTab(tab, toPane: pane, atIndex: index)
+            placed = activeBonsplitController.moveTab(tab, toPane: pane, atIndex: index)
         case .split(let pane, let orientation, let insertFirst):
-            placed = bonsplitController.splitPane(
+            placed = activeBonsplitController.splitPane(
                 pane, orientation: orientation, movingTab: tab, insertFirst: insertFirst
             ) != nil
         }
         guard placed else {
-            if existing == nil { _ = bonsplitController.closeTab(tab) }
+            if existing == nil { _ = activeBonsplitController.closeTab(tab) }
             return false
         }
         clearSplitZoom()

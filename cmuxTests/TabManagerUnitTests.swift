@@ -655,7 +655,7 @@ final class TabManagerChildExitCloseTests: XCTestCase {
         XCTAssertTrue(workspace.isRemoteTerminalSurface(remotePanelId))
         XCTAssertEqual(workspace.remoteConnectionState, .connected)
 
-        XCTAssertTrue(workspace.bonsplitController.closePane(remotePaneId))
+        XCTAssertTrue(workspace.activeBonsplitController.closePane(remotePaneId))
         drainMainQueue()
         drainMainQueue()
 
@@ -1173,7 +1173,7 @@ final class TabManagerPullRequestProbeTests: XCTestCase {
         let manager = TabManager(workspaceGitMetadataReader: reader)
         guard let workspace = manager.selectedWorkspace,
               let mainPanelId = workspace.focusedPanelId,
-              let paneId = workspace.bonsplitController.focusedPaneId,
+              let paneId = workspace.activeBonsplitController.focusedPaneId,
               let splitPanel = workspace.newTerminalSplit(from: mainPanelId, orientation: .horizontal, focus: false),
               let tabPanel = workspace.newTerminalSurface(inPane: paneId) else {
             XCTFail("Expected selected workspace with three terminal panels")
@@ -2284,7 +2284,7 @@ final class TabManagerCloseCurrentPanelTests: XCTestCase {
                 return
             }
 
-            XCTAssertFalse(workspace.bonsplitController.configuration.allowCloseTabs)
+            XCTAssertFalse(workspace.activeBonsplitController.configuration.allowCloseTabs)
         }
     }
 
@@ -2312,7 +2312,7 @@ final class TabManagerCloseCurrentPanelTests: XCTestCase {
         try withCloseTabUserDefaults(warnBeforeClosingTab: true, hideTabCloseButton: false) {
             let manager = TabManager()
             guard let workspace = manager.selectedWorkspace,
-                  let paneId = workspace.bonsplitController.focusedPaneId,
+                  let paneId = workspace.activeBonsplitController.focusedPaneId,
                   let initialPanelId = workspace.focusedPanelId,
                   let initialTerminalPanel = workspace.terminalPanel(for: initialPanelId),
                   workspace.newTerminalSurface(inPane: paneId, focus: false) != nil,
@@ -2330,12 +2330,12 @@ final class TabManagerCloseCurrentPanelTests: XCTestCase {
             var promptCount = 0
             manager.confirmCloseHandler = { _, _, _ in
                 promptCount += 1
-                workspace.bonsplitController.delegate = vetoingDelegate
+                workspace.activeBonsplitController.delegate = vetoingDelegate
                 return true
             }
 
             workspace.markExplicitClose(surfaceId: initialSurfaceId)
-            _ = workspace.bonsplitController.closeTab(initialSurfaceId)
+            _ = workspace.activeBonsplitController.closeTab(initialSurfaceId)
             wait(for: [retryRejected], timeout: 5)
             // The confirmation session ends on a later main-queue turn; a close
             // issued before then is dropped as "confirmation in flight".
@@ -2350,7 +2350,7 @@ final class TabManagerCloseCurrentPanelTests: XCTestCase {
 
             // A later close of the still-open tab must ask again instead of
             // reusing the stale force-close entry.
-            workspace.bonsplitController.delegate = workspace
+            workspace.activeBonsplitController.delegate = workspace
             let secondPrompt = expectation(description: "second close prompts again")
             manager.confirmCloseHandler = { _, _, _ in
                 promptCount += 1
@@ -2358,7 +2358,7 @@ final class TabManagerCloseCurrentPanelTests: XCTestCase {
                 return false
             }
             workspace.markExplicitClose(surfaceId: initialSurfaceId)
-            _ = workspace.bonsplitController.closeTab(initialSurfaceId)
+            _ = workspace.activeBonsplitController.closeTab(initialSurfaceId)
             wait(for: [secondPrompt], timeout: 5)
 
             XCTAssertEqual(promptCount, 2)
@@ -2395,7 +2395,7 @@ final class TabManagerCloseCurrentPanelTests: XCTestCase {
                 return
             }
 
-            XCTAssertFalse(workspace.bonsplitController.configuration.allowCloseTabs)
+            XCTAssertFalse(workspace.activeBonsplitController.configuration.allowCloseTabs)
         }
     }
 
@@ -2408,11 +2408,11 @@ final class TabManagerCloseCurrentPanelTests: XCTestCase {
                 return
             }
 
-            XCTAssertTrue(workspace.bonsplitController.configuration.allowCloseTabs)
+            XCTAssertTrue(workspace.activeBonsplitController.configuration.allowCloseTabs)
             defaults.set(true, forKey: AppCatalogSection().hideTabCloseButton.userDefaultsKey)
             manager.refreshTabCloseButtonVisibility()
 
-            XCTAssertFalse(workspace.bonsplitController.configuration.allowCloseTabs)
+            XCTAssertFalse(workspace.activeBonsplitController.configuration.allowCloseTabs)
         }
     }
 
@@ -2737,7 +2737,7 @@ final class TabManagerCloseCurrentPanelTests: XCTestCase {
         // Give the workspace a second surface so the shortcut closes the
         // surface itself, which is what this test is about.
         guard let workspace = manager.selectedWorkspace,
-              let paneId = workspace.bonsplitController.focusedPaneId,
+              let paneId = workspace.activeBonsplitController.focusedPaneId,
               let initialPanelId = workspace.focusedPanelId,
               let initialTerminalPanel = workspace.terminalPanel(for: initialPanelId),
               workspace.newTerminalSurface(inPane: paneId, focus: false) != nil else {
@@ -2781,7 +2781,7 @@ final class TabManagerCloseCurrentPanelTests: XCTestCase {
         try withWarnBeforeClosingTabConfig(warnBeforeClosingTab) {
             let manager = TabManager()
             guard let workspace = manager.selectedWorkspace,
-                  let paneId = workspace.bonsplitController.focusedPaneId,
+                  let paneId = workspace.activeBonsplitController.focusedPaneId,
                   let initialPanelId = workspace.focusedPanelId,
                   let initialTerminalPanel = workspace.terminalPanel(for: initialPanelId),
                   workspace.newTerminalSurface(inPane: paneId, focus: false) != nil else {
@@ -2869,7 +2869,7 @@ final class TabManagerCloseCurrentPanelTests: XCTestCase {
         ) {
             let manager = TabManager()
             guard let workspace = manager.selectedWorkspace,
-                  let paneId = workspace.bonsplitController.focusedPaneId,
+                  let paneId = workspace.activeBonsplitController.focusedPaneId,
                   let initialPanelId = workspace.focusedPanelId,
                   let initialTerminalPanel = workspace.terminalPanel(for: initialPanelId),
                   workspace.newTerminalSurface(inPane: paneId, focus: false) != nil,
@@ -2891,7 +2891,7 @@ final class TabManagerCloseCurrentPanelTests: XCTestCase {
             } else {
                 workspace.markExplicitClose(surfaceId: initialSurfaceId)
             }
-            _ = workspace.bonsplitController.closeTab(initialSurfaceId)
+            _ = workspace.activeBonsplitController.closeTab(initialSurfaceId)
             drainMainQueue()
             drainMainQueue()
             drainMainQueue()
@@ -3023,14 +3023,14 @@ final class TabManagerNotificationFocusTests: XCTestCase {
 
         workspace.focusPanel(leftPanelId)
         XCTAssertTrue(workspace.toggleSplitZoom(panelId: leftPanelId), "Expected split zoom to enable")
-        XCTAssertTrue(workspace.bonsplitController.isSplitZoomed, "Expected workspace to start zoomed")
+        XCTAssertTrue(workspace.activeBonsplitController.isSplitZoomed, "Expected workspace to start zoomed")
 
         XCTAssertTrue(manager.focusTabFromNotification(workspace.id, surfaceId: rightPanel.id))
         drainMainQueue()
         drainMainQueue()
 
         XCTAssertFalse(
-            workspace.bonsplitController.isSplitZoomed,
+            workspace.activeBonsplitController.isSplitZoomed,
             "Expected notification focus to exit split zoom so the target pane becomes visible"
         )
         XCTAssertEqual(workspace.focusedPanelId, rightPanel.id, "Expected notification target panel to be focused")
@@ -3050,7 +3050,7 @@ final class TabManagerNotificationFocusTests: XCTestCase {
         let manager = TabManager()
         guard let workspace = manager.selectedWorkspace,
               let firstPanelId = workspace.focusedPanelId,
-              let firstPaneId = workspace.bonsplitController.focusedPaneId,
+              let firstPaneId = workspace.activeBonsplitController.focusedPaneId,
               workspace.newTerminalSplit(from: firstPanelId, orientation: .horizontal) != nil,
               let secondTabPanel = workspace.newTerminalSurface(inPane: firstPaneId, focus: true) else {
             XCTFail("Expected split workspace with two tabs in the first pane")
@@ -3059,7 +3059,7 @@ final class TabManagerNotificationFocusTests: XCTestCase {
 
         XCTAssertEqual(workspace.focusedPanelId, secondTabPanel.id)
         XCTAssertTrue(workspace.toggleSplitZoom(panelId: secondTabPanel.id), "Expected split zoom to enable")
-        XCTAssertTrue(workspace.bonsplitController.isSplitZoomed, "Expected workspace to start zoomed")
+        XCTAssertTrue(workspace.activeBonsplitController.isSplitZoomed, "Expected workspace to start zoomed")
 
         XCTAssertTrue(workspace.closePanel(secondTabPanel.id, force: true), "Expected selected tab close to succeed")
         drainMainQueue()
@@ -3070,20 +3070,20 @@ final class TabManagerNotificationFocusTests: XCTestCase {
         // (https://github.com/manaflow-ai/cmux/issues/8363). Zoom state itself
         // is covered by WorkspaceSplitZoomTabCloseTests.
         XCTAssertTrue(
-            workspace.bonsplitController.isSplitZoomed,
+            workspace.activeBonsplitController.isSplitZoomed,
             "Closing one tab of a zoomed pane that still has tabs must keep the pane zoomed"
         )
         XCTAssertTrue(
             workspace.toggleSplitZoom(panelId: firstPanelId),
             "The surviving tab should still control the zoom"
         )
-        XCTAssertFalse(workspace.bonsplitController.isSplitZoomed)
+        XCTAssertFalse(workspace.activeBonsplitController.isSplitZoomed)
     }
 
     func testClosingUnselectedTabPreservesTheSelectedTab() {
         let manager = TabManager()
         guard let workspace = manager.selectedWorkspace,
-              let paneId = workspace.bonsplitController.focusedPaneId,
+              let paneId = workspace.activeBonsplitController.focusedPaneId,
               let selectedPanel = workspace.newTerminalSurface(inPane: paneId, focus: true),
               let closedPanel = workspace.newTerminalSurface(
                   inPane: paneId,
@@ -3109,7 +3109,7 @@ final class TabManagerNotificationFocusTests: XCTestCase {
     func testClosingUnselectedTabInUnfocusedPanePreservesItsSelection() {
         let manager = TabManager()
         guard let workspace = manager.selectedWorkspace,
-              let firstPane = workspace.bonsplitController.focusedPaneId,
+              let firstPane = workspace.activeBonsplitController.focusedPaneId,
               let selectedPanel = workspace.newTerminalSurface(inPane: firstPane, focus: true),
               let closedPanel = workspace.newTerminalSurface(
                   inPane: firstPane,
@@ -3117,23 +3117,23 @@ final class TabManagerNotificationFocusTests: XCTestCase {
                   preserveBonsplitSelectionWhenUnfocused: true
               ),
               workspace.newTerminalSplit(from: selectedPanel.id, orientation: .horizontal) != nil,
-              let secondPane = workspace.bonsplitController.allPaneIds.first(where: { $0 != firstPane }) else {
+              let secondPane = workspace.activeBonsplitController.allPaneIds.first(where: { $0 != firstPane }) else {
             XCTFail("Expected two panes with multiple tabs in the first pane")
             return
         }
 
-        workspace.bonsplitController.focusPane(secondPane)
-        XCTAssertEqual(workspace.bonsplitController.selectedTab(inPane: firstPane)?.id, workspace.surfaceIdFromPanelId(selectedPanel.id))
+        workspace.activeBonsplitController.focusPane(secondPane)
+        XCTAssertEqual(workspace.activeBonsplitController.selectedTab(inPane: firstPane)?.id, workspace.surfaceIdFromPanelId(selectedPanel.id))
         XCTAssertTrue(workspace.closePanel(closedPanel.id, force: true))
         drainMainQueue()
         drainMainQueue()
 
         XCTAssertEqual(
-            workspace.bonsplitController.selectedTab(inPane: firstPane)?.id,
+            workspace.activeBonsplitController.selectedTab(inPane: firstPane)?.id,
             workspace.surfaceIdFromPanelId(selectedPanel.id),
             "Closing a tab in an unfocused pane must preserve that pane's selection"
         )
-        XCTAssertEqual(workspace.bonsplitController.focusedPaneId, secondPane)
+        XCTAssertEqual(workspace.activeBonsplitController.focusedPaneId, secondPane)
     }
 
     func testFocusTabFromNotificationDismissesUnreadWithDismissFlash() {
@@ -3268,7 +3268,7 @@ final class TabManagerSurfaceCreationTests: XCTestCase {
         let manager = TabManager()
         guard let workspace = manager.selectedWorkspace,
               let initialPanel = workspace.focusedTerminalPanel,
-              let paneId = workspace.bonsplitController.focusedPaneId else {
+              let paneId = workspace.activeBonsplitController.focusedPaneId else {
             XCTFail("Expected initial terminal workspace")
             return
         }
@@ -3318,7 +3318,7 @@ final class TabManagerSurfaceCreationTests: XCTestCase {
         let manager = TabManager()
         guard let workspace = manager.selectedWorkspace,
               let initialPanel = workspace.focusedTerminalPanel,
-              let paneId = workspace.bonsplitController.focusedPaneId,
+              let paneId = workspace.activeBonsplitController.focusedPaneId,
               let newTabPanel = workspace.newTerminalSurface(inPane: paneId, focus: true) else {
             XCTFail("Expected initial and new terminal panels")
             return
@@ -3355,7 +3355,7 @@ final class TabManagerSurfaceCreationTests: XCTestCase {
         let manager = TabManager()
         guard let workspace = manager.selectedWorkspace,
               let initialPanel = workspace.focusedTerminalPanel,
-              let paneId = workspace.bonsplitController.focusedPaneId,
+              let paneId = workspace.activeBonsplitController.focusedPaneId,
               let newTabPanel = workspace.newTerminalSurface(inPane: paneId, focus: true) else {
             XCTFail("Expected initial and new terminal panels")
             return
@@ -3390,7 +3390,7 @@ final class TabManagerSurfaceCreationTests: XCTestCase {
     func testOpenBrowserInsertAtEndPlacesNewBrowserAtPaneEnd() {
         let manager = TabManager()
         guard let workspace = manager.selectedWorkspace,
-              let paneId = workspace.bonsplitController.focusedPaneId else {
+              let paneId = workspace.activeBonsplitController.focusedPaneId else {
             XCTFail("Expected focused workspace and pane")
             return
         }
@@ -3403,7 +3403,7 @@ final class TabManagerSurfaceCreationTests: XCTestCase {
             return
         }
 
-        let tabs = workspace.bonsplitController.tabs(inPane: paneId)
+        let tabs = workspace.activeBonsplitController.tabs(inPane: paneId)
         guard let lastSurfaceId = tabs.last?.id else {
             XCTFail("Expected at least one surface in pane")
             return
@@ -3431,7 +3431,7 @@ final class TabManagerSurfaceCreationTests: XCTestCase {
         XCTAssertFalse(browserPanel.isOmnibarVisible)
 
         let otherBrowser = workspace.newBrowserSurface(
-            inPane: workspace.paneId(forPanelId: browserPanelId) ?? workspace.bonsplitController.allPaneIds[0],
+            inPane: workspace.paneId(forPanelId: browserPanelId) ?? workspace.activeBonsplitController.allPaneIds[0],
             focus: true
         )
         XCTAssertTrue(otherBrowser?.isOmnibarVisible ?? false)
@@ -3448,7 +3448,7 @@ final class TabManagerSurfaceCreationTests: XCTestCase {
             return
         }
         workspace.focusPanel(sourcePanelId)
-        let sourcePaneBefore = workspace.bonsplitController.focusedPaneId
+        let sourcePaneBefore = workspace.activeBonsplitController.focusedPaneId
 
         guard let browserPanel = workspace.newBrowserSurface(
             inPane: rightPaneId,
@@ -3462,14 +3462,14 @@ final class TabManagerSurfaceCreationTests: XCTestCase {
         }
 
         XCTAssertEqual(workspace.focusedPanelId, sourcePanelId)
-        XCTAssertEqual(workspace.bonsplitController.focusedPaneId, sourcePaneBefore)
-        XCTAssertEqual(workspace.bonsplitController.selectedTab(inPane: rightPaneId)?.id, browserSurfaceId)
+        XCTAssertEqual(workspace.activeBonsplitController.focusedPaneId, sourcePaneBefore)
+        XCTAssertEqual(workspace.activeBonsplitController.selectedTab(inPane: rightPaneId)?.id, browserSurfaceId)
         XCTAssertFalse(browserPanel.isOmnibarVisible)
     }
 
     func testDuplicateBrowserPreservesDiffViewerChromeAndProxyBypass() throws {
         let workspace = Workspace()
-        let paneId = try XCTUnwrap(workspace.bonsplitController.focusedPaneId)
+        let paneId = try XCTUnwrap(workspace.activeBonsplitController.focusedPaneId)
         let url = try XCTUnwrap(URL(string: "http://127.0.0.1:49152/token/diff.html#cmux-diff-viewer"))
         let browserPanel = try XCTUnwrap(
             workspace.newBrowserSurface(
@@ -3486,7 +3486,7 @@ final class TabManagerSurfaceCreationTests: XCTestCase {
 
         let duplicate = try XCTUnwrap(workspace.duplicateBrowserToRight(panelId: browserPanel.id, focus: false))
         let duplicateTabId = try XCTUnwrap(workspace.surfaceIdFromPanelId(duplicate.id))
-        let duplicateTab = try XCTUnwrap(workspace.bonsplitController.tab(duplicateTabId))
+        let duplicateTab = try XCTUnwrap(workspace.activeBonsplitController.tab(duplicateTabId))
 
         XCTAssertFalse(duplicate.isOmnibarVisible)
         XCTAssertTrue(duplicate.bypassesRemoteWorkspaceProxyForTabDuplication)
@@ -3496,34 +3496,34 @@ final class TabManagerSurfaceCreationTests: XCTestCase {
 
     func testBrowserAudioMuteContextActionTogglesPanelAndTabState() throws {
         let workspace = Workspace()
-        let paneId = try XCTUnwrap(workspace.bonsplitController.focusedPaneId)
+        let paneId = try XCTUnwrap(workspace.activeBonsplitController.focusedPaneId)
         let browserPanel = try XCTUnwrap(workspace.newBrowserSurface(inPane: paneId, focus: true))
         let tabId = try XCTUnwrap(workspace.surfaceIdFromPanelId(browserPanel.id))
         guard browserPanel.setMuted(false) else {
             throw XCTSkip("WKWebView page-audio mute selector is unavailable")
         }
 
-        let initialTab = try XCTUnwrap(workspace.bonsplitController.tab(tabId))
+        let initialTab = try XCTUnwrap(workspace.activeBonsplitController.tab(tabId))
         workspace.splitTabBar(
-            workspace.bonsplitController,
+            workspace.activeBonsplitController,
             didRequestTabContextAction: .toggleAudioMute,
             for: initialTab,
             inPane: paneId
         )
 
         XCTAssertTrue(browserPanel.isMuted)
-        XCTAssertTrue(try XCTUnwrap(workspace.bonsplitController.tab(tabId)).isAudioMuted)
+        XCTAssertTrue(try XCTUnwrap(workspace.activeBonsplitController.tab(tabId)).isAudioMuted)
 
-        let mutedTab = try XCTUnwrap(workspace.bonsplitController.tab(tabId))
+        let mutedTab = try XCTUnwrap(workspace.activeBonsplitController.tab(tabId))
         workspace.splitTabBar(
-            workspace.bonsplitController,
+            workspace.activeBonsplitController,
             didRequestTabContextAction: .toggleAudioMute,
             for: mutedTab,
             inPane: paneId
         )
 
         XCTAssertFalse(browserPanel.isMuted)
-        XCTAssertFalse(try XCTUnwrap(workspace.bonsplitController.tab(tabId)).isAudioMuted)
+        XCTAssertFalse(try XCTUnwrap(workspace.activeBonsplitController.tab(tabId)).isAudioMuted)
     }
 
     func testOpenBrowserInWorkspaceSplitRightSelectsTargetWorkspaceAndCreatesSplit() {
@@ -3539,7 +3539,7 @@ final class TabManagerSurfaceCreationTests: XCTestCase {
 
         let targetWorkspace = manager.addWorkspace(select: false)
         manager.selectWorkspace(initialWorkspace)
-        let initialPaneCount = targetWorkspace.bonsplitController.allPaneIds.count
+        let initialPaneCount = targetWorkspace.activeBonsplitController.allPaneIds.count
         let initialPanelCount = targetWorkspace.panels.count
 
         guard let browserPanelId = manager.openBrowser(
@@ -3554,7 +3554,7 @@ final class TabManagerSurfaceCreationTests: XCTestCase {
 
         XCTAssertEqual(manager.selectedTabId, targetWorkspace.id, "Expected target workspace to become selected")
         XCTAssertEqual(
-            targetWorkspace.bonsplitController.allPaneIds.count,
+            targetWorkspace.activeBonsplitController.allPaneIds.count,
             initialPaneCount + 1,
             "Expected split-right browser open to create a new pane"
         )
@@ -3586,7 +3586,7 @@ final class TabManagerSurfaceCreationTests: XCTestCase {
             return
         }
 
-        let initialPaneCount = workspace.bonsplitController.allPaneIds.count
+        let initialPaneCount = workspace.activeBonsplitController.allPaneIds.count
 
         guard let browserPanelId = manager.openBrowser(
             inWorkspace: workspace.id,
@@ -3599,7 +3599,7 @@ final class TabManagerSurfaceCreationTests: XCTestCase {
         }
 
         XCTAssertEqual(
-            workspace.bonsplitController.allPaneIds.count,
+            workspace.activeBonsplitController.allPaneIds.count,
             initialPaneCount,
             "Expected split-right browser open to reuse existing panes"
         )
@@ -3609,7 +3609,7 @@ final class TabManagerSurfaceCreationTests: XCTestCase {
             "Expected browser to open in the top-right pane when multiple splits already exist"
         )
 
-        let targetPaneTabs = workspace.bonsplitController.tabs(inPane: topRightPaneId)
+        let targetPaneTabs = workspace.activeBonsplitController.tabs(inPane: topRightPaneId)
         guard let lastSurfaceId = targetPaneTabs.last?.id else {
             XCTFail("Expected top-right pane to contain tabs")
             return
@@ -3651,7 +3651,7 @@ final class TabManagerEqualizeSplitsTests: XCTestCase {
 
         XCTAssertTrue(manager.equalizeSplits(tabId: workspace.id), "Expected equalize splits command to succeed")
 
-        guard case .split(let root) = workspace.bonsplitController.treeSnapshot() else {
+        guard case .split(let root) = workspace.activeBonsplitController.treeSnapshot() else {
             XCTFail("Expected horizontal root split")
             return
         }
@@ -3699,7 +3699,7 @@ final class TabManagerEqualizeSplitsTests: XCTestCase {
 
         XCTAssertTrue(manager.equalizeSplits(tabId: workspace.id), "Expected equalize splits command to succeed")
 
-        guard case .split(let root) = workspace.bonsplitController.treeSnapshot(),
+        guard case .split(let root) = workspace.activeBonsplitController.treeSnapshot(),
               case .split(let rightColumn) = root.second else {
             XCTFail("Expected three-pane same-axis split tree")
             return
@@ -3744,7 +3744,7 @@ final class TabManagerEqualizeSplitsTests: XCTestCase {
 
         XCTAssertTrue(manager.equalizeSplits(tabId: workspace.id), "Expected equalize splits command to succeed")
 
-        guard case .split(let root) = workspace.bonsplitController.treeSnapshot(),
+        guard case .split(let root) = workspace.activeBonsplitController.treeSnapshot(),
               case .split(let leftStack) = root.first else {
             XCTFail("Expected browser beside a vertically stacked terminal subtree")
             return
@@ -3798,7 +3798,7 @@ final class TabManagerEqualizeSplitsTests: XCTestCase {
 
         XCTAssertTrue(manager.equalizeSplits(tabId: workspace.id), "Expected equalize splits command to succeed")
 
-        guard case .split(let root) = workspace.bonsplitController.treeSnapshot(),
+        guard case .split(let root) = workspace.activeBonsplitController.treeSnapshot(),
               case .split(let leftStack) = root.first,
               case .split(let topRow) = leftStack.first else {
             XCTFail("Expected browser beside a mixed nested terminal subtree")
@@ -3860,15 +3860,15 @@ final class TabManagerEqualizeSplitsOnCreateTests: XCTestCase {
         let top = try XCTUnwrap(workspace.focusedPanelId)
         let bottom = try XCTUnwrap(manager.createSplit(tabId: workspace.id, surfaceId: top, direction: .down))
 
-        let verticalRoot = try XCTUnwrap(splitNode(workspace.bonsplitController.treeSnapshot()))
+        let verticalRoot = try XCTUnwrap(splitNode(workspace.activeBonsplitController.treeSnapshot()))
         XCTAssertEqual(verticalRoot.orientation, "vertical")
         let verticalSplitId = try XCTUnwrap(UUID(uuidString: verticalRoot.id))
-        XCTAssertTrue(workspace.bonsplitController.setDividerPosition(0.3, forSplit: verticalSplitId, fromExternal: true))
+        XCTAssertTrue(workspace.activeBonsplitController.setDividerPosition(0.3, forSplit: verticalSplitId, fromExternal: true))
 
         let middle = try XCTUnwrap(manager.createSplit(tabId: workspace.id, surfaceId: bottom, direction: .right))
         XCTAssertNotNil(manager.createSplit(tabId: workspace.id, surfaceId: middle, direction: .right))
 
-        let root = try XCTUnwrap(splitNode(workspace.bonsplitController.treeSnapshot()))
+        let root = try XCTUnwrap(splitNode(workspace.activeBonsplitController.treeSnapshot()))
         XCTAssertEqual(root.orientation, "vertical")
         XCTAssertEqual(root.dividerPosition, 0.3, accuracy: 0.000_1, "A horizontal split must not move vertical dividers")
         let bottomRow = try XCTUnwrap(splitNode(root.second))
@@ -3884,15 +3884,15 @@ final class TabManagerEqualizeSplitsOnCreateTests: XCTestCase {
         let bottom = try XCTUnwrap(manager.createSplit(tabId: workspace.id, surfaceId: top, direction: .down))
         XCTAssertNotNil(manager.createSplit(tabId: workspace.id, surfaceId: top, direction: .right))
 
-        let beforeRoot = try XCTUnwrap(splitNode(workspace.bonsplitController.treeSnapshot()))
+        let beforeRoot = try XCTUnwrap(splitNode(workspace.activeBonsplitController.treeSnapshot()))
         let topRow = try XCTUnwrap(splitNode(beforeRoot.first))
         XCTAssertEqual(topRow.orientation, "horizontal")
         let topRowId = try XCTUnwrap(UUID(uuidString: topRow.id))
-        XCTAssertTrue(workspace.bonsplitController.setDividerPosition(0.2, forSplit: topRowId, fromExternal: true))
+        XCTAssertTrue(workspace.activeBonsplitController.setDividerPosition(0.2, forSplit: topRowId, fromExternal: true))
 
         XCTAssertNotNil(manager.createSplit(tabId: workspace.id, surfaceId: bottom, direction: .right))
 
-        let root = try XCTUnwrap(splitNode(workspace.bonsplitController.treeSnapshot()))
+        let root = try XCTUnwrap(splitNode(workspace.activeBonsplitController.treeSnapshot()))
         let topRowAfter = try XCTUnwrap(splitNode(root.first))
         XCTAssertEqual(topRowAfter.dividerPosition, 0.2, accuracy: 0.000_1, "A split in the bottom row must not reset the top row")
         let bottomRow = try XCTUnwrap(splitNode(root.second))
@@ -3906,7 +3906,7 @@ final class TabManagerEqualizeSplitsOnCreateTests: XCTestCase {
         let first = try XCTUnwrap(workspace.focusedPanelId)
         XCTAssertNotNil(manager.newSplit(tabId: workspace.id, surfaceId: first, direction: .right, initialDividerPosition: 0.25))
 
-        let root = try XCTUnwrap(splitNode(workspace.bonsplitController.treeSnapshot()))
+        let root = try XCTUnwrap(splitNode(workspace.activeBonsplitController.treeSnapshot()))
         XCTAssertEqual(root.dividerPosition, 0.25, accuracy: 0.000_1)
     }
 
@@ -3917,7 +3917,7 @@ final class TabManagerEqualizeSplitsOnCreateTests: XCTestCase {
         let first = try XCTUnwrap(workspace.focusedPanelId)
         let second = try XCTUnwrap(manager.createSplit(tabId: workspace.id, surfaceId: first, direction: .right))
         XCTAssertNotNil(manager.createSplit(tabId: workspace.id, surfaceId: second, direction: .right))
-        return try XCTUnwrap(splitNode(workspace.bonsplitController.treeSnapshot()))
+        return try XCTUnwrap(splitNode(workspace.activeBonsplitController.treeSnapshot()))
     }
 
     private func splitNode(_ node: ExternalTreeNode) -> ExternalSplitNode? {
@@ -3937,14 +3937,14 @@ final class TabManagerResizeSplitsTests: XCTestCase {
             return
         }
 
-        guard let split = splitNodes(in: workspace.bonsplitController.treeSnapshot()).first,
+        guard let split = splitNodes(in: workspace.activeBonsplitController.treeSnapshot()).first,
               let splitId = UUID(uuidString: split.id) else {
             XCTFail("Expected a split node in tree snapshot")
             return
         }
 
         XCTAssertTrue(
-            workspace.bonsplitController.setDividerPosition(0.5, forSplit: splitId),
+            workspace.activeBonsplitController.setDividerPosition(0.5, forSplit: splitId),
             "Expected to seed divider position"
         )
 
@@ -3953,7 +3953,7 @@ final class TabManagerResizeSplitsTests: XCTestCase {
             "Expected resizeSplit to succeed for the right edge of the left pane"
         )
 
-        guard let updatedSplit = splitNodes(in: workspace.bonsplitController.treeSnapshot()).first else {
+        guard let updatedSplit = splitNodes(in: workspace.activeBonsplitController.treeSnapshot()).first else {
             XCTFail("Expected updated split node in tree snapshot")
             return
         }
@@ -3974,14 +3974,14 @@ final class TabManagerResizeSplitsTests: XCTestCase {
             return
         }
 
-        guard let split = splitNodes(in: workspace.bonsplitController.treeSnapshot()).first,
+        guard let split = splitNodes(in: workspace.activeBonsplitController.treeSnapshot()).first,
               let splitId = UUID(uuidString: split.id) else {
             XCTFail("Expected a split node in tree snapshot")
             return
         }
 
         XCTAssertTrue(
-            workspace.bonsplitController.setDividerPosition(0.5, forSplit: splitId),
+            workspace.activeBonsplitController.setDividerPosition(0.5, forSplit: splitId),
             "Expected to seed divider position"
         )
 
@@ -3990,7 +3990,7 @@ final class TabManagerResizeSplitsTests: XCTestCase {
             "Expected resizeSplit to succeed for the left edge of the right pane"
         )
 
-        guard let updatedSplit = splitNodes(in: workspace.bonsplitController.treeSnapshot()).first else {
+        guard let updatedSplit = splitNodes(in: workspace.activeBonsplitController.treeSnapshot()).first else {
             XCTFail("Expected updated split node in tree snapshot")
             return
         }
@@ -4011,14 +4011,14 @@ final class TabManagerResizeSplitsTests: XCTestCase {
             return
         }
 
-        guard let split = splitNodes(in: workspace.bonsplitController.treeSnapshot()).first,
+        guard let split = splitNodes(in: workspace.activeBonsplitController.treeSnapshot()).first,
               let splitId = UUID(uuidString: split.id) else {
             XCTFail("Expected a split node in tree snapshot")
             return
         }
 
         XCTAssertTrue(
-            workspace.bonsplitController.setDividerPosition(0.5, forSplit: splitId),
+            workspace.activeBonsplitController.setDividerPosition(0.5, forSplit: splitId),
             "Expected to seed divider position"
         )
 
@@ -4027,7 +4027,7 @@ final class TabManagerResizeSplitsTests: XCTestCase {
             "Expected resizeSplit to succeed for the bottom edge of the top pane"
         )
 
-        guard let updatedSplit = splitNodes(in: workspace.bonsplitController.treeSnapshot()).first else {
+        guard let updatedSplit = splitNodes(in: workspace.activeBonsplitController.treeSnapshot()).first else {
             XCTFail("Expected updated split node in tree snapshot")
             return
         }
@@ -4048,14 +4048,14 @@ final class TabManagerResizeSplitsTests: XCTestCase {
             return
         }
 
-        guard let split = splitNodes(in: workspace.bonsplitController.treeSnapshot()).first,
+        guard let split = splitNodes(in: workspace.activeBonsplitController.treeSnapshot()).first,
               let splitId = UUID(uuidString: split.id) else {
             XCTFail("Expected a split node in tree snapshot")
             return
         }
 
         XCTAssertTrue(
-            workspace.bonsplitController.setDividerPosition(0.5, forSplit: splitId),
+            workspace.activeBonsplitController.setDividerPosition(0.5, forSplit: splitId),
             "Expected to seed divider position"
         )
 
@@ -4064,7 +4064,7 @@ final class TabManagerResizeSplitsTests: XCTestCase {
             "Expected resizeSplit to succeed for the top edge of the bottom pane"
         )
 
-        guard let updatedSplit = splitNodes(in: workspace.bonsplitController.treeSnapshot()).first else {
+        guard let updatedSplit = splitNodes(in: workspace.activeBonsplitController.treeSnapshot()).first else {
             XCTFail("Expected updated split node in tree snapshot")
             return
         }
@@ -4085,7 +4085,7 @@ final class TabManagerResizeSplitsTests: XCTestCase {
             return
         }
 
-        guard let split = splitNodes(in: workspace.bonsplitController.treeSnapshot()).first else {
+        guard let split = splitNodes(in: workspace.activeBonsplitController.treeSnapshot()).first else {
             XCTFail("Expected a split node in tree snapshot")
             return
         }
@@ -4095,7 +4095,7 @@ final class TabManagerResizeSplitsTests: XCTestCase {
             "Expected resizeSplit to fail when the pane has no adjacent border in that direction"
         )
 
-        guard let updatedSplit = splitNodes(in: workspace.bonsplitController.treeSnapshot()).first else {
+        guard let updatedSplit = splitNodes(in: workspace.activeBonsplitController.treeSnapshot()).first else {
             XCTFail("Expected updated split node in tree snapshot")
             return
         }
@@ -4111,14 +4111,14 @@ final class TabManagerResizeSplitsTests: XCTestCase {
             return
         }
 
-        guard let split = splitNodes(in: workspace.bonsplitController.treeSnapshot()).first,
+        guard let split = splitNodes(in: workspace.activeBonsplitController.treeSnapshot()).first,
               let splitId = UUID(uuidString: split.id) else {
             XCTFail("Expected a split node in tree snapshot")
             return
         }
 
         XCTAssertTrue(
-            workspace.bonsplitController.setDividerPosition(0.89, forSplit: splitId),
+            workspace.activeBonsplitController.setDividerPosition(0.89, forSplit: splitId),
             "Expected to seed divider position near upper bound"
         )
 
@@ -4127,7 +4127,7 @@ final class TabManagerResizeSplitsTests: XCTestCase {
             "Expected resizeSplit to clamp instead of failing"
         )
 
-        guard let updatedSplit = splitNodes(in: workspace.bonsplitController.treeSnapshot()).first else {
+        guard let updatedSplit = splitNodes(in: workspace.activeBonsplitController.treeSnapshot()).first else {
             XCTFail("Expected updated split node in tree snapshot")
             return
         }
@@ -4144,14 +4144,14 @@ final class TabManagerResizeSplitsTests: XCTestCase {
             return
         }
 
-        guard let split = splitNodes(in: workspace.bonsplitController.treeSnapshot()).first,
+        guard let split = splitNodes(in: workspace.activeBonsplitController.treeSnapshot()).first,
               let splitId = UUID(uuidString: split.id) else {
             XCTFail("Expected a split node in tree snapshot")
             return
         }
 
         XCTAssertTrue(
-            workspace.bonsplitController.setDividerPosition(0.11, forSplit: splitId),
+            workspace.activeBonsplitController.setDividerPosition(0.11, forSplit: splitId),
             "Expected to seed divider position near lower bound"
         )
 
@@ -4160,7 +4160,7 @@ final class TabManagerResizeSplitsTests: XCTestCase {
             "Expected resizeSplit to clamp instead of failing"
         )
 
-        guard let updatedSplit = splitNodes(in: workspace.bonsplitController.treeSnapshot()).first else {
+        guard let updatedSplit = splitNodes(in: workspace.activeBonsplitController.treeSnapshot()).first else {
             XCTFail("Expected updated split node in tree snapshot")
             return
         }
@@ -4418,10 +4418,10 @@ final class TabManagerReopenClosedBrowserFocusTests: XCTestCase {
     func testStandardBrowserTabCloseStagesRestoreSnapshot() {
         let workspace = Workspace()
         let expectedURL = URL(string: "https://example.com/standard-close")
-        guard let paneId = workspace.bonsplitController.focusedPaneId,
+        guard let paneId = workspace.activeBonsplitController.focusedPaneId,
               let browserPanel = workspace.newBrowserSurface(inPane: paneId, url: expectedURL, focus: false),
               let tabId = workspace.surfaceIdFromPanelId(browserPanel.id),
-              let tab = workspace.bonsplitController.tab(tabId) else {
+              let tab = workspace.activeBonsplitController.tab(tabId) else {
             XCTFail("Expected browser panel setup")
             return
         }
@@ -4431,8 +4431,8 @@ final class TabManagerReopenClosedBrowserFocusTests: XCTestCase {
             closedSnapshot = snapshot
         }
 
-        XCTAssertTrue(workspace.splitTabBar(workspace.bonsplitController, shouldCloseTab: tab, inPane: paneId))
-        workspace.splitTabBar(workspace.bonsplitController, didCloseTab: tabId, fromPane: paneId)
+        XCTAssertTrue(workspace.splitTabBar(workspace.activeBonsplitController, shouldCloseTab: tab, inPane: paneId))
+        workspace.splitTabBar(workspace.activeBonsplitController, didCloseTab: tabId, fromPane: paneId)
 
         XCTAssertEqual(closedSnapshot?.workspaceId, workspace.id)
         XCTAssertEqual(closedSnapshot?.url, expectedURL)
@@ -4442,10 +4442,10 @@ final class TabManagerReopenClosedBrowserFocusTests: XCTestCase {
     func testTemporaryDiffViewerTabCloseDoesNotStageRestoreSnapshot() throws {
         let workspace = Workspace()
         let diffViewerURL = try XCTUnwrap(URL(string: "http://127.0.0.1:49152/token/diff.html#cmux-diff-viewer"))
-        guard let paneId = workspace.bonsplitController.focusedPaneId,
+        guard let paneId = workspace.activeBonsplitController.focusedPaneId,
               let browserPanel = workspace.newBrowserSurface(inPane: paneId, url: diffViewerURL, focus: false),
               let tabId = workspace.surfaceIdFromPanelId(browserPanel.id),
-              let tab = workspace.bonsplitController.tab(tabId) else {
+              let tab = workspace.activeBonsplitController.tab(tabId) else {
             XCTFail("Expected diff viewer browser panel setup")
             return
         }
@@ -4455,8 +4455,8 @@ final class TabManagerReopenClosedBrowserFocusTests: XCTestCase {
             closedSnapshot = snapshot
         }
 
-        XCTAssertTrue(workspace.splitTabBar(workspace.bonsplitController, shouldCloseTab: tab, inPane: paneId))
-        workspace.splitTabBar(workspace.bonsplitController, didCloseTab: tabId, fromPane: paneId)
+        XCTAssertTrue(workspace.splitTabBar(workspace.activeBonsplitController, shouldCloseTab: tab, inPane: paneId))
+        workspace.splitTabBar(workspace.activeBonsplitController, didCloseTab: tabId, fromPane: paneId)
 
         XCTAssertNil(closedSnapshot)
     }
@@ -4539,7 +4539,7 @@ final class TabManagerReopenClosedBrowserFocusTests: XCTestCase {
         let manager = TabManager()
         let expectedURL = URL(string: "https://example.com/newer-legacy-browser")
         let workspace = try XCTUnwrap(manager.selectedWorkspace)
-        let paneId = try XCTUnwrap(workspace.bonsplitController.focusedPaneId)
+        let paneId = try XCTUnwrap(workspace.activeBonsplitController.focusedPaneId)
         var olderPanelSnapshot = try XCTUnwrap(workspace.sessionSnapshot(includeScrollback: false).panels.first)
         olderPanelSnapshot.customTitle = "Older Stored Panel"
         ClosedItemHistoryStore.shared.push(ClosedItemHistoryRecord(

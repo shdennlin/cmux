@@ -14,7 +14,7 @@ extension Workspace {
     func updateTerminalSharingPresence(panelId: UUID, snapshot: TerminalSharingSnapshot?) {
         guard let tabId = surfaceIdFromPanelId(panelId) else { return }
         let presence = snapshot.flatMap { TerminalSharingDisplay(snapshot: $0).tabPresence() }
-        bonsplitController.updateTab(tabId, presence: .some(presence))
+        activeBonsplitController.updateTab(tabId, presence: .some(presence))
     }
 
     /// Handles a size action from a terminal tab's context menu or accessory.

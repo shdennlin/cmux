@@ -225,7 +225,7 @@ struct SSHRemoteCWDRegressionTests {
     @Test @MainActor
     func remoteTerminalSplitInheritsStartupWorkingDirectoryBeforeCwdReport() throws {
         let workspace = makeRemoteWorkspace(relayPort: 64019)
-        let paneID = try #require(workspace.bonsplitController.allPaneIds.first)
+        let paneID = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let sourceDirectory = "/srv/cmux/startup-before-report"
         let sourcePanel = try #require(workspace.newTerminalSurface(
             inPane: paneID, focus: true, initialCommand: "cmux ssh-pty-attach",
@@ -252,7 +252,7 @@ struct SSHRemoteCWDRegressionTests {
     @Test @MainActor
     func remoteTerminalSurfaceRespectsWorkingDirectoryFallbackFlag() throws {
         let workspace = makeRemoteWorkspace(relayPort: 64018)
-        let paneID = try #require(workspace.bonsplitController.allPaneIds.first)
+        let paneID = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let sourcePanelID = try #require(workspace.focusedTerminalPanel?.id)
         #expect(workspace.updateRemotePanelDirectory(panelId: sourcePanelID, directory: "/srv/cmux/selected"))
         let withoutFallback = try #require(workspace.newTerminalSurface(inPane: paneID, focus: false, inheritWorkingDirectoryFallback: false))
@@ -273,7 +273,7 @@ struct SSHRemoteCWDRegressionTests {
         let sourcePanelID = try #require(workspace.focusedTerminalPanel?.id)
         let splitPanel = try #require(workspace.newTerminalSplit(from: sourcePanelID, orientation: .vertical, focus: false))
         #expect(splitPanel.surface.startupEnvironmentValue("CMUX_REMOTE_INITIAL_CWD") == nil)
-        let paneID = try #require(workspace.bonsplitController.allPaneIds.first)
+        let paneID = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let explicitDirectory = "/srv/cmux/explicit-environment"
         let surface = try #require(workspace.newTerminalSurface(
             inPane: paneID, focus: false,

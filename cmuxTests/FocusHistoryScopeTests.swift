@@ -55,7 +55,7 @@ struct FocusHistoryScopeTests {
     @Test func panesAndTabsSettingNavigatesWithinWorkspacePanels() throws {
         try withPaneHistoryManager { manager in
             let workspace = try #require(manager.selectedWorkspace)
-            let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+            let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
             let firstPanelId = try #require(workspace.focusedPanelId)
             let secondPanelId = try #require(workspace.newTerminalSurface(inPane: pane, focus: true)?.id)
 
@@ -75,7 +75,7 @@ struct FocusHistoryScopeTests {
     @Test func panesAndTabsSettingSkipsClosedPanelThatResolvesToCurrentPanel() throws {
         try withPaneHistoryManager { manager in
             let workspace = try #require(manager.selectedWorkspace)
-            let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+            let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
             let closedPanelId = try #require(workspace.focusedPanelId)
             let fallbackPanelId = try #require(workspace.newTerminalSurface(inPane: pane, focus: true)?.id)
 
@@ -96,7 +96,7 @@ struct FocusHistoryScopeTests {
     @Test func panesAndTabsSettingInvalidatesClosedPanelHistory() throws {
         try withPaneHistoryManager { manager in
             let workspace = try #require(manager.selectedWorkspace)
-            let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+            let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
             let closedPanelId = try #require(workspace.focusedPanelId)
             let fallbackPanelId = try #require(workspace.newTerminalSurface(inPane: pane, focus: true)?.id)
 
@@ -130,7 +130,7 @@ struct FocusHistoryScopeTests {
             #expect(manager.canNavigateBack)
             let revision = manager.focusHistoryRevision
 
-            #expect(workspace.bonsplitController.closePane(leftPaneId))
+            #expect(workspace.activeBonsplitController.closePane(leftPaneId))
             #expect(manager.focusHistoryRevision > revision)
             #expect(!manager.canNavigateBack)
         }
@@ -139,7 +139,7 @@ struct FocusHistoryScopeTests {
     @Test func ghosttyFocusMapsSurfaceToPanelWithPanesAndTabsSetting() throws {
         try withPaneHistoryManager { manager in
             let workspace = try #require(manager.selectedWorkspace)
-            let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+            let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
             let secondPanelId = try #require(workspace.newTerminalSurface(inPane: pane, focus: true)?.id)
             let secondSurfaceId = try #require(workspace.surfaceIdFromPanelId(secondPanelId))
             #expect(secondSurfaceId.uuid != secondPanelId)
@@ -187,7 +187,7 @@ struct FocusHistoryScopeTests {
         settings.set(false, for: SettingCatalog().app.focusHistoryIncludesPanesAndTabs)
         let manager = TabManager(settings: settings)
         let firstWorkspace = try #require(manager.selectedWorkspace)
-        let pane = try #require(firstWorkspace.bonsplitController.allPaneIds.first)
+        let pane = try #require(firstWorkspace.activeBonsplitController.allPaneIds.first)
         let firstPanelId = try #require(firstWorkspace.focusedPanelId)
         let secondPanelId = try #require(firstWorkspace.newTerminalSurface(inPane: pane, focus: true)?.id)
 
@@ -215,7 +215,7 @@ struct FocusHistoryScopeTests {
         settings.set(true, for: scopeKey)
         let manager = TabManager(settings: settings)
         let workspace = try #require(manager.selectedWorkspace)
-        let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+        let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let firstPanelId = try #require(workspace.focusedPanelId)
         let secondPanelId = try #require(workspace.newTerminalSurface(inPane: pane, focus: true)?.id)
         workspace.focusPanel(firstPanelId)

@@ -136,7 +136,7 @@ extension RemoteTmuxMirrorCLIObservabilityTests {
                 requestedFocus: false
             ) == .surfaceNotFound(harness.outerPanelID))
             #expect(TerminalController.shared.controlPaneJoin(
-                targetPaneID: try #require(harness.workspace.bonsplitController.focusedPaneId?.id),
+                targetPaneID: try #require(harness.workspace.activeBonsplitController.focusedPaneId?.id),
                 surfaceID: harness.outerPanelID,
                 sourcePaneID: nil,
                 hasFocusParam: false,
@@ -183,7 +183,7 @@ extension RemoteTmuxMirrorCLIObservabilityTests {
             paneID: sourcePane.id,
             surfaceID: advertisedSurfaceID
         ))
-        let reorderedPanelIDs = harness.workspace.bonsplitController.tabs(inPane: sourcePane)
+        let reorderedPanelIDs = harness.workspace.activeBonsplitController.tabs(inPane: sourcePane)
             .compactMap { harness.workspace.panelIdFromSurfaceId($0.id) }
         #expect(reorderedPanelIDs == [peerSurfaceID, harness.outerPanelID])
         #expect(synchronizedPanelOrder == reorderedPanelIDs)
@@ -195,8 +195,8 @@ extension RemoteTmuxMirrorCLIObservabilityTests {
         let tmuxPaneID = try #require(harness.mirror.paneIDsInOrder.first)
         let paneID = try #require(harness.mirror.syntheticPaneID(forPane: tmuxPaneID)?.id)
         let surfaceID = try #require(harness.mirror.panel(forPane: tmuxPaneID)?.id)
-        let focusedBefore = harness.workspace.bonsplitController.focusedPaneId?.id
-        let treeBefore = harness.workspace.bonsplitController.treeSnapshot()
+        let focusedBefore = harness.workspace.activeBonsplitController.focusedPaneId?.id
+        let treeBefore = harness.workspace.activeBonsplitController.treeSnapshot()
 
         let resize = ControlCommandCoordinator(context: TerminalController.shared).handle(
             ControlRequest(
@@ -216,7 +216,7 @@ extension RemoteTmuxMirrorCLIObservabilityTests {
         }
         #expect(code == "unavailable")
         #expect(data == .object(["pane_id": .string(paneID.uuidString)]))
-        #expect(harness.workspace.bonsplitController.treeSnapshot() == treeBefore)
+        #expect(harness.workspace.activeBonsplitController.treeSnapshot() == treeBefore)
 
         let breakResult = TerminalController.shared.controlPaneBreak(
             routing: harness.routing(paneID: paneID),
@@ -239,7 +239,7 @@ extension RemoteTmuxMirrorCLIObservabilityTests {
             routing: harness.routing(paneID: paneID)
         )
         #expect(last == .noAlternatePane)
-        #expect(harness.workspace.bonsplitController.focusedPaneId?.id == focusedBefore)
+        #expect(harness.workspace.activeBonsplitController.focusedPaneId?.id == focusedBefore)
     }
 
     @Test func paneScopedMutationsTargetTheRequestedProjectedPane() throws {

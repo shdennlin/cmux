@@ -47,7 +47,7 @@ struct CloudDesktopOpenActionTests {
             let fixture = try CloudDesktopOpenFixture(ownerID: ownerID)
             defer { fixture.close() }
             let row = try fixture.poolNode()
-            let original = fixture.other.bonsplitController.treeSnapshot()
+            let original = fixture.other.activeBonsplitController.treeSnapshot()
             fixture.selectedID = fixture.other.id
             try fixture.activate(row)
             if navigateBeforeTask { fixture.selectedID = fixture.owner.id }
@@ -55,11 +55,11 @@ struct CloudDesktopOpenActionTests {
             #expect(fixture.completions == 0)
             #expect(fixture.failures == [SurfaceTransferRejection.cloudMachineMismatch.message])
             #expect(fixture.provider.destinations.isEmpty)
-            let pane = try #require(fixture.other.bonsplitController.allPaneIds.first)
+            let pane = try #require(fixture.other.activeBonsplitController.allPaneIds.first)
             #expect(!fixture.other.handleSurfaceResourceDrop(group: try #require(row.dragGroup),
                 destination: .split(targetPane: pane, orientation: .horizontal, insertFirst: false),
                 catalog: fixture.catalog))
-            #expect(fixture.other.bonsplitController.treeSnapshot() == original)
+            #expect(fixture.other.activeBonsplitController.treeSnapshot() == original)
             #expect(fixture.catalog.projections.isEmpty)
             #expect(fixture.other.cloudVMID != fixture.owner.cloudVMID)
         }
@@ -75,12 +75,12 @@ struct CloudDesktopOpenActionTests {
             await fixture.waitForOpen()
             #expect(fixture.failures.isEmpty)
             let first = try #require(fixture.catalog.projections(of: fixture.display.id).first)
-            let layout = fixture.owner.bonsplitController.treeSnapshot()
-            #expect(fixture.owner.bonsplitController.allPaneIds.count == 2)
+            let layout = fixture.owner.activeBonsplitController.treeSnapshot()
+            #expect(fixture.owner.activeBonsplitController.allPaneIds.count == 2)
             try fixture.activate(row, menu: true)
             await fixture.waitForOpen()
             #expect(fixture.catalog.projections(of: fixture.display.id) == [first])
-            #expect(fixture.owner.bonsplitController.treeSnapshot() == layout)
+            #expect(fixture.owner.activeBonsplitController.treeSnapshot() == layout)
             #expect(fixture.owner.focusedPanelId == first.panelID)
             #expect(fixture.provider.destinations.count == 1)
         }
@@ -103,11 +103,11 @@ struct CloudDesktopOpenActionTests {
             let projections = fixture.catalog.projections(of: fixture.display.id)
             #expect(projections.count == 2)
             #expect(Set(projections.map(\.workspaceID)) == [fixture.owner.id, fixture.other.id])
-            let layout = fixture.other.bonsplitController.treeSnapshot()
+            let layout = fixture.other.activeBonsplitController.treeSnapshot()
             try fixture.activate(nested, menu: true)
             await fixture.waitForOpen()
             #expect(fixture.catalog.projections(of: fixture.display.id) == projections)
-            #expect(fixture.other.bonsplitController.treeSnapshot() == layout)
+            #expect(fixture.other.activeBonsplitController.treeSnapshot() == layout)
             #expect(fixture.failures.isEmpty)
         }
     }
@@ -168,7 +168,7 @@ struct CloudDesktopOpenActionTests {
             try fixture.activate(try fixture.poolNode())
             _ = await started.result
             let panels = Set(fixture.owner.panels.keys)
-            let panes = fixture.owner.bonsplitController.allPaneIds
+            let panes = fixture.owner.activeBonsplitController.allPaneIds
             if change == "navigate" { fixture.selectedID = fixture.other.id }
             if change == "rebind" { fixture.owner.cloudVMBinding = fixture.other.cloudVMBinding }
             if change == "retire" { fixture.catalog.unregister(machine: fixture.provider.machine) }
@@ -181,7 +181,7 @@ struct CloudDesktopOpenActionTests {
                 if change == "retire" { _ = await fixture.provider.didDiscard.result }
                 #expect(fixture.catalog.projections.isEmpty)
                 #expect(Set(fixture.owner.panels.keys) == panels)
-                #expect(fixture.owner.bonsplitController.allPaneIds == panes)
+                #expect(fixture.owner.activeBonsplitController.allPaneIds == panes)
                 #expect(fixture.provider.discarded.count == 1)
             }
         }

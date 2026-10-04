@@ -168,7 +168,7 @@ extension BrowserDiscardPageStateRestoreTests {
     }
 
     private func makeWorkspaceBrowser(in workspace: Workspace, url: URL) throws -> BrowserPanel {
-        let pane = try XCTUnwrap(workspace.bonsplitController.focusedPaneId)
+        let pane = try XCTUnwrap(workspace.activeBonsplitController.focusedPaneId)
         return try XCTUnwrap(workspace.newBrowserSurface(inPane: pane, url: url, focus: false))
     }
 

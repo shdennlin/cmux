@@ -25,7 +25,7 @@ struct DockShortcutRoutingTests {
         try await AppContextSerialGate.withExclusiveAppContext {
             try await Self.withHarness { harness in
                 let mainPane = try #require(
-                    harness.mainWorkspace.bonsplitController.focusedPaneId
+                    harness.mainWorkspace.activeBonsplitController.focusedPaneId
                 )
                 let mainBrowser = try #require(
                     harness.mainWorkspace.newBrowserSurface(
@@ -125,7 +125,7 @@ struct DockShortcutRoutingTests {
         try await AppContextSerialGate.withExclusiveAppContext {
             try await Self.withHarness { harness in
                 let mainPane = try #require(
-                    harness.mainWorkspace.bonsplitController.focusedPaneId
+                    harness.mainWorkspace.activeBonsplitController.focusedPaneId
                 )
                 let mainBrowser = try #require(
                     harness.mainWorkspace.newBrowserSurface(
@@ -217,7 +217,7 @@ struct DockShortcutRoutingTests {
         try await AppContextSerialGate.withExclusiveAppContext {
             try await Self.withHarness { harness in
                 let mainPane = try #require(
-                    harness.mainWorkspace.bonsplitController.focusedPaneId
+                    harness.mainWorkspace.activeBonsplitController.focusedPaneId
                 )
                 let mainBrowser = try #require(
                     harness.mainWorkspace.newBrowserSurface(
@@ -442,7 +442,7 @@ struct DockShortcutRoutingTests {
         try await AppContextSerialGate.withExclusiveAppContext {
             try await Self.withHarness { harness in
                 let mainPane = try #require(
-                    harness.mainWorkspace.bonsplitController.focusedPaneId
+                    harness.mainWorkspace.activeBonsplitController.focusedPaneId
                 )
                 let mainBrowser = try #require(
                     harness.mainWorkspace.newBrowserSurface(
@@ -1035,7 +1035,7 @@ struct DockShortcutRoutingTests {
         try await AppContextSerialGate.withExclusiveAppContext {
             try await Self.withHarness { harness in
                 let mainPane = try #require(
-                    harness.mainWorkspace.bonsplitController.focusedPaneId
+                    harness.mainWorkspace.activeBonsplitController.focusedPaneId
                 )
                 let mainBrowser = try #require(
                     harness.mainWorkspace.newBrowserSurface(
@@ -1076,7 +1076,7 @@ struct DockShortcutRoutingTests {
                 defer { ClosedItemHistoryStore.shared.removeAll() }
 
                 let mainPane = try #require(
-                    harness.mainWorkspace.bonsplitController.focusedPaneId
+                    harness.mainWorkspace.activeBonsplitController.focusedPaneId
                 )
                 let mainBrowser = try #require(
                     harness.mainWorkspace.newBrowserSurface(
@@ -1556,7 +1556,7 @@ struct DockShortcutRoutingTests {
         try await AppContextSerialGate.withExclusiveAppContext {
             try await Self.withHarness { harness in
                 let movedPanelId = try #require(harness.mainWorkspace.focusedPanelId)
-                let paneIdsBefore = harness.mainWorkspace.bonsplitController.allPaneIds
+                let paneIdsBefore = harness.mainWorkspace.activeBonsplitController.allPaneIds
                 let panelIdsBefore = Set(harness.mainWorkspace.panels.keys)
                 let shortcut = Self.customShortcut(key: "y")
                 KeyboardShortcutSettings.setShortcut(
@@ -1570,7 +1570,7 @@ struct DockShortcutRoutingTests {
                 )
 
                 #expect(Self.dispatch(shortcut, in: harness, isARepeat: true))
-                #expect(harness.mainWorkspace.bonsplitController.allPaneIds == paneIdsBefore)
+                #expect(harness.mainWorkspace.activeBonsplitController.allPaneIds == paneIdsBefore)
                 #expect(Set(harness.mainWorkspace.panels.keys) == panelIdsBefore)
                 #expect(harness.mainWorkspace.focusedPanelId == movedPanelId)
             }

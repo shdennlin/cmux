@@ -20,7 +20,7 @@ final class CloudDirectoryTestFixture {
     init() throws {
         let workspace = Workspace(workingDirectory: "/Users/alice/local-checkout")
         self.workspace = workspace
-        let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+        let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
         panels = [try #require(workspace.focusedPanelId), try #require(workspace.newTerminalSurface(inPane: pane, focus: false)).id]
         workspace.cloudVMBinding = WorkspaceCloudVMBinding(vmID: machine.rawValue, isBase: false, remoteWorkspaceID: "ws_main")
         workspace.setCustomTitle("My explicit task title")

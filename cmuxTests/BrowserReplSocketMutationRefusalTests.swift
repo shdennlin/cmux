@@ -45,7 +45,7 @@ struct BrowserReplSocketMutationRefusalTests {
             }
             let other = manager.addWorkspace(select: false)
             let workspace = manager.addWorkspace(select: true)
-            let pane = try #require(workspace.bonsplitController.focusedPaneId)
+            let pane = try #require(workspace.activeBonsplitController.focusedPaneId)
             let terminal = try #require(workspace.focusedTerminalPanel)
             let panel = try #require(workspace.newBrowserSurface(
                 inPane: pane,
@@ -60,7 +60,7 @@ struct BrowserReplSocketMutationRefusalTests {
             ) { _, _ in }
             attachment.markCreated(by: sessionID)
             let index = workspace.indexInPane(forPanelId: panel.id)
-            let otherPane = try #require(other.bonsplitController.focusedPaneId)
+            let otherPane = try #require(other.activeBonsplitController.focusedPaneId)
 
             let ws = workspace.id.uuidString
             let tab = panel.id.uuidString

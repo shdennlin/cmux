@@ -253,7 +253,7 @@ final class WorkspaceContentViewVisibilityTests {
         }
         var sustainedTabBarRenderWindows = 0
         for workspace in tabManager.tabs {
-            workspace.bonsplitController.onTabBarRenderDiagnostic = { _ in
+            workspace.activeBonsplitController.onTabBarRenderDiagnostic = { _ in
                 sustainedTabBarRenderWindows += 1
             }
         }

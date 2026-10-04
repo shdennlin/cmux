@@ -289,7 +289,7 @@ struct CanvasShortcutRoutingFeedbackTests {
             let viewport = CanvasRoutingViewportSpy()
             workspace.canvasModel.viewport = viewport
 
-            let firstPane = try #require(workspace.bonsplitController.allPaneIds.first)
+            let firstPane = try #require(workspace.activeBonsplitController.allPaneIds.first)
             let fileURL = try temporaryTextFile(contents: "preview text")
             defer { try? FileManager.default.removeItem(at: fileURL) }
             let panel = try #require(workspace.newFilePreviewSurface(
@@ -340,7 +340,7 @@ struct CanvasShortcutRoutingFeedbackTests {
             let viewport = CanvasRoutingViewportSpy()
             workspace.canvasModel.viewport = viewport
 
-            let firstPane = try #require(workspace.bonsplitController.allPaneIds.first)
+            let firstPane = try #require(workspace.activeBonsplitController.allPaneIds.first)
             let fileURL = try temporaryMarkdownFile(contents: "# Preview\n")
             defer { try? FileManager.default.removeItem(at: fileURL) }
             let panel = try #require(workspace.newMarkdownSurface(
@@ -400,7 +400,7 @@ struct CanvasShortcutRoutingFeedbackTests {
             let viewport = CanvasRoutingViewportSpy()
             workspace.canvasModel.viewport = viewport
 
-            let firstPane = try #require(workspace.bonsplitController.allPaneIds.first)
+            let firstPane = try #require(workspace.activeBonsplitController.allPaneIds.first)
             let fileURL = try temporaryMarkdownFile(contents: "# Preview\n")
             defer { try? FileManager.default.removeItem(at: fileURL) }
             let panel = try #require(workspace.newMarkdownSurface(
@@ -467,7 +467,7 @@ struct CanvasShortcutRoutingFeedbackTests {
             let window = try #require(mainWindow(for: windowId))
             let manager = try #require(appDelegate.tabManagerFor(windowId: windowId))
             let workspace = try #require(manager.selectedWorkspace)
-            let firstPane = try #require(workspace.bonsplitController.allPaneIds.first)
+            let firstPane = try #require(workspace.activeBonsplitController.allPaneIds.first)
             let fileURL = try temporaryTextFile(contents: "preview text")
             defer { try? FileManager.default.removeItem(at: fileURL) }
             let panel = try #require(workspace.newFilePreviewSurface(

@@ -166,7 +166,7 @@ struct WorkspaceTerminalTabWorkingDirectoryTests {
         #expect(workspace.updatePanelDirectory(panelId: remotePanelId, directory: localDirectory))
         workspace.configureRemoteConnection(sshRemoteConfiguration(command: sshCommand), autoConnect: false)
         workspace.updatePanelGitBranch(panelId: remotePanelId, branch: "remote-main", isDirty: false)
-        let paneId = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneId = try #require(workspace.activeBonsplitController.focusedPaneId)
         _ = try #require(workspace.newTerminalSurface(inPane: paneId, focus: true, suppressWorkspaceRemoteStartupCommand: true))
         var snapshot = workspace.sessionSnapshot(includeScrollback: false)
         snapshot.panels[0].directory = remoteDirectory
@@ -255,7 +255,7 @@ struct WorkspaceTerminalTabWorkingDirectoryTests {
         let restored = Workspace()
         let restoredPanelId = try #require(restored.restoreSessionSnapshot(snapshot)[remotePanelId])
         #expect(restored.reportedPanelDirectory(panelId: restoredPanelId) == nil && restored.presentedCurrentDirectory == nil)
-        let paneId = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneId = try #require(workspace.activeBonsplitController.focusedPaneId)
         let localPanel = try #require(workspace.newTerminalSurface(inPane: paneId, focus: true, workingDirectory: localDirectory, suppressWorkspaceRemoteStartupCommand: true))
         #expect(workspace.sidebarDirectoriesInDisplayOrder(orderedPanelIds: [localPanel.id]) == [localDirectory])
         workspace.configureRemoteConnection(sshRemoteConfiguration(command: sshCommand), autoConnect: false)
@@ -379,7 +379,7 @@ struct WorkspaceTerminalTabWorkingDirectoryTests {
         workspace.configureRemoteConnection(sshRemoteConfiguration(command: sshCommand), autoConnect: false)
         workspace.updateRemotePanelDirectory(panelId: remotePanelId, directory: remoteDirectory)
 
-        let paneId = try #require(workspace.bonsplitController.allPaneIds.first)
+        let paneId = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let detached = try #require(workspace.detachSurface(panelId: remotePanelId))
         #expect(detached.directory == remoteDirectory)
         #expect(detached.directoryIsTrustedRemoteReport)
@@ -401,7 +401,7 @@ struct WorkspaceTerminalTabWorkingDirectoryTests {
         try FileManager.default.createDirectory(atPath: anchorDirectory, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(atPath: anchorDirectory) }
         let workspace = Workspace(workingDirectory: "/tmp/cmux-workspace-\(UUID().uuidString)")
-        let paneId = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneId = try #require(workspace.activeBonsplitController.focusedPaneId)
         let selectedPanel = try #require(workspace.focusedTerminalPanel)
         let selectedTabId = try #require(workspace.surfaceIdFromPanelId(selectedPanel.id))
         workspace.updatePanelDirectory(panelId: selectedPanel.id, directory: selectedDirectory)
@@ -414,16 +414,16 @@ struct WorkspaceTerminalTabWorkingDirectoryTests {
         workspace.updatePanelDirectory(panelId: anchorPanel.id, directory: anchorDirectory)
         let anchorTabId = try #require(workspace.surfaceIdFromPanelId(anchorPanel.id))
 
-        workspace.bonsplitController.selectTab(selectedTabId)
-        let anchorTab = try #require(workspace.bonsplitController.tabs(inPane: paneId).first { $0.id == anchorTabId })
+        workspace.activeBonsplitController.selectTab(selectedTabId)
+        let anchorTab = try #require(workspace.activeBonsplitController.tabs(inPane: paneId).first { $0.id == anchorTabId })
         workspace.splitTabBar(
-            workspace.bonsplitController,
+            workspace.activeBonsplitController,
             didRequestTabContextAction: .newTerminalToRight,
             for: anchorTab,
             inPane: paneId
         )
 
-        let tabs = workspace.bonsplitController.tabs(inPane: paneId)
+        let tabs = workspace.activeBonsplitController.tabs(inPane: paneId)
         let anchorIndex = try #require(tabs.firstIndex { $0.id == anchorTabId })
         let createdTab = try #require(tabs.dropFirst(anchorIndex + 1).first)
         let createdPanelId = try #require(workspace.panelIdFromSurfaceId(createdTab.id))
@@ -442,7 +442,7 @@ struct WorkspaceTerminalTabWorkingDirectoryTests {
         let manager = TabManager()
         let workspace = try #require(manager.selectedWorkspace)
         workspace.currentDirectory = workspaceDirectory
-        let pane = try #require(workspace.bonsplitController.focusedPaneId)
+        let pane = try #require(workspace.activeBonsplitController.focusedPaneId)
         let agentPanel = try #require(workspace.newAgentSessionSurface(
             inPane: pane,
             rendererKind: .react,

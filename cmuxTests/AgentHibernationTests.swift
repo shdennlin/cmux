@@ -1158,7 +1158,7 @@ struct AgentHibernationTests {
         let detached = try #require(source.detachSurface(panelId: panelId))
 
         let destination = Workspace()
-        let destinationPaneId = try #require(destination.bonsplitController.focusedPaneId)
+        let destinationPaneId = try #require(destination.activeBonsplitController.focusedPaneId)
         expectEqual(
             destination.attachDetachedSurface(detached, inPane: destinationPaneId, focus: false),
             panelId

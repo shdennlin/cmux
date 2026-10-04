@@ -95,7 +95,7 @@ extension AppDelegate {
         focusWindow: Bool = true
     ) -> Bool {
         guard let target = mergeWorkspace(id: targetId),
-              let pane = target.bonsplitController.focusedPaneId ?? target.bonsplitController.allPaneIds.first
+              let pane = target.activeBonsplitController.focusedPaneId ?? target.activeBonsplitController.allPaneIds.first
         else { return false }
         return mergeWorkspace(
             sourceId,

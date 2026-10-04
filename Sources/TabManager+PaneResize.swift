@@ -9,16 +9,16 @@ extension TabManager {
               let paneId = tab.paneId(forPanelId: surfaceId) else { return false }
 
         let paneUUID = paneId.id
-        guard tab.bonsplitController.allPaneIds.contains(where: { $0.id == paneUUID }) else {
+        guard tab.activeBonsplitController.allPaneIds.contains(where: { $0.id == paneUUID }) else {
             return false
         }
 
         let didResize = paneLayout.resizeSplit(
-            in: tab.bonsplitController.treeSnapshot(),
+            in: tab.activeBonsplitController.treeSnapshot(),
             targetPaneId: paneUUID.uuidString,
             direction: direction,
             amountPixels: amount,
-            controller: tab.bonsplitController
+            controller: tab.activeBonsplitController
         )
         if didResize {
             // Keep the cached layout snapshot and terminal geometry reconciliation

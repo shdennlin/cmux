@@ -102,7 +102,7 @@ final class RightSidebarToolPanel: Panel, ObservableObject {
 
     func openFilePreview(_ filePath: String) {
         guard let workspace,
-              let paneId = workspace.bonsplitController.focusedPaneId ?? workspace.bonsplitController.allPaneIds.first else {
+              let paneId = workspace.activeBonsplitController.focusedPaneId ?? workspace.activeBonsplitController.allPaneIds.first else {
             return
         }
         FileExplorerPreviewCoordinator(store: fileExplorerStore).open(path: filePath, workspace: workspace,

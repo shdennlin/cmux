@@ -52,7 +52,7 @@ extension AgentNotificationRegressionTests {
             attemptID: attemptID
         ))
         fixture.source.registerReportedSurfaceTTYName("pts/21", panelId: fixture.panelId)
-        let paneID = try #require(fixture.source.bonsplitController.allPaneIds.first)
+        let paneID = try #require(fixture.source.activeBonsplitController.allPaneIds.first)
         _ = try #require(fixture.source.newTerminalSurface(inPane: paneID, focus: false))
         try movePanel(fixture)
         #expect(
@@ -172,7 +172,7 @@ extension AgentNotificationRegressionTests {
             fixture.destination.detachSurface(panelId: fixture.panelId)
         )
         let destinationPaneID = try #require(
-            secondDestination.bonsplitController.allPaneIds.first
+            secondDestination.activeBonsplitController.allPaneIds.first
         )
         #expect(
             secondDestination.attachDetachedSurface(

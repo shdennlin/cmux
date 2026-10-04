@@ -189,7 +189,7 @@ struct RemoteShellPromptRelayTests {
 
         let workspace = try #require(manager.selectedWorkspace)
         let reportingTerminal = try #require(workspace.focusedTerminalPanel)
-        let paneID = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
         let focusedTarget = try #require(workspace.newTerminalSurface(
             inPane: paneID,
             focus: true

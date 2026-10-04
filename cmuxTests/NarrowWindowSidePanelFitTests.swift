@@ -129,6 +129,6 @@ struct NarrowWindowSidePanelFitTests {
 
     private func containerWidth(_ context: AppDelegate.MainWindowContext) -> Double {
         guard let workspace = context.tabManager.selectedWorkspace else { return 0 }
-        return Double(workspace.bonsplitController.layoutSnapshot().containerFrame.width)
+        return Double(workspace.activeBonsplitController.layoutSnapshot().containerFrame.width)
     }
 }

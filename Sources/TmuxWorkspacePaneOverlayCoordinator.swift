@@ -40,7 +40,7 @@ final class TmuxWorkspacePaneOverlayCoordinator {
                 WorkspaceContentView.effectiveTmuxLayoutSnapshot(
                     cachedSnapshot: builder.tabManager.selectedWorkspace?.tmuxLayoutSnapshot,
                     liveSnapshot: liveLayoutSnapshot
-                        ?? builder.tabManager.selectedWorkspace?.bonsplitController.layoutSnapshot()
+                        ?? builder.tabManager.selectedWorkspace?.activeBonsplitController.layoutSnapshot()
                 )
             )
             : nil

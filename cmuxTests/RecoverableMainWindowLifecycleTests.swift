@@ -526,7 +526,7 @@ struct RecoverableMainWindowLifecycleTests {
         )
         let workspace = try #require(manager.selectedWorkspace)
         let terminal = try #require(workspace.focusedTerminalPanel)
-        let paneId = try #require(workspace.bonsplitController.allPaneIds.first)
+        let paneId = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let browser = try #require(workspace.newBrowserSurface(
             inPane: paneId,
             url: nil,

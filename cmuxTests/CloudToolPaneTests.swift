@@ -29,7 +29,7 @@ struct CloudToolPaneTests {
             let fixture = try VaultPaneAppFixture()
             defer { fixture.tearDown() }
             let workspace = fixture.workspace
-            let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+            let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
             let originalPanels = Set(workspace.panels.keys)
             let cloud = try #require(workspace.openOrFocusRightSidebarToolSurface(
                 inPane: pane, mode: .machines, focus: false

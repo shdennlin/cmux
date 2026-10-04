@@ -265,7 +265,7 @@ server.serve_forever()
         _ fixture: Fixture,
         directory: URL
     ) throws -> (AgentSessionPanel, AgentSessionWebRendererCoordinator) {
-        let pane = try #require(fixture.source.bonsplitController.allPaneIds.first)
+        let pane = try #require(fixture.source.activeBonsplitController.allPaneIds.first)
         let panel = try #require(fixture.source.newAgentSessionSurface(
             inPane: pane,
             providerID: .claude,

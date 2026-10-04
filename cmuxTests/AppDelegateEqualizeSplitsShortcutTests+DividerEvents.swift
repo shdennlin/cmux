@@ -46,7 +46,7 @@ extension AppDelegateEqualizeSplitsShortcutTests {
                 let other = try #require(workspace.newTerminalSplit(from: first, orientation: cross))
                 let second = try #require(workspace.newTerminalSplit(from: first, orientation: orientation))
                 _ = try #require(workspace.newTerminalSplit(from: second.id, orientation: orientation))
-                let controller = workspace.bonsplitController
+                let controller = workspace.activeBonsplitController
                 let nodes = self.shortcutRoutingSplitNodes(in: controller.treeSnapshot())
                 let axis = orientation == .horizontal ? "horizontal" : "vertical"
                 let run = nodes.filter { $0.orientation == axis }

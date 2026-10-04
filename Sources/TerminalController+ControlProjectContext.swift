@@ -32,7 +32,7 @@ extension TerminalController: ControlProjectContext {
         v2MaybeFocusWindow(for: tabManager)
         v2MaybeSelectWorkspace(tabManager, workspace: ws)
 
-        guard let paneId = ws.bonsplitController.focusedPaneId else {
+        guard let paneId = ws.activeBonsplitController.focusedPaneId else {
             return .noFocusedPane
         }
 

@@ -170,7 +170,7 @@ extension Workspace {
         panels[panel.id] = panel
         panelTitles[panel.id] = panel.displayTitle
 
-        guard let tabId = bonsplitController.createTab(
+        guard let tabId = activeBonsplitController.createTab(
             title: panel.displayTitle,
             icon: panel.displayIcon,
             kind: SurfaceKind.mobilePairing.rawValue,
@@ -193,8 +193,8 @@ extension Workspace {
             focused: focus
         )
         if focus {
-            bonsplitController.focusPane(paneId)
-            bonsplitController.selectTab(tabId)
+            activeBonsplitController.focusPane(paneId)
+            activeBonsplitController.selectTab(tabId)
             applyTabSelection(tabId: tabId, inPane: paneId)
         }
         return panel

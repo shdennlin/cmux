@@ -88,10 +88,10 @@ struct WorkspaceCloseTabsContextMenuTests {
                 promptCount += 1
                 return true
             }
-            let tab = try #require(fixture.workspace.bonsplitController.tab(tabId))
+            let tab = try #require(fixture.workspace.activeBonsplitController.tab(tabId))
 
             fixture.workspace.splitTabBar(
-                fixture.workspace.bonsplitController,
+                fixture.workspace.activeBonsplitController,
                 didRequestTabContextAction: .close,
                 for: tab,
                 inPane: fixture.paneId
@@ -108,12 +108,12 @@ struct WorkspaceCloseTabsContextMenuTests {
     func closeTabContextActionRespectsDisabledTabClosing() throws {
         try withCleanClosedHistory {
             let fixture = try makeWorkspaceWithFourConfirmingTabs()
-            fixture.workspace.bonsplitController.configuration.allowCloseTabs = false
+            fixture.workspace.activeBonsplitController.configuration.allowCloseTabs = false
             let tabId = fixture.tabIds[2]
-            let tab = try #require(fixture.workspace.bonsplitController.tab(tabId))
+            let tab = try #require(fixture.workspace.activeBonsplitController.tab(tabId))
 
             fixture.workspace.splitTabBar(
-                fixture.workspace.bonsplitController,
+                fixture.workspace.activeBonsplitController,
                 didRequestTabContextAction: .close,
                 for: tab,
                 inPane: fixture.paneId
@@ -137,9 +137,9 @@ struct WorkspaceCloseTabsContextMenuTests {
                 promptCount += 1
                 return true
             }
-            let tab = try #require(fixture.workspace.bonsplitController.tab(tabId))
+            let tab = try #require(fixture.workspace.activeBonsplitController.tab(tabId))
             #expect(!fixture.workspace.splitTabBar(
-                fixture.workspace.bonsplitController,
+                fixture.workspace.activeBonsplitController,
                 shouldCloseTab: tab,
                 inPane: fixture.paneId
             ))
@@ -168,9 +168,9 @@ struct WorkspaceCloseTabsContextMenuTests {
                 return true
             }
 
-            let tab = try #require(fixture.workspace.bonsplitController.tab(tabId))
+            let tab = try #require(fixture.workspace.activeBonsplitController.tab(tabId))
             #expect(!fixture.workspace.splitTabBar(
-                fixture.workspace.bonsplitController,
+                fixture.workspace.activeBonsplitController,
                 shouldCloseTab: tab,
                 inPane: fixture.paneId
             ))
@@ -234,8 +234,8 @@ struct WorkspaceCloseTabsContextMenuTests {
         let fixture = try makeWorkspaceWithFourConfirmingTabs()
         let tabId = fixture.tabIds[2]
         let panelId = try #require(fixture.workspace.panelIdFromSurfaceId(tabId))
-        let tab = try #require(fixture.workspace.bonsplitController.tab(tabId))
-        fixture.workspace.bonsplitController.selectTab(tabId)
+        let tab = try #require(fixture.workspace.activeBonsplitController.tab(tabId))
+        fixture.workspace.activeBonsplitController.selectTab(tabId)
         fixture.workspace.focusPanel(panelId)
         fixture.workspace.markCloseHistoryEligible(panelId: panelId)
 
@@ -250,7 +250,7 @@ struct WorkspaceCloseTabsContextMenuTests {
             return true
         }
 
-        #expect(!fixture.workspace.splitTabBar(fixture.workspace.bonsplitController, shouldCloseTab: tab, inPane: fixture.paneId))
+        #expect(!fixture.workspace.splitTabBar(fixture.workspace.activeBonsplitController, shouldCloseTab: tab, inPane: fixture.paneId))
         await waitForMainActorWork(timeout: 10) {
             promptCount == 1 && fixture.workspace.panelIdFromSurfaceId(tabId) == nil
         }
@@ -291,7 +291,7 @@ struct WorkspaceCloseTabsContextMenuTests {
         _ = try #require(workspace.newTerminalSurface(inPane: paneId, focus: false))
         _ = try #require(workspace.newTerminalSurface(inPane: paneId, focus: false))
 
-        let tabIds = workspace.bonsplitController.tabs(inPane: paneId).map(\.id)
+        let tabIds = workspace.activeBonsplitController.tabs(inPane: paneId).map(\.id)
         #expect(tabIds.count == 4, "Precondition: fixture should start with four tabs in one pane")
 
         for (index, tabId) in tabIds.enumerated() {
@@ -322,9 +322,9 @@ struct WorkspaceCloseTabsContextMenuTests {
             return true
         }
 
-        let anchorTab = try #require(fixture.workspace.bonsplitController.tab(anchorTabId))
+        let anchorTab = try #require(fixture.workspace.activeBonsplitController.tab(anchorTabId))
         fixture.workspace.splitTabBar(
-            fixture.workspace.bonsplitController,
+            fixture.workspace.activeBonsplitController,
             didRequestTabContextAction: action,
             for: anchorTab,
             inPane: fixture.paneId
@@ -336,7 +336,7 @@ struct WorkspaceCloseTabsContextMenuTests {
     }
 
     private func assertRemainingTabs(_ expected: [TabID], in fixture: Fixture) {
-        let remaining = fixture.workspace.bonsplitController.tabs(inPane: fixture.paneId).map(\.id)
+        let remaining = fixture.workspace.activeBonsplitController.tabs(inPane: fixture.paneId).map(\.id)
         #expect(remaining == expected)
         for closedTabId in fixture.tabIds where !expected.contains(closedTabId) {
             #expect(

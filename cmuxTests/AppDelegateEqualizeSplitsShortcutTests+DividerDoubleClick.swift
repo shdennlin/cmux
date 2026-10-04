@@ -31,7 +31,7 @@ extension AppDelegateEqualizeSplitsShortcutTests {
                 let other = try #require(workspace.newTerminalSplit(from: first, orientation: cross))
                 let second = try #require(workspace.newTerminalSplit(from: first, orientation: orientation))
                 _ = try #require(workspace.newTerminalSplit(from: second.id, orientation: orientation))
-                let controller = workspace.bonsplitController
+                let controller = workspace.activeBonsplitController
                 let nodes = self.shortcutRoutingSplitNodes(in: controller.treeSnapshot())
                 for node in nodes {
                     #expect(controller.setDividerPosition(0.25, forSplit: try #require(UUID(uuidString: node.id))))

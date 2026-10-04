@@ -177,7 +177,7 @@ struct CloudTerminalPlacementTests {
             let before = Set(workspace.panels.keys)
             perform(action, workspace: workspace, expectsAcceptance: false)
             #expect(Set(workspace.panels.keys) == before)
-            #expect(workspace.bonsplitController.allPaneIds.count == 1)
+            #expect(workspace.activeBonsplitController.allPaneIds.count == 1)
             #expect(workspace.cloudPaneCreationFailureStore.failure?.machine == machine)
         }
     }
@@ -445,7 +445,7 @@ struct CloudTerminalPlacementTests {
             case "split":
                 #expect(workspace.newTerminalSplitOutcome(from: sourceID, orientation: .horizontal, focus: true).isAccepted == expectsAcceptance)
             case "button":
-                #expect(workspace.bonsplitController.splitPane(paneID, orientation: .horizontal) != nil)
+                #expect(workspace.activeBonsplitController.splitPane(paneID, orientation: .horizontal) != nil)
             case "socketTab":
                 let result = TerminalController.shared.controlSurfaceCreate(routing: routing, inputs: .init(
                     typeRaw: "terminal", providerRaw: nil, rendererRaw: nil, urlRaw: nil,

@@ -185,11 +185,11 @@ struct CloudSurfaceDragFeedbackTests {
             pasteboard: fixture.pasteboard, context: fixture.context, proposedZone: .right
         ) else { Issue.record("Same-machine hover should be accepted"); return }
         let panels = Set(fixture.workspace.panels.keys)
-        let panes = fixture.workspace.bonsplitController.allPaneIds
+        let panes = fixture.workspace.activeBonsplitController.allPaneIds
         fixture.workspace.cloudVMBinding = WorkspaceCloudVMBinding(vmID: "b", isBase: false)
         #expect(!router.perform(plan, pasteboard: fixture.pasteboard))
         #expect(Set(fixture.workspace.panels.keys) == panels)
-        #expect(fixture.workspace.bonsplitController.allPaneIds == panes)
+        #expect(fixture.workspace.activeBonsplitController.allPaneIds == panes)
         #expect(router.rejection == nil)
         #expect(!router.perform(plan, pasteboard: fixture.pasteboard))
     }
@@ -272,7 +272,7 @@ struct CloudSurfaceDragFeedbackTests {
             sourcePanel.retainTransferredSurfaceMachine(.cloud("foreign-cloud"))
             #expect(app.workspace.machineOwningSurface(focusedPanelID) == .cloud("foreign-cloud"))
             let tabID = try #require(app.workspace.surfaceIdFromPanelId(focusedPanelID))
-            let pane = try #require(app.workspace.bonsplitController.allPaneIds.first)
+            let pane = try #require(app.workspace.activeBonsplitController.allPaneIds.first)
             let registration = try #require(app.appDelegate.tabDragTransferRegistry.register(TabDragTransfer(
                 tab: Tab(id: tabID, title: "Cloud terminal", kind: "terminal"), sourcePaneId: pane
             )))
@@ -287,7 +287,7 @@ struct CloudSurfaceDragFeedbackTests {
             gate.isActive = true
             let sourcePanels = Set(app.workspace.panels.keys)
             let destinationPanels = Set(destination.panels.keys)
-            let destinationPanes = destination.bonsplitController.allPaneIds
+            let destinationPanes = destination.activeBonsplitController.allPaneIds
             let organization = fixture.catalog.sidebarOrganization.state
             let sender = CloudSidebarDraggingInfo(source: outline, pasteboard: pasteboard, location: .zero)
             #expect(gate.draggingEntered(sender).isEmpty)
@@ -319,7 +319,7 @@ struct CloudSurfaceDragFeedbackTests {
             #expect(gate.feedback.badge.superview == nil)
             #expect(Set(app.workspace.panels.keys) == sourcePanels)
             #expect(Set(destination.panels.keys) == destinationPanels)
-            #expect(destination.bonsplitController.allPaneIds == destinationPanes)
+            #expect(destination.activeBonsplitController.allPaneIds == destinationPanes)
             #expect(fixture.catalog.sidebarOrganization.state == organization)
             #expect(fixture.provider.moved.isEmpty && fixture.provider.projected.isEmpty && fixture.provider.closedTabs.isEmpty)
             #expect(app.appDelegate.tabDragTransferRegistry.resolve(from: pasteboard) != nil)
