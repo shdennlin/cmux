@@ -90,7 +90,7 @@ extension Workspace {
         panels[customPanel.id] = customPanel
         panelTitles[customPanel.id] = customPanel.displayTitle
 
-        guard let newTabId = activeBonsplitController.createTab(
+        guard let newTabId = bonsplitController(owningPane: paneId).createTab(
             title: customPanel.displayTitle,
             icon: customPanel.displayIcon,
             kind: SurfaceKind.customSidebar.rawValue,
@@ -106,7 +106,7 @@ extension Workspace {
 
         bindSurface(newTabId, toPanelId: customPanel.id)
         if let targetIndex {
-            _ = activeBonsplitController.reorderTab(newTabId, toIndex: targetIndex)
+            _ = bonsplitController(owningTab: newTabId).reorderTab(newTabId, toIndex: targetIndex)
         }
         publishCmuxSurfaceCreated(
             customPanel.id,
@@ -160,8 +160,7 @@ extension Workspace {
 
         isProgrammaticSplit = true
         defer { isProgrammaticSplit = false }
-        guard let newPaneId = activeBonsplitController.splitPane(
-            paneId,
+        guard let newPaneId = bonsplitController(owningPane: paneId).splitPane(paneId,
             orientation: orientation,
             withTab: newTab,
             insertFirst: insertFirst
@@ -173,7 +172,7 @@ extension Workspace {
             return nil
         }
 
-        activeBonsplitController.selectTab(newTab.id)
+        bonsplitController(owningTab: newTab.id).selectTab(newTab.id)
         suppressReparentFocusUntilLayoutFollowUp(
             previousHostedView,
             reason: "workspace.customSidebarSplitReparent"

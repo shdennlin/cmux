@@ -555,7 +555,7 @@ extension AppDelegate {
             return nil
         }
         if let surfaceId = workspace.surfaceIdFromPanelId(context.panelId),
-           workspace.activeBonsplitController.paneId(containing: surfaceId) == context.paneId {
+           workspace.bonsplitController(owningTab: surfaceId).paneId(containing: surfaceId) == context.paneId {
             return workspace
         }
         return workspace.remoteTmuxWindowMirrors.values.first {

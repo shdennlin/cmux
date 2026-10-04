@@ -129,7 +129,7 @@ extension TerminalController {
 
             if targetWorkspace.attachDetachedSurface(transfer, inPane: destinationPane, atIndex: targetIndex, focus: focus) == nil {
                 // Roll back to source workspace if attach fails.
-                let rollbackPane = sourcePane.flatMap { sp in sourceWorkspace.activeBonsplitController.allPaneIds.first(where: { $0 == sp }) }
+                let rollbackPane = sourcePane.flatMap { sp in sourceWorkspace.allTopTabPaneIds.first(where: { $0 == sp }) }
                     ?? sourceWorkspace.activeBonsplitController.focusedPaneId
                     ?? sourceWorkspace.activeBonsplitController.allPaneIds.first
                 if let rollbackPane {

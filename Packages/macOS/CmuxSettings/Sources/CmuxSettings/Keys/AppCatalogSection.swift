@@ -126,6 +126,15 @@ public struct AppCatalogSection: SettingCatalogSection {
         userDefaultsKey: "equalizeSplitsOnCreate"
     )
 
+    /// Whether each workspace shows tabs above its split area, each owning its
+    /// own split layout (Ghostty-style). Off keeps one layout per workspace
+    /// with tabs inside each pane.
+    public let workspaceTopTabs = DefaultsKey<Bool>(
+        id: "app.workspaceTopTabs",
+        defaultValue: false,
+        userDefaultsKey: "workspaceTopTabs"
+    )
+
     public let preferredEditor = DefaultsKey<String>(
         id: "app.preferredEditor",
         defaultValue: "",

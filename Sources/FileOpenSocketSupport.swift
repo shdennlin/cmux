@@ -109,7 +109,7 @@ extension TerminalController {
             let hasExplicitPaneDestination = requestedPaneUUID != nil || requestedSurfaceUUID != nil
             let paneId: PaneID?
             if let paneUUID = requestedPaneUUID {
-                paneId = ws.activeBonsplitController.allPaneIds.first(where: { $0.id == paneUUID })
+                paneId = ws.allTopTabPaneIds.first(where: { $0.id == paneUUID })
                 if paneId == nil {
                     result = .err(code: "not_found", message: "Pane not found", data: ["pane_id": paneUUID.uuidString])
                     return

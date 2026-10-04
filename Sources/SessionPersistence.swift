@@ -1812,6 +1812,13 @@ struct SessionCloudVMBindingSnapshot: Codable, Sendable, Equatable {
     var teamID: String? = nil
 }
 
+/// One top tab of a workspace: its identity, custom title and split layout.
+struct SessionTopTabSnapshot: Codable, Sendable {
+    var id: UUID
+    var customTitle: String?
+    var layout: SessionWorkspaceLayoutSnapshot
+}
+
 struct SessionWorkspaceSnapshot: Codable, Sendable {
     /// Original workspace ID captured when the snapshot comes from a live workspace.
     /// Restore reuses this identity when it is present and non-colliding; legacy,
@@ -1844,6 +1851,10 @@ struct SessionWorkspaceSnapshot: Codable, Sendable {
     var currentDirectory: String
     var focusedPanelId: UUID?
     var layout: SessionWorkspaceLayoutSnapshot
+    /// Every top tab, written only when there are two or more; `layout`
+    /// always holds the selected tab, so single-tab sessions are unchanged.
+    var topTabs: [SessionTopTabSnapshot]? = nil
+    var selectedTopTabIndex: Int? = nil
     /// `WorkspaceLayoutMode` raw value; absent in pre-canvas snapshots (treated as splits).
     var layoutMode: String? = nil
     /// Canvas pane frames in z-order; persisted whenever any exist so

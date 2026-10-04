@@ -77,6 +77,12 @@ extension Array where Element == CuratedSettingEntry {
                 title: String(localized: "settings.app.equalizeSplitsOnCreate", defaultValue: "Equalize Splits on Create"),
                 synonyms: "app.equalizeSplitsOnCreate equalize balance distribute even equal split pane size new split"
             ),
+            .init(
+                section: .app,
+                id: "workspace-top-tabs",
+                title: String(localized: "settings.app.workspaceTopTabs", defaultValue: "Tabs Contain Splits"),
+                synonyms: "app.workspaceTopTabs tabs splits ghostty iterm top tab layout per tab split inside tab"
+            ),
             .init(section: .app, id: "file-drops", title: String(localized: "settings.app.fileDrop.defaultBehavior", defaultValue: "File Drops"), synonyms: "File Drops drag drop files finder path text terminal editor split preview shift"),
             .init(section: .app, id: "preferred-editor", title: String(localized: "settings.app.preferredEditor", defaultValue: "Open Files With"), synonyms: "Open Files With app.preferredEditor editor open file code vscode visual studio zed sublime subl cursor"),
             .init(section: .app, id: "supported-file-previews", title: String(localized: "settings.app.openSupportedFilesInCmux", defaultValue: "Open Supported Files in cmux"), synonyms: "Open Supported Files in cmux app.openSupportedFilesInCmux cmd click file preview pdf image video audio quicklook quick look editor external"),

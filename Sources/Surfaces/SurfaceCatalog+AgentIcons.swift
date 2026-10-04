@@ -17,9 +17,9 @@ extension SurfaceCatalog {
               let workspace = cloudWorkspaceRenameService.environment.workspace(projection.workspaceID),
               workspace.panels[projection.panelID] is TerminalPanel,
               let tabID = workspace.surfaceIdFromPanelId(projection.panelID),
-              let tab = workspace.activeBonsplitController.tab(tabID) else { return }
+              let tab = workspace.bonsplitController(owningTab: tabID).tab(tabID) else { return }
         let asset = resources[projection.resource]?.terminalAgentIconAssetName
         guard tab.iconAsset != asset else { return }
-        workspace.activeBonsplitController.updateTab(tabID, iconAsset: .some(asset))
+        workspace.bonsplitController(owningTab: tabID).updateTab(tabID, iconAsset: .some(asset))
     }
 }

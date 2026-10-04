@@ -103,7 +103,7 @@ extension AppDelegate {
         case .workspace:
             targetPanelId = nil
         case .pane(_, let paneId):
-            guard let pane = workspace.activeBonsplitController.allPaneIds.first(where: { $0.id == paneId }) else {
+            guard let pane = workspace.allTopTabPaneIds.first(where: { $0.id == paneId }) else {
 #if DEBUG
                 cmuxDebugLog(
                     "navigationURL.notFound workspace=\(workspaceId.uuidString.prefix(8)) " +
@@ -112,11 +112,11 @@ extension AppDelegate {
 #endif
                 return false
             }
-            let selectedTab = workspace.activeBonsplitController.selectedTab(inPane: pane)
-                ?? workspace.activeBonsplitController.tabs(inPane: pane).first
+            let selectedTab = workspace.bonsplitController(owningPane: pane).selectedTab(inPane: pane)
+                ?? workspace.bonsplitController(owningPane: pane).tabs(inPane: pane).first
             targetPanelId = selectedTab.flatMap { workspace.panelIdFromSurfaceId($0.id) }
             if targetPanelId == nil {
-                workspace.activeBonsplitController.focusPane(pane)
+                workspace.bonsplitController(owningPane: pane).focusPane(pane)
             }
         case .surface(_, let panelId):
             targetPanelId = panelId

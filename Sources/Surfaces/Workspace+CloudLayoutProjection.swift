@@ -73,11 +73,11 @@ extension Workspace {
                     tabIDForPanelID: surfaceIdFromPanelId
                 )
                 for pane in activeBonsplitController.allPaneIds {
-                    if let tab = activeBonsplitController.tabs(inPane: pane).first(where: { selected.contains($0.id) }) {
-                        activeBonsplitController.selectTab(tab.id)
+                    if let tab = bonsplitController(owningPane: pane).tabs(inPane: pane).first(where: { selected.contains($0.id) }) {
+                        bonsplitController(owningTab: tab.id).selectTab(tab.id)
                     }
                 }
-                if let focused, activeBonsplitController.tab(focused) != nil { activeBonsplitController.selectTab(focused) }
+                if let focused, bonsplitController(owningTab: focused).tab(focused) != nil { bonsplitController(owningTab: focused).selectTab(focused) }
             }
         }
         recordCloudLayoutBaseline(projections)

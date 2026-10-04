@@ -66,8 +66,8 @@ extension TerminalController {
             return .noPaneTarget
         }
 
-        let tabs = tab.activeBonsplitController.tabs(inPane: paneId)
-        let selectedTab = tab.activeBonsplitController.selectedTab(inPane: paneId)
+        let tabs = tab.bonsplitController(owningPane: paneId).tabs(inPane: paneId)
+        let selectedTab = tab.bonsplitController(owningPane: paneId).selectedTab(inPane: paneId)
 
         return .rows(tabs.map { bonsplitTab in
             ControlSidebarPaneSurfacesResolution.Row(
@@ -90,7 +90,7 @@ extension TerminalController {
         // Try UUID first, then fall back to index
         if let uuid = UUID(uuidString: paneArg),
            let paneId = paneIds.first(where: { $0.id == uuid }) {
-            tab.activeBonsplitController.focusPane(paneId)
+            tab.bonsplitController(owningPane: paneId).focusPane(paneId)
             return true
         } else if let index = Int(paneArg), index >= 0, index < paneIds.count {
             tab.activeBonsplitController.focusPane(paneIds[index])
