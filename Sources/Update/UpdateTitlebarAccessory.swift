@@ -2356,8 +2356,8 @@ private func openPhoneForwardingSettings(in window: NSWindow?) {
           let appDelegate = AppDelegate.shared,
           let context = appDelegate.contextForMainTerminalWindow(window),
           let workspace = context.tabManager.selectedWorkspace,
-          let paneId = workspace.bonsplitController.focusedPaneId
-            ?? workspace.bonsplitController.allPaneIds.first else {
+          let paneId = workspace.activeBonsplitController.focusedPaneId
+            ?? workspace.activeBonsplitController.allPaneIds.first else {
         NSSound.beep()
         return
     }

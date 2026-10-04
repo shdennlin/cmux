@@ -2353,7 +2353,7 @@ struct ContentView: View {
     func openRightSidebarToolPane(_ mode: RightSidebarMode) {
         guard mode.canOpenAsPane, mode.isAvailable(),
               let workspace = tabManager.selectedWorkspace,
-              let paneId = workspace.bonsplitController.focusedPaneId ?? workspace.bonsplitController.allPaneIds.first else {
+              let paneId = workspace.activeBonsplitController.focusedPaneId ?? workspace.activeBonsplitController.allPaneIds.first else {
             NSSound.beep()
             return
         }
@@ -2365,7 +2365,7 @@ struct ContentView: View {
 
     private func openFilePreviewFromSidebar(filePath: String) {
         guard let workspace = tabManager.selectedWorkspace else { return }
-        guard let paneId = workspace.bonsplitController.focusedPaneId ?? workspace.bonsplitController.allPaneIds.first else {
+        guard let paneId = workspace.activeBonsplitController.focusedPaneId ?? workspace.activeBonsplitController.allPaneIds.first else {
             return
         }
 
@@ -7346,7 +7346,7 @@ struct ContentView: View {
             snapshot.setBool(
                 CommandPaletteContextKeys.workspaceHasSplits,
                 (focusedDock?.bonsplitController.allPaneIds.count
-                    ?? workspace.bonsplitController.allPaneIds.count) > 1
+                    ?? workspace.activeBonsplitController.allPaneIds.count) > 1
             )
             snapshot.setBool(
                 CommandPaletteContextKeys.workspaceCanvasLayout,

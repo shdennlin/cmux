@@ -805,7 +805,7 @@ struct RemoteTmuxMirrorPaneInputMappingTests {
         harness.workspace.moveFocus(direction: .right)
 
         #expect(
-            harness.workspace.bonsplitController.focusedPaneId == outerNeighborPaneId,
+            harness.workspace.activeBonsplitController.focusedPaneId == outerNeighborPaneId,
             "A valid edge in the nested tree must continue into the outer workspace tree"
         )
 
@@ -817,7 +817,7 @@ struct RemoteTmuxMirrorPaneInputMappingTests {
         harness.workspace.moveFocus(direction: .right)
 
         #expect(
-            harness.workspace.bonsplitController.focusedPaneId == containerPaneId,
+            harness.workspace.activeBonsplitController.focusedPaneId == containerPaneId,
             "An invalid nested focus identity must not escape into an outer workspace pane"
         )
     }

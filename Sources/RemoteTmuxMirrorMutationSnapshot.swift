@@ -17,11 +17,11 @@ struct RemoteTmuxMirrorMutationSnapshot {
     let previousKeyWindow: NSWindow?
 
     init(workspace: Workspace) {
-        selectedTabs = workspace.bonsplitController.allPaneIds.compactMap { paneId in
-            workspace.bonsplitController.selectedTab(inPane: paneId).map { (paneId, $0.id) }
+        selectedTabs = workspace.activeBonsplitController.allPaneIds.compactMap { paneId in
+            workspace.activeBonsplitController.selectedTab(inPane: paneId).map { (paneId, $0.id) }
         }
-        focusedPaneId = workspace.bonsplitController.focusedPaneId
-        focusedTabId = focusedPaneId.flatMap { workspace.bonsplitController.selectedTab(inPane: $0)?.id }
+        focusedPaneId = workspace.activeBonsplitController.focusedPaneId
+        focusedTabId = focusedPaneId.flatMap { workspace.activeBonsplitController.selectedTab(inPane: $0)?.id }
         tabManager = workspace.owningTabManager
         selectedWorkspaceId = tabManager?.selectedTabId
         window = tabManager?.window
@@ -40,19 +40,19 @@ struct RemoteTmuxMirrorMutationSnapshot {
         }
 
         for selection in selectedTabs
-        where workspace.bonsplitController.tabs(inPane: selection.paneId).contains(where: { $0.id == selection.tabId }) {
-            workspace.bonsplitController.selectTab(selection.tabId)
+        where workspace.activeBonsplitController.tabs(inPane: selection.paneId).contains(where: { $0.id == selection.tabId }) {
+            workspace.activeBonsplitController.selectTab(selection.tabId)
         }
         if let focusedTabId,
-           let focusedPane = workspace.bonsplitController.allPaneIds.first(where: {
-               workspace.bonsplitController.tabs(inPane: $0).contains { $0.id == focusedTabId }
+           let focusedPane = workspace.activeBonsplitController.allPaneIds.first(where: {
+               workspace.activeBonsplitController.tabs(inPane: $0).contains { $0.id == focusedTabId }
            }) {
             // Topology may move the selected tab into a different pane. Preserve
             // that identity rather than focusing the old pane's replacement tab.
-            workspace.bonsplitController.focusPane(focusedPane)
-            workspace.bonsplitController.selectTab(focusedTabId)
-        } else if let focusedPaneId, workspace.bonsplitController.allPaneIds.contains(focusedPaneId) {
-            workspace.bonsplitController.focusPane(focusedPaneId)
+            workspace.activeBonsplitController.focusPane(focusedPane)
+            workspace.activeBonsplitController.selectTab(focusedTabId)
+        } else if let focusedPaneId, workspace.activeBonsplitController.allPaneIds.contains(focusedPaneId) {
+            workspace.activeBonsplitController.focusPane(focusedPaneId)
         }
 
         // A session-end lifecycle may legitimately discard the dedicated window;
@@ -88,6 +88,6 @@ struct RemoteTmuxMirrorMutationSnapshot {
               let focusedPaneId,
               let selectedTabId = selectedTabs.first(where: { $0.paneId == focusedPaneId })?.tabId
         else { return false }
-        return workspace.bonsplitController.tab(selectedTabId) == nil
+        return workspace.activeBonsplitController.tab(selectedTabId) == nil
     }
 }

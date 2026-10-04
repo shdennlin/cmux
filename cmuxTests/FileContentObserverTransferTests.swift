@@ -124,7 +124,7 @@ struct FileContentObserverTransferTests {
         let sourceChanges = FileContentChangeCoordinator(makeFileWatcher: { _ in nil })
         let sourceWorkspace = Workspace(fileContentChangeCoordinator: sourceChanges)
         defer { sourceWorkspace.teardownAllPanels() }
-        let sourcePane = try #require(sourceWorkspace.bonsplitController.allPaneIds.first)
+        let sourcePane = try #require(sourceWorkspace.activeBonsplitController.allPaneIds.first)
         let panel = try #require(sourceWorkspace.newMarkdownSurface(
             inPane: sourcePane,
             filePath: fileURL.path,

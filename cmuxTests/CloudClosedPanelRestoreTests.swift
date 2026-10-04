@@ -21,7 +21,7 @@ struct CloudClosedPanelRestoreTests {
             let panelID = try #require(workspace.focusedPanelId)
             let paneID = try #require(workspace.paneId(forPanelId: panelID))
             let before = Set(workspace.panels.keys)
-            let layout = workspace.bonsplitController.treeSnapshot()
+            let layout = workspace.activeBonsplitController.treeSnapshot()
             var snapshot = workspace.sessionSnapshot(includeScrollback: false)
             snapshot.panels[0].browser?.urlString = "http://10.0.0.7:6901/vnc.html"
             let foreign = SurfaceResourceID(machine: .cloud(owner == "a" ? "b" : "a"), kind: .display, key: "display:1")
@@ -30,7 +30,7 @@ struct CloudClosedPanelRestoreTests {
                 snapshot.surfaceProjections = [record]
                 #expect(workspace.restoreSessionSnapshot(snapshot).isEmpty)
                 #expect(Set(workspace.panels.keys) == before)
-                #expect(workspace.bonsplitController.treeSnapshot() == layout)
+                #expect(workspace.activeBonsplitController.treeSnapshot() == layout)
                 #expect(workspace.cloudVMID == owner)
                 #expect(workspace.createPanel(from: snapshot.panels[0], inPane: paneID,
                     snapshotWorkspaceId: nil, shouldRestoreSingleDefaultCloudTerminal: false,
@@ -84,7 +84,7 @@ struct CloudClosedPanelRestoreTests {
                 workspace.markCloseHistoryEligible(panelId: closingID)
                 #expect(workspace.closePanel(closingID, force: true))
                 #expect(workspace.panels.isEmpty)
-                #expect(workspace.bonsplitController.allPaneIds.count == 1)
+                #expect(workspace.activeBonsplitController.allPaneIds.count == 1)
                 #expect(manager.reopenMostRecentlyClosedItem())
                 let restoredID = try #require(workspace.focusedPanelId)
                 #expect(workspace.panels.count == 1)
@@ -181,7 +181,7 @@ struct CloudClosedPanelRestoreTests {
             #expect(workspace.panels[reopenedID] is BrowserPanel)
             #expect(manager.selectedTabId == workspace.id)
             #expect(workspace.focusedPanelId == reopenedID)
-            #expect(workspace.bonsplitController.allPaneIds.count == 2)
+            #expect(workspace.activeBonsplitController.allPaneIds.count == 2)
             let sourcePane = try #require(workspace.paneId(forPanelId: sourceID))
             let browserPane = try #require(workspace.paneId(forPanelId: reopenedID))
             #expect(sourcePane != browserPane)
@@ -206,9 +206,9 @@ struct CloudClosedPanelRestoreTests {
             #expect(manager.reopenMostRecentlyClosedItem())
             #expect(workspace.panels.count == 3)
             #expect(workspace.panels.values.allSatisfy { $0.panelType == .browser })
-            #expect(workspace.bonsplitController.allPaneIds.count == 3)
+            #expect(workspace.activeBonsplitController.allPaneIds.count == 3)
             #expect(workspace.isProgrammaticSplit == false)
-            guard case .split(let root) = workspace.bonsplitController.treeSnapshot(),
+            guard case .split(let root) = workspace.activeBonsplitController.treeSnapshot(),
                   case .split(let nested) = root.second else {
                 Issue.record("Expected horizontal split containing a nested vertical split")
                 return

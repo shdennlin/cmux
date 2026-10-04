@@ -16,8 +16,8 @@ extension TabManager {
     @discardableResult
     private func equalizeSplitsOnce(in tab: Workspace) -> SplitEqualizeResult {
         paneLayout.equalizeSplits(
-            in: tab.bonsplitController.treeSnapshot(),
-            controller: tab.bonsplitController
+            in: tab.activeBonsplitController.treeSnapshot(),
+            controller: tab.activeBonsplitController
         )
     }
 }

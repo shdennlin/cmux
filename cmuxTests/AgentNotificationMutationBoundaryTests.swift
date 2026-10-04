@@ -410,7 +410,7 @@ extension AgentNotificationRegressionTests {
 
         let workspaceTransfer = try #require(dock.detachSurface(panelId: fixture.panelId))
         #expect(dock.agentRuntimeByPanelId[fixture.panelId] == nil)
-        let destinationPane = try #require(fixture.destination.bonsplitController.allPaneIds.first)
+        let destinationPane = try #require(fixture.destination.activeBonsplitController.allPaneIds.first)
         #expect(
             fixture.destination.attachDetachedSurface(
                 workspaceTransfer,

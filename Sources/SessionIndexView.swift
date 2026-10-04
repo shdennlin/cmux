@@ -169,8 +169,8 @@ enum SessionEntryResumeCoordinator {
         guard let workspace = tabManager.selectedWorkspace,
               !workspace.isRemoteWorkspace,
               !workspace.isRemoteTmuxMirror,
-              let paneId = workspace.bonsplitController.focusedPaneId
-                  ?? workspace.bonsplitController.allPaneIds.first else {
+              let paneId = workspace.activeBonsplitController.focusedPaneId
+                  ?? workspace.activeBonsplitController.allPaneIds.first else {
             // A remote workspace cannot safely execute a local Vault restore
             // command. If there is no usable local pane, fall back to the
             // same isolated-workspace launch used by Resume.

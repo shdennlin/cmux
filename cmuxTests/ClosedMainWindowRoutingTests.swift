@@ -801,8 +801,8 @@ struct RecoverableWindowlessMainWindowRoutingTests {
             let workspace = try #require(manager.selectedWorkspace)
             let terminal = try #require(workspace.focusedTerminalPanel)
             let paneId = try #require(
-                workspace.bonsplitController.focusedPaneId
-                    ?? workspace.bonsplitController.allPaneIds.first
+                workspace.activeBonsplitController.focusedPaneId
+                    ?? workspace.activeBonsplitController.allPaneIds.first
             )
             let browser = try #require(
                 workspace.newBrowserSurface(
@@ -1028,8 +1028,8 @@ struct RecoverableWindowlessMainWindowRoutingTests {
         let ownerWorkspace = try #require(owner.selectedWorkspace)
         let ownerTerminal = try #require(ownerWorkspace.focusedTerminalPanel)
         let ownerPaneId = try #require(
-            ownerWorkspace.bonsplitController.focusedPaneId
-                ?? ownerWorkspace.bonsplitController.allPaneIds.first
+            ownerWorkspace.activeBonsplitController.focusedPaneId
+                ?? ownerWorkspace.activeBonsplitController.allPaneIds.first
         )
         let ownerBrowser = try #require(
             ownerWorkspace.newBrowserSurface(
@@ -1577,8 +1577,8 @@ struct GhostMainWindowContextLifecycleTests {
         let manager = TabManager()
         let workspace = try #require(manager.selectedWorkspace)
         let paneId = try #require(
-            workspace.bonsplitController.focusedPaneId
-                ?? workspace.bonsplitController.allPaneIds.first
+            workspace.activeBonsplitController.focusedPaneId
+                ?? workspace.activeBonsplitController.allPaneIds.first
         )
         defer {
             workspace.teardownAllPanels()
@@ -1587,11 +1587,11 @@ struct GhostMainWindowContextLifecycleTests {
 
         manager.finalizeAllWorkspacesForWindowClose()
         #expect(workspace.isRetiredFromOwningTabManager)
-        #expect(workspace.bonsplitController.allPaneIds.contains(paneId))
-        let paneIdsAfterRetirement = workspace.bonsplitController.allPaneIds
+        #expect(workspace.activeBonsplitController.allPaneIds.contains(paneId))
+        let paneIdsAfterRetirement = workspace.activeBonsplitController.allPaneIds
         let tabIdsByPaneAfterRetirement = Dictionary(
             uniqueKeysWithValues: paneIdsAfterRetirement.map { paneId in
-                (paneId.id, workspace.bonsplitController.tabs(inPane: paneId).map(\.id))
+                (paneId.id, workspace.activeBonsplitController.tabs(inPane: paneId).map(\.id))
             }
         )
 
@@ -1600,11 +1600,11 @@ struct GhostMainWindowContextLifecycleTests {
 
         #expect(latePanelId == nil, message)
         #expect(workspace.panels.isEmpty, message)
-        #expect(workspace.bonsplitController.allPaneIds == paneIdsAfterRetirement, message)
+        #expect(workspace.activeBonsplitController.allPaneIds == paneIdsAfterRetirement, message)
         #expect(
             Dictionary(
-                uniqueKeysWithValues: workspace.bonsplitController.allPaneIds.map { paneId in
-                    (paneId.id, workspace.bonsplitController.tabs(inPane: paneId).map(\.id))
+                uniqueKeysWithValues: workspace.activeBonsplitController.allPaneIds.map { paneId in
+                    (paneId.id, workspace.activeBonsplitController.tabs(inPane: paneId).map(\.id))
                 }
             ) == tabIdsByPaneAfterRetirement,
             message
@@ -1743,7 +1743,7 @@ struct GhostMainWindowContextLifecycleTests {
         let workspace = try #require(manager.selectedWorkspace)
         let terminalPanel = try #require(workspace.focusedTerminalPanel)
         let paneId = try #require(
-            workspace.bonsplitController.focusedPaneId ?? workspace.bonsplitController.allPaneIds.first
+            workspace.activeBonsplitController.focusedPaneId ?? workspace.activeBonsplitController.allPaneIds.first
         )
         defer {
             workspace.teardownAllPanels()
@@ -1867,8 +1867,8 @@ struct GhostMainWindowContextLifecycleTests {
                 onInput: { _ in }
             )?.id
         }
-        try expectRetiredWorkspaceRejectsPanelCreation(named: "bonsplitController.splitPane") { workspace, paneId in
-            workspace.bonsplitController.splitPane(
+        try expectRetiredWorkspaceRejectsPanelCreation(named: "activeBonsplitController.splitPane") { workspace, paneId in
+            workspace.activeBonsplitController.splitPane(
                 paneId,
                 orientation: .horizontal,
                 withTab: nil
@@ -3061,21 +3061,21 @@ struct WorkspaceProcessWideObserverRetirementTests {
                 terminalCommandSourcePaths: [:],
                 workspaceCommands: [:]
             )
-            #expect(!workspace.bonsplitController.configuration.appearance.splitButtons.isEmpty)
+            #expect(!workspace.activeBonsplitController.configuration.appearance.splitButtons.isEmpty)
 
-            var configuration = workspace.bonsplitController.configuration
+            var configuration = workspace.activeBonsplitController.configuration
             configuration.appearance.splitButtons = []
-            workspace.bonsplitController.configuration = configuration
+            workspace.activeBonsplitController.configuration = configuration
             NotificationCenter.default.post(
                 name: .cmuxFeatureFlagsDidChange,
                 object: CmuxFeatureFlags.shared
             )
             await drainMainActorQueue()
-            #expect(!workspace.bonsplitController.configuration.appearance.splitButtons.isEmpty)
+            #expect(!workspace.activeBonsplitController.configuration.appearance.splitButtons.isEmpty)
 
-            configuration = workspace.bonsplitController.configuration
+            configuration = workspace.activeBonsplitController.configuration
             configuration.appearance.splitButtons = []
-            workspace.bonsplitController.configuration = configuration
+            workspace.activeBonsplitController.configuration = configuration
 
             // Queue one final refresh, then retire before its MainActor task can
             // mutate a workspace whose window has already closed.
@@ -3085,7 +3085,7 @@ struct WorkspaceProcessWideObserverRetirementTests {
             )
             workspace.retireFromOwningTabManager()
             await drainMainActorQueue()
-            #expect(workspace.bonsplitController.configuration.appearance.splitButtons.isEmpty)
+            #expect(workspace.activeBonsplitController.configuration.appearance.splitButtons.isEmpty)
 
             for _ in 0..<3 {
                 NotificationCenter.default.post(
@@ -3094,7 +3094,7 @@ struct WorkspaceProcessWideObserverRetirementTests {
                 )
             }
             await drainMainActorQueue()
-            #expect(workspace.bonsplitController.configuration.appearance.splitButtons.isEmpty)
+            #expect(workspace.activeBonsplitController.configuration.appearance.splitButtons.isEmpty)
         }
     }
 

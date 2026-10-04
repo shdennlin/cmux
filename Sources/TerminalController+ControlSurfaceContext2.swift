@@ -423,9 +423,9 @@ extension TerminalController {
         if let remote = controlRemoteTmuxSurfaceCreate(workspace: ws, tabManager: tabManager, inputs: inputs, panelType: panelType) { return remote }
         let paneId: PaneID? = {
             if let paneUUID = inputs.requestedPaneID {
-                return ws.bonsplitController.allPaneIds.first(where: { $0.id == paneUUID })
+                return ws.activeBonsplitController.allPaneIds.first(where: { $0.id == paneUUID })
             }
-            return ws.bonsplitController.focusedPaneId
+            return ws.activeBonsplitController.focusedPaneId
         }()
         guard let paneId else {
             return .paneNotFound

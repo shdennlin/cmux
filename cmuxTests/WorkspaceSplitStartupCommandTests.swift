@@ -107,7 +107,7 @@ final class WorkspaceSplitStartupCommandTests: XCTestCase {
 
         workspace.applyCustomLayout(layout, baseCwd: NSTemporaryDirectory())
 
-        let modelSplitBeforeRender = try XCTUnwrap(workspaceSplitNodes(in: workspace.bonsplitController.treeSnapshot()).first)
+        let modelSplitBeforeRender = try XCTUnwrap(workspaceSplitNodes(in: workspace.activeBonsplitController.treeSnapshot()).first)
         XCTAssertEqual(
             modelSplitBeforeRender.dividerPosition,
             expectedDividerPosition,
@@ -116,7 +116,7 @@ final class WorkspaceSplitStartupCommandTests: XCTestCase {
         )
 
         let hostingView = NSHostingView(
-            rootView: BonsplitView(controller: workspace.bonsplitController) { _, _ in
+            rootView: BonsplitView(controller: workspace.activeBonsplitController) { _, _ in
                 Color.clear
             } emptyPane: { _ in
                 Color.clear
@@ -144,7 +144,7 @@ final class WorkspaceSplitStartupCommandTests: XCTestCase {
             accuracy: 0.03
         )
 
-        let modelSplitAfterRender = try XCTUnwrap(workspaceSplitNodes(in: workspace.bonsplitController.treeSnapshot()).first)
+        let modelSplitAfterRender = try XCTUnwrap(workspaceSplitNodes(in: workspace.activeBonsplitController.treeSnapshot()).first)
         XCTAssertEqual(
             modelSplitAfterRender.dividerPosition,
             expectedDividerPosition,
@@ -196,7 +196,7 @@ final class WorkspaceSplitStartupCommandTests: XCTestCase {
             tmuxStartCommand,
             "Programmatic tmux-compatible splits must preserve the original tmux command for pane format queries"
         )
-        guard let split = workspaceSplitNodes(in: workspace.bonsplitController.treeSnapshot()).first else {
+        guard let split = workspaceSplitNodes(in: workspace.activeBonsplitController.treeSnapshot()).first else {
             XCTFail("Expected split terminal panel to create a split node")
             return
         }
@@ -211,7 +211,7 @@ final class WorkspaceSplitStartupCommandTests: XCTestCase {
 
     func testNewTerminalSurfaceCarriesRequestedWorkingDirectoryAndStartupCommand() {
         let workspace = Workspace()
-        guard let paneId = workspace.bonsplitController.focusedPaneId else {
+        guard let paneId = workspace.activeBonsplitController.focusedPaneId else {
             XCTFail("Expected focused pane in new workspace")
             return
         }
@@ -260,8 +260,8 @@ final class WorkspaceSplitStartupCommandTests: XCTestCase {
         let originalPane = try XCTUnwrap(workspace.paneId(forPanelId: originalPanelId))
         let originalPaneId = originalPane.id
         let originalTabId = try XCTUnwrap(workspace.surfaceIdFromPanelId(originalPanelId))
-        let originalPaneCount = workspace.bonsplitController.allPaneIds.count
-        let originalTabCount = workspace.bonsplitController.tabs(inPane: originalPane).count
+        let originalPaneCount = workspace.activeBonsplitController.allPaneIds.count
+        let originalTabCount = workspace.activeBonsplitController.tabs(inPane: originalPane).count
         let originalWaitAfterCommand = placeholderPanel.surface.debugWaitAfterCommand()
 
         let respawnedPanel = try XCTUnwrap(workspace.respawnTerminalSurface(
@@ -276,10 +276,10 @@ final class WorkspaceSplitStartupCommandTests: XCTestCase {
         let currentPane = try XCTUnwrap(workspace.paneId(forPanelId: originalPanelId))
         XCTAssertEqual(currentPane.id, originalPaneId)
         XCTAssertEqual(workspace.surfaceIdFromPanelId(originalPanelId), originalTabId)
-        XCTAssertEqual(workspace.bonsplitController.allPaneIds.count, originalPaneCount)
-        XCTAssertTrue(workspace.bonsplitController.allPaneIds.contains(where: { $0.id == originalPaneId }))
-        XCTAssertEqual(workspace.bonsplitController.tabs(inPane: currentPane).count, originalTabCount)
-        XCTAssertTrue(workspace.bonsplitController.tabs(inPane: currentPane).contains(where: { $0.id == originalTabId }))
+        XCTAssertEqual(workspace.activeBonsplitController.allPaneIds.count, originalPaneCount)
+        XCTAssertTrue(workspace.activeBonsplitController.allPaneIds.contains(where: { $0.id == originalPaneId }))
+        XCTAssertEqual(workspace.activeBonsplitController.tabs(inPane: currentPane).count, originalTabCount)
+        XCTAssertTrue(workspace.activeBonsplitController.tabs(inPane: currentPane).contains(where: { $0.id == originalTabId }))
         XCTAssertEqual(respawnedPanel.requestedWorkingDirectory, requestedDirectory)
         XCTAssertEqual(respawnedPanel.surface.debugInitialCommand(), attachCommand)
         XCTAssertEqual(respawnedPanel.surface.debugTmuxStartCommand(), attachCommand)
@@ -338,7 +338,7 @@ final class WorkspaceSplitStartupCommandTests: XCTestCase {
 
     func testSessionSnapshotDoesNotPersistGenericTmuxStartCommand() throws {
         let workspace = Workspace()
-        let paneId = try XCTUnwrap(workspace.bonsplitController.focusedPaneId)
+        let paneId = try XCTUnwrap(workspace.activeBonsplitController.focusedPaneId)
         let genericCommand = "sleep 600"
         let panel = try XCTUnwrap(workspace.newTerminalSurface(
             inPane: paneId,

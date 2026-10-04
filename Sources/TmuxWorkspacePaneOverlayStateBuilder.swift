@@ -38,7 +38,7 @@ struct TmuxWorkspacePaneOverlayStateBuilder {
             LayoutSnapshot(containerFrame: $0.containerFrame, panes: $0.panes,
                            focusedPaneId: $0.focusedPaneId, timestamp: 0)
         }
-        result.isZoomed = workspace.bonsplitController.isSplitZoomed
+        result.isZoomed = workspace.activeBonsplitController.isSplitZoomed
         if let focusedPaneId = layout?.focusedPaneId,
            let focusedPane = layout?.panes.first(where: { $0.paneId == focusedPaneId }),
            let selected = focusedPane.selectedTabId.flatMap(UUID.init(uuidString:)) {
@@ -72,7 +72,7 @@ struct TmuxWorkspacePaneOverlayStateBuilder {
         settings.activePaneBorderColorHex != nil
             && workspace.layoutMode != .canvas
             && !settings.rightSidebarOwnsInputFocus
-            && workspace.bonsplitController.allPaneIds.count > 1
+            && workspace.activeBonsplitController.allPaneIds.count > 1
     }
 
     /// The overlay for the selected workspace, or `nil` when neither the
@@ -85,7 +85,7 @@ struct TmuxWorkspacePaneOverlayStateBuilder {
 
         let layoutSnapshot = WorkspaceContentView.effectiveTmuxLayoutSnapshot(
             cachedSnapshot: workspace.tmuxLayoutSnapshot,
-            liveSnapshot: workspace.bonsplitController.layoutSnapshot()
+            liveSnapshot: workspace.activeBonsplitController.layoutSnapshot()
         )
         let contentView = WindowTmuxWorkspacePaneOverlayController.controller(
             for: window,
@@ -201,7 +201,7 @@ struct TmuxWorkspacePaneOverlayStateBuilder {
             paneId: workspace.paneId(forPanelId: panelId)
         )
         let exactRect = contentView.flatMap { ContentView.tmuxWorkspacePaneExactRect(for: panel, in: $0) }
-        let isSplitZoomed = workspace.bonsplitController.isSplitZoomed
+        let isSplitZoomed = workspace.activeBonsplitController.isSplitZoomed
         // Bonsplit's zoomed container covers the visible pane; hosted terminal
         // views can include a tab-chrome offset during the zoom transition.
         return WorkspaceContentView.tmuxPaneOverlayGeometry.preferredWindowOverlayRect(

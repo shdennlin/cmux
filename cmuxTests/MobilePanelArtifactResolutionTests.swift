@@ -26,7 +26,7 @@ struct MobilePanelArtifactResolutionTests {
         let fileURL = try temporaryMarkdownFile(contents: contents)
         defer { try? FileManager.default.removeItem(at: fileURL) }
 
-        let firstPane = try #require(workspace.bonsplitController.allPaneIds.first)
+        let firstPane = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let panel = try #require(workspace.newMarkdownSurface(
             inPane: firstPane,
             filePath: fileURL.path,
@@ -71,7 +71,7 @@ struct MobilePanelArtifactResolutionTests {
         let fileURL = try temporaryMarkdownFile(contents: "# Not a terminal\n")
         defer { try? FileManager.default.removeItem(at: fileURL) }
 
-        let firstPane = try #require(workspace.bonsplitController.allPaneIds.first)
+        let firstPane = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let panel = try #require(workspace.newMarkdownSurface(
             inPane: firstPane,
             filePath: fileURL.path,

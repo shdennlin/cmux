@@ -22,7 +22,7 @@ struct AppDelegateMoveTabToNewWorkspaceTests {
         defer { app.unregisterMainWindowContextForTesting(windowId: windowId) }
 
         let sourceWorkspace = try XCTUnwrap(manager.selectedWorkspace)
-        let sourcePaneId = try XCTUnwrap(sourceWorkspace.bonsplitController.allPaneIds.first)
+        let sourcePaneId = try XCTUnwrap(sourceWorkspace.activeBonsplitController.allPaneIds.first)
         let remainingPanelId = try XCTUnwrap(sourceWorkspace.focusedTerminalPanel?.id)
         let movedPanel = try XCTUnwrap(sourceWorkspace.newTerminalSurface(inPane: sourcePaneId, focus: false))
         sourceWorkspace.setPanelCustomTitle(panelId: movedPanel.id, title: "Build logs")
@@ -74,7 +74,7 @@ struct AppDelegateMoveTabToNewWorkspaceTests {
         defer { app.unregisterMainWindowContextForTesting(windowId: windowId) }
 
         let workspace = try XCTUnwrap(manager.selectedWorkspace)
-        let paneId = try XCTUnwrap(workspace.bonsplitController.allPaneIds.first)
+        let paneId = try XCTUnwrap(workspace.activeBonsplitController.allPaneIds.first)
         let remainingPanelId = try XCTUnwrap(workspace.focusedPanelId)
         let movedPanel = try XCTUnwrap(workspace.newTerminalSurface(inPane: paneId, focus: false))
         let movedTitle = "Moved Surface Title - grok"
@@ -142,7 +142,7 @@ struct AppDelegateMoveTabToNewWorkspaceTests {
         defer { app.unregisterMainWindowContextForTesting(windowId: windowId) }
 
         let sourceWorkspace = try XCTUnwrap(manager.selectedWorkspace)
-        let sourcePaneId = try XCTUnwrap(sourceWorkspace.bonsplitController.allPaneIds.first)
+        let sourcePaneId = try XCTUnwrap(sourceWorkspace.activeBonsplitController.allPaneIds.first)
         let movedPanel = try XCTUnwrap(sourceWorkspace.newTerminalSurface(inPane: sourcePaneId, focus: false))
         #expect(!movedPanel.isTextBoxActive)
 
@@ -170,7 +170,7 @@ struct AppDelegateMoveTabToNewWorkspaceTests {
         defer { app.unregisterMainWindowContextForTesting(windowId: windowId) }
 
         let sourceWorkspace = try XCTUnwrap(manager.selectedWorkspace)
-        let sourcePaneId = try XCTUnwrap(sourceWorkspace.bonsplitController.allPaneIds.first)
+        let sourcePaneId = try XCTUnwrap(sourceWorkspace.activeBonsplitController.allPaneIds.first)
         let browserPanel = try XCTUnwrap(
             sourceWorkspace.newBrowserSurface(
                 inPane: sourcePaneId,
@@ -258,7 +258,7 @@ struct AppDelegateMoveTabToNewWorkspaceTests {
         defer { app.unregisterMainWindowContextForTesting(windowId: windowId) }
 
         let sourceWorkspace = try #require(manager.selectedWorkspace)
-        let sourcePaneId = try #require(sourceWorkspace.bonsplitController.allPaneIds.first)
+        let sourcePaneId = try #require(sourceWorkspace.activeBonsplitController.allPaneIds.first)
         let movedPanel = try #require(sourceWorkspace.newTerminalSurface(inPane: sourcePaneId, focus: false))
 
         // Seed the source panel's process-derived title with what a shell
@@ -304,7 +304,7 @@ struct AppDelegateMoveTabToNewWorkspaceTests {
         defer { app.unregisterMainWindowContextForTesting(windowId: windowId) }
 
         let sourceWorkspace = try #require(manager.selectedWorkspace)
-        let sourcePaneId = try #require(sourceWorkspace.bonsplitController.allPaneIds.first)
+        let sourcePaneId = try #require(sourceWorkspace.activeBonsplitController.allPaneIds.first)
         let movedPanel = try #require(sourceWorkspace.newTerminalSurface(inPane: sourcePaneId, focus: false))
         #expect(sourceWorkspace.updatePanelTitle(panelId: movedPanel.id, title: "user@host:~/git/repo"))
         sourceWorkspace.setPanelCustomTitle(panelId: movedPanel.id, title: "Deploy logs")
@@ -335,7 +335,7 @@ struct AppDelegateMoveTabToNewWorkspaceTests {
         defer { app.unregisterMainWindowContextForTesting(windowId: windowId) }
 
         let sourceWorkspace = try #require(manager.selectedWorkspace)
-        let sourcePaneId = try #require(sourceWorkspace.bonsplitController.allPaneIds.first)
+        let sourcePaneId = try #require(sourceWorkspace.activeBonsplitController.allPaneIds.first)
         let movedPanel = try #require(sourceWorkspace.newTerminalSurface(inPane: sourcePaneId, focus: false))
         #expect(sourceWorkspace.setPanelCustomTitle(panelId: movedPanel.id, title: "Agent task", source: source))
 
@@ -364,7 +364,7 @@ struct AppDelegateMoveTabToNewWorkspaceTests {
         defer { app.unregisterMainWindowContextForTesting(windowId: windowId) }
 
         let sourceWorkspace = try #require(manager.selectedWorkspace)
-        let sourcePaneId = try #require(sourceWorkspace.bonsplitController.allPaneIds.first)
+        let sourcePaneId = try #require(sourceWorkspace.activeBonsplitController.allPaneIds.first)
         let movedPanel = try #require(sourceWorkspace.newTerminalSurface(inPane: sourcePaneId, focus: false))
         sourceWorkspace.setPanelCustomTitle(panelId: movedPanel.id, title: "Agent task", source: .auto)
 
@@ -397,7 +397,7 @@ struct AppDelegateMoveTabToNewWorkspaceTests {
         defer { app.unregisterMainWindowContextForTesting(windowId: windowId) }
 
         let sourceWorkspace = try #require(manager.selectedWorkspace)
-        let sourcePaneId = try #require(sourceWorkspace.bonsplitController.allPaneIds.first)
+        let sourcePaneId = try #require(sourceWorkspace.activeBonsplitController.allPaneIds.first)
         let movedPanel = try #require(sourceWorkspace.newTerminalSurface(inPane: sourcePaneId, focus: false))
         sourceWorkspace.setPanelCustomTitle(panelId: movedPanel.id, title: "user@host:~/git/repo")
 

@@ -92,7 +92,7 @@ final class LocalSurfaceProviderTests: XCTestCase {
 
         let detached = try XCTUnwrap(source.detachSurface(panelId: panelID))
         XCTAssertNotNil(catalog.resources[resourceID], "a pane in flight keeps its resource")
-        let targetPane = try XCTUnwrap(target.bonsplitController.allPaneIds.first)
+        let targetPane = try XCTUnwrap(target.activeBonsplitController.allPaneIds.first)
         XCTAssertNotNil(target.attachDetachedSurface(detached, inPane: targetPane))
 
         XCTAssertEqual(catalog.projection(forPanel: panelID)?.workspaceID, target.id)

@@ -42,7 +42,7 @@ struct WorkspaceMergeDropTests {
         let fixture = Fixture()
         defer { fixture.tearDown() }
         let target = try XCTUnwrap(fixture.manager.selectedWorkspace)
-        let targetPane = try XCTUnwrap(target.bonsplitController.allPaneIds.first)
+        let targetPane = try XCTUnwrap(target.activeBonsplitController.allPaneIds.first)
         let targetPanel = try XCTUnwrap(target.focusedTerminalPanel?.id)
         let source = fixture.manager.addWorkspace(title: "Logs", select: false)
         let sourcePanel = try XCTUnwrap(source.focusedTerminalPanel?.id)
@@ -55,7 +55,7 @@ struct WorkspaceMergeDropTests {
         #expect(fixture.manager.tabs.map(\.id) == [target.id], "the emptied workspace closed")
         #expect(target.panels[sourcePanel] != nil && target.panels[targetPanel] != nil)
         #expect(target.paneId(forPanelId: sourcePanel) == targetPane)
-        #expect(target.bonsplitController.allPaneIds.count == 1, "the center adds a tab, no split")
+        #expect(target.activeBonsplitController.allPaneIds.count == 1, "the center adds a tab, no split")
     }
 
     @Test
@@ -63,10 +63,10 @@ struct WorkspaceMergeDropTests {
         let fixture = Fixture()
         defer { fixture.tearDown() }
         let target = try XCTUnwrap(fixture.manager.selectedWorkspace)
-        let targetPane = try XCTUnwrap(target.bonsplitController.allPaneIds.first)
+        let targetPane = try XCTUnwrap(target.activeBonsplitController.allPaneIds.first)
         let targetPanel = try XCTUnwrap(target.focusedTerminalPanel?.id)
         let source = fixture.manager.addWorkspace(title: "Build", select: false)
-        let sourcePane = try XCTUnwrap(source.bonsplitController.allPaneIds.first)
+        let sourcePane = try XCTUnwrap(source.activeBonsplitController.allPaneIds.first)
         _ = try XCTUnwrap(source.newTerminalSurface(inPane: sourcePane, focus: false))
         _ = try XCTUnwrap(source.newTerminalSurface(inPane: sourcePane, focus: false))
         // New tabs open beside the selected one, so read the order the tab bar shows.
@@ -88,10 +88,10 @@ struct WorkspaceMergeDropTests {
         let fixture = Fixture()
         defer { fixture.tearDown() }
         let target = try XCTUnwrap(fixture.manager.selectedWorkspace)
-        let targetPane = try XCTUnwrap(target.bonsplitController.allPaneIds.first)
+        let targetPane = try XCTUnwrap(target.activeBonsplitController.allPaneIds.first)
         let targetPanel = try XCTUnwrap(target.focusedTerminalPanel?.id)
         let source = fixture.manager.addWorkspace(title: "Servers", select: false)
-        let sourcePane = try XCTUnwrap(source.bonsplitController.allPaneIds.first)
+        let sourcePane = try XCTUnwrap(source.activeBonsplitController.allPaneIds.first)
         let first = try XCTUnwrap(source.focusedTerminalPanel?.id)
         let second = try XCTUnwrap(source.newTerminalSurface(inPane: sourcePane, focus: false)).id
 
@@ -100,7 +100,7 @@ struct WorkspaceMergeDropTests {
                                            focus: false, focusWindow: false))
 
         #expect(!fixture.manager.tabs.contains { $0.id == source.id })
-        #expect(target.bonsplitController.allPaneIds.count == 2)
+        #expect(target.activeBonsplitController.allPaneIds.count == 2)
         let newPane = try XCTUnwrap(target.paneId(forPanelId: first))
         #expect(newPane != targetPane)
         #expect(target.paneId(forPanelId: second) == newPane)
@@ -113,7 +113,7 @@ struct WorkspaceMergeDropTests {
         let fixture = Fixture()
         defer { fixture.tearDown() }
         let workspace = try XCTUnwrap(fixture.manager.selectedWorkspace)
-        let pane = try XCTUnwrap(workspace.bonsplitController.allPaneIds.first)
+        let pane = try XCTUnwrap(workspace.activeBonsplitController.allPaneIds.first)
         let panelCount = workspace.panels.count
 
         #expect(!fixture.app.canMergeWorkspace(workspace.id, into: workspace.id))

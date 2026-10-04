@@ -41,7 +41,7 @@ struct RapidSwitchTests {
         let manager = TabManager()
         let workspace = try XCTUnwrap(manager.selectedWorkspace)
         let other = manager.addWorkspace(title: "Build", select: false)
-        let pane = try XCTUnwrap(workspace.bonsplitController.allPaneIds.first)
+        let pane = try XCTUnwrap(workspace.activeBonsplitController.allPaneIds.first)
         _ = try XCTUnwrap(workspace.newTerminalSurface(inPane: pane, focus: false))
         let order = workspace.sidebarOrderedPanelIds()
         #expect(order.count == 2)

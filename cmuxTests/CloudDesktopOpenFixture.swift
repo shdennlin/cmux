@@ -171,7 +171,7 @@ final class CloudDesktopOpenFixture {
     func drop(_ row: CloudTreeNode, into workspace: Workspace) async throws {
         assertTaskWindowRemainsUnfocused()
         let group = try #require(row.dragGroup)
-        let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+        let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let route = try #require(TerminalController.shared.v2LocatePane(pane.id))
         try #require(route.windowId == app.windowID && route.tabManager === app.manager)
         try #require(route.workspace === workspace && route.paneId == pane)

@@ -6,7 +6,7 @@ import Foundation
 extension Workspace {
     /// Captures split geometry and stable panel IDs for Mac workspace-layout requests.
     func deviceWorkspaceLayoutSnapshot() -> DeviceWorkspaceLayoutNode? {
-        deviceLayoutNode(bonsplitController.treeSnapshot())
+        deviceLayoutNode(activeBonsplitController.treeSnapshot())
     }
 
     private func deviceLayoutNode(_ node: ExternalTreeNode) -> DeviceWorkspaceLayoutNode? {

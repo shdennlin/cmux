@@ -288,7 +288,7 @@ extension WorkspaceCreateWorkingDirectoryTests {
         let manager = TabManager()
         let workspace = try #require(manager.selectedWorkspace)
         let sourcePanelID = try #require(workspace.focusedPanelId)
-        let paneID = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
         let initialInput = " printf '  preserved  '\t\r"
         TerminalController.shared.setActiveTabManager(manager)
         defer { TerminalController.shared.setActiveTabManager(previousManager) }

@@ -111,7 +111,7 @@ struct WorkspaceProgramStatusTests {
         )
 
         let detached = try #require(source.detachSurface(panelId: movedPanel.id))
-        let destinationPane = try #require(destination.bonsplitController.allPaneIds.first)
+        let destinationPane = try #require(destination.activeBonsplitController.allPaneIds.first)
         _ = try #require(destination.attachDetachedSurface(detached, inPane: destinationPane, focus: false))
 
         #expect(source.statusEntries[Workspace.programStatusKey] == nil)

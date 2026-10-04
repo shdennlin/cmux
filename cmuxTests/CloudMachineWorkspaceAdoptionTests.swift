@@ -73,7 +73,7 @@ struct CloudMachineWorkspaceAdoptionTests {
             NewMachineSheetPresenter.closeReservedWorkspace(app.workspace.id)
             #expect(app.manager.tabs.contains { $0.id == app.workspace.id })
             #expect(app.workspace.panels[panel.id] === panel)
-            let pane = try #require(pending.bonsplitController.allPaneIds.first)
+            let pane = try #require(pending.activeBonsplitController.allPaneIds.first)
             let command = try #require(pending.newTerminalSurface(inPane: pane, focus: false,
                 initialCommand: "echo first-command", autoRefreshMetadata: false))
             pending.cloudVMBinding = WorkspaceCloudVMBinding(vmID: "newer-machine", isBase: false)
@@ -293,7 +293,7 @@ struct CloudMachineWorkspaceAdoptionTests {
             try provider.install(in: catalog)
             let pending = app.manager.addWorkspace(initialSurface: .cloudVMLoading, select: false, autoWelcomeIfNeeded: false)
             let other = app.manager.addWorkspace(initialSurface: .cloudVMLoading, select: false, autoWelcomeIfNeeded: false)
-            let pane = try #require(pending.bonsplitController.allPaneIds.first)
+            let pane = try #require(pending.activeBonsplitController.allPaneIds.first)
             let command = try #require(pending.newTerminalSurface(inPane: pane, focus: false, initialCommand: "echo first-command", autoRefreshMetadata: false))
             catalog.bindCloudWorkspace(localWorkspaceID: pending.id, machine: provider.machine, remoteWorkspaceID: nil)
             let entered = CloudLinkFirstValue<Bool>(), release = CloudLinkFirstValue<Bool>()

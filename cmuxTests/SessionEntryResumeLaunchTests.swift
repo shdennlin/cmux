@@ -501,7 +501,7 @@ struct SessionEntryResumeLaunchTests {
         )
         defer { manager.tabs.forEach { $0.teardownAllPanels() } }
         let workspace = try #require(manager.selectedWorkspace)
-        let initialPaneID = try #require(workspace.bonsplitController.focusedPaneId)
+        let initialPaneID = try #require(workspace.activeBonsplitController.focusedPaneId)
 
         let entry = SessionEntry(
             id: "codex:already-active-session",
@@ -534,14 +534,14 @@ struct SessionEntryResumeLaunchTests {
             workspace.restoredAgentSnapshotsByPanelId[existingPanel.id]?.sessionId
                 == entry.sessionId
         )
-        let paneCountBefore = workspace.bonsplitController.allPaneIds.count
+        let paneCountBefore = workspace.activeBonsplitController.allPaneIds.count
         let panelCountBefore = workspace.panels.count
 
         SessionEntryResumeCoordinator.open(entry, tabManager: manager)
 
         #expect(manager.tabs.count == 1)
         #expect(manager.selectedWorkspace === workspace)
-        #expect(workspace.bonsplitController.allPaneIds.count == paneCountBefore + 1)
+        #expect(workspace.activeBonsplitController.allPaneIds.count == paneCountBefore + 1)
         #expect(workspace.panels.count == panelCountBefore + 1)
         let openedPanelID = try #require(workspace.focusedPanelId)
         #expect(openedPanelID != existingPanel.id)
@@ -567,7 +567,7 @@ struct SessionEntryResumeLaunchTests {
         )
         defer { manager.tabs.forEach { $0.teardownAllPanels() } }
         let workspace = try #require(manager.selectedWorkspace)
-        let paneID = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
         let entry = SessionEntry(
             id: "codex:active-session",
             agent: .codex,

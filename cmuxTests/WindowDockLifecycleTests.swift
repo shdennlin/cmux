@@ -314,7 +314,7 @@ struct WindowDockLifecycleTests {
             }
         }
 
-        let paneId = try #require(workspace.bonsplitController.allPaneIds.first)
+        let paneId = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let dock = try #require(workspace.dockSplit)
         let dockPaneId = try #require(dock.bonsplitController.allPaneIds.first)
         workspace.retireFromOwningTabManager()
@@ -517,8 +517,8 @@ struct WindowDockLifecycleTests {
             let workspace = try #require(manager?.selectedWorkspace)
             let terminal = try #require(workspace.focusedTerminalPanel)
             let workspacePane = try #require(
-                workspace.bonsplitController.focusedPaneId
-                    ?? workspace.bonsplitController.allPaneIds.first
+                workspace.activeBonsplitController.focusedPaneId
+                    ?? workspace.activeBonsplitController.allPaneIds.first
             )
             let workspaceBrowser = try #require(
                 workspace.newBrowserSurface(

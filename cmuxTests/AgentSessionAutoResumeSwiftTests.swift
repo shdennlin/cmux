@@ -65,7 +65,7 @@ struct AgentSessionAutoResumeSwiftTests {
         #expect(restored.panelTitle(panelId: restoredPanelID) == persistedTitle)
         #expect(restored.title == persistedTitle)
         #expect(restored.processTitle == persistedTitle)
-        #expect(restored.bonsplitController.tab(restoredTabID)?.title == persistedTitle)
+        #expect(restored.activeBonsplitController.tab(restoredTabID)?.title == persistedTitle)
 
         // Ghostty can deliver the shell's command title before cmux receives the
         // matching shell-activity transition. The internal event must be inert in
@@ -74,7 +74,7 @@ struct AgentSessionAutoResumeSwiftTests {
         #expect(restored.panelTitle(panelId: restoredPanelID) == persistedTitle)
         #expect(restored.title == persistedTitle)
         #expect(restored.processTitle == persistedTitle)
-        #expect(restored.bonsplitController.tab(restoredTabID)?.title == persistedTitle)
+        #expect(restored.activeBonsplitController.tab(restoredTabID)?.title == persistedTitle)
 
         restored.updatePanelShellActivityState(panelId: restoredPanelID, state: .commandRunning)
         #expect(restored.panelTitle(panelId: restoredPanelID) == persistedTitle)
@@ -84,7 +84,7 @@ struct AgentSessionAutoResumeSwiftTests {
         #expect(restored.panelTitle(panelId: restoredPanelID) == genuineTitle)
         #expect(restored.title == genuineTitle)
         #expect(restored.processTitle == genuineTitle)
-        #expect(restored.bonsplitController.tab(restoredTabID)?.title == genuineTitle)
+        #expect(restored.activeBonsplitController.tab(restoredTabID)?.title == genuineTitle)
     }
 
     /// The same restore-title boundary applies to an ordinary shell with no
@@ -111,7 +111,7 @@ struct AgentSessionAutoResumeSwiftTests {
         #expect(restored.panelTitle(panelId: restoredPanelID) == persistedTitle)
         #expect(restored.title == persistedTitle)
         #expect(restored.processTitle == persistedTitle)
-        #expect(restored.bonsplitController.tab(restoredTabID)?.title == persistedTitle)
+        #expect(restored.activeBonsplitController.tab(restoredTabID)?.title == persistedTitle)
 
         restored.updatePanelShellActivityState(panelId: restoredPanelID, state: .promptIdle)
         let commandTitle = "cd /tmp/cmux-issue-9619"
@@ -127,7 +127,7 @@ struct AgentSessionAutoResumeSwiftTests {
         #expect(restored.panelTitle(panelId: restoredPanelID) == commandTitle)
         #expect(restored.title == commandTitle)
         #expect(restored.processTitle == commandTitle)
-        #expect(restored.bonsplitController.tab(restoredTabID)?.title == commandTitle)
+        #expect(restored.activeBonsplitController.tab(restoredTabID)?.title == commandTitle)
 
         restored.updatePanelShellActivityState(panelId: restoredPanelID, state: .promptIdle)
         let directoryTitle = "/tmp/cmux-issue-9619"
@@ -135,7 +135,7 @@ struct AgentSessionAutoResumeSwiftTests {
         #expect(restored.panelTitle(panelId: restoredPanelID) == directoryTitle)
         #expect(restored.title == directoryTitle)
         #expect(restored.processTitle == directoryTitle)
-        #expect(restored.bonsplitController.tab(restoredTabID)?.title == directoryTitle)
+        #expect(restored.activeBonsplitController.tab(restoredTabID)?.title == directoryTitle)
     }
 
     /// A restored terminal can move through a detached transfer before its
@@ -225,7 +225,7 @@ struct AgentSessionAutoResumeSwiftTests {
 
         let destination = Workspace()
         defer { destination.teardownAllPanels() }
-        let destinationPaneID = try #require(destination.bonsplitController.allPaneIds.first)
+        let destinationPaneID = try #require(destination.activeBonsplitController.allPaneIds.first)
         #expect(
             destination.attachDetachedSurface(
                 detachedFromDock,
@@ -237,7 +237,7 @@ struct AgentSessionAutoResumeSwiftTests {
         #expect(destination.panelTitle(panelId: restoredPanelID) == commandTitle)
         #expect(destination.title == commandTitle)
         #expect(destination.processTitle == commandTitle)
-        #expect(destination.bonsplitController.tab(destinationTabID)?.title == commandTitle)
+        #expect(destination.activeBonsplitController.tab(destinationTabID)?.title == commandTitle)
     }
 
     /// Regression for #8501: restoring an auto-resumed terminal reapplies the
@@ -791,7 +791,7 @@ struct AgentSessionAutoResumeSwiftTests {
             #expect(source.restoredResumeSessionWorkingDirectoriesByPanelId[sourcePanelId] == nil)
 
             let destination = Workspace()
-            let paneId = try #require(destination.bonsplitController.allPaneIds.first)
+            let paneId = try #require(destination.activeBonsplitController.allPaneIds.first)
             let attachedPanelId = try #require(destination.attachDetachedSurface(
                 detached,
                 inPane: paneId,

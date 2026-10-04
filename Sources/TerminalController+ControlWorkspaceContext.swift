@@ -347,10 +347,10 @@ extension TerminalController: ControlWorkspaceContext {
         guard let ws = resolveWorkspace(routing: routing, tabManager: tabManager) else {
             return .notFound
         }
-        let tree = ws.bonsplitController.treeSnapshot()
+        let tree = ws.activeBonsplitController.treeSnapshot()
         let equalizeResult = tabManager.paneLayout.equalizeSplits(
             in: tree,
-            controller: ws.bonsplitController,
+            controller: ws.activeBonsplitController,
             orientationFilter: orientationFilter
         )
         return .resolved(workspaceID: ws.id, equalized: equalizeResult.didFullyEqualize)

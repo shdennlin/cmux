@@ -89,7 +89,7 @@ struct CmuxDurableDeepLinkRestoreTests {
     @Test func surfaceLinkResolvesToSameLogicalTabAfterRestore() throws {
         let manager = TabManager()
         let workspace = try #require(manager.selectedWorkspace)
-        let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+        let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let linkedPanelId = try #require(workspace.newTerminalSurface(inPane: pane, focus: true)?.id)
         workspace.setPanelCustomTitle(panelId: linkedPanelId, title: "Linked tab")
         let linkedPanel = try #require(workspace.panels[linkedPanelId])
@@ -148,7 +148,7 @@ struct CmuxDurableDeepLinkRestoreTests {
     @Test func terminalContextMenuSurfaceLinkUsesLivePanelId() throws {
         let manager = TabManager()
         let workspace = try #require(manager.selectedWorkspace)
-        let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+        let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let panel = try #require(workspace.newTerminalSurface(inPane: pane, focus: true))
         let surfaceId = try #require(workspace.surfaceIdFromPanelId(panel.id)?.uuid)
         #expect(surfaceId != panel.id)
@@ -180,7 +180,7 @@ struct CmuxDurableDeepLinkRestoreTests {
     @Test func copiedSurfaceLinkMatchesCopyIdsLiveIdentity() throws {
         let manager = TabManager()
         let workspace = try #require(manager.selectedWorkspace)
-        let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+        let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let panel = try #require(workspace.newTerminalSurface(inPane: pane, focus: true))
         let identifiers = WorkspaceSurfaceIdentifierClipboardText.makeWorkspacePaneSurfaceIdentifiers(
             workspaceId: workspace.id,
@@ -216,7 +216,7 @@ struct CmuxDurableDeepLinkRestoreTests {
     @Test func copiedLiveSurfaceLinkResolvesAfterRestoredPanelRemapsId() throws {
         let manager = TabManager()
         let workspace = try #require(manager.selectedWorkspace)
-        let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+        let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let panel = try #require(workspace.newWorkspaceTodoSurface(inPane: pane, focus: true))
         workspace.setPanelCustomTitle(panelId: panel.id, title: "Linked todo")
 

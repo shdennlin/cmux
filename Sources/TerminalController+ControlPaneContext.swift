@@ -74,7 +74,7 @@ extension TerminalController: ControlPaneContext {
         }
         guard let ws = resolveWorkspace(routing: routing, tabManager: tabManager) else { return nil }
 
-        let snapshot = ws.bonsplitController.layoutSnapshot()
+        let snapshot = ws.activeBonsplitController.layoutSnapshot()
         return ControlPaneListSnapshot(
             workspaceID: ws.id,
             windowID: v2ResolveWindowId(tabManager: tabManager),
@@ -430,18 +430,18 @@ extension TerminalController: ControlPaneContext {
             return .workspaceNotFound
         }
 
-        let paneUUID = inputs.paneID ?? ws.bonsplitController.focusedPaneId?.id
+        let paneUUID = inputs.paneID ?? ws.activeBonsplitController.focusedPaneId?.id
         guard let paneUUID else {
             return .noFocusedPane
         }
         if let remote = controlRemoteTmuxPaneResize(workspace: ws, tabManager: tabManager, inputs: inputs) {
             return remote
         }
-        guard ws.bonsplitController.allPaneIds.contains(where: { $0.id == paneUUID }) else {
+        guard ws.activeBonsplitController.allPaneIds.contains(where: { $0.id == paneUUID }) else {
             return .paneNotFound(paneUUID)
         }
 
-        let tree = ws.bonsplitController.treeSnapshot()
+        let tree = ws.activeBonsplitController.treeSnapshot()
         var candidates: [V2PaneResizeCandidate] = []
         let trace = v2PaneResizeCollectCandidates(
             node: tree,
@@ -511,7 +511,7 @@ extension TerminalController: ControlPaneContext {
         let delta = CGFloat(amount) / candidate.axisPixels
         let requested = candidate.dividerPosition + (direction.dividerDeltaSign * delta)
         let clamped = min(max(requested, 0.1), 0.9)
-        guard ws.bonsplitController.setDividerPosition(clamped, forSplit: candidate.splitId, fromExternal: true) else {
+        guard ws.activeBonsplitController.setDividerPosition(clamped, forSplit: candidate.splitId, fromExternal: true) else {
             return .setDividerFailed(splitID: candidate.splitId)
         }
 
@@ -545,7 +545,7 @@ extension TerminalController: ControlPaneContext {
         guard located.workspace.remoteTmuxControlPane(paneID: targetPaneID) == nil else {
             return .targetPaneNotFound(targetPaneID)
         }
-        guard let targetPane = located.workspace.bonsplitController.allPaneIds.first(where: {
+        guard let targetPane = located.workspace.activeBonsplitController.allPaneIds.first(where: {
             $0.id == targetPaneID
         }) else {
             return .targetPaneNotFound(targetPaneID)
@@ -553,8 +553,8 @@ extension TerminalController: ControlPaneContext {
         let workspace = located.workspace
         let sourcePane = located.paneId
 
-        guard let selectedSourceTab = workspace.bonsplitController.selectedTab(inPane: sourcePane),
-              let selectedTargetTab = workspace.bonsplitController.selectedTab(inPane: targetPane),
+        guard let selectedSourceTab = workspace.activeBonsplitController.selectedTab(inPane: sourcePane),
+              let selectedTargetTab = workspace.activeBonsplitController.selectedTab(inPane: targetPane),
               let sourceSurfaceId = workspace.panelIdFromSurfaceId(selectedSourceTab.id),
               let targetSurfaceId = workspace.panelIdFromSurfaceId(selectedTargetTab.id) else {
             return .bothPanesNeedSurface
@@ -563,7 +563,7 @@ extension TerminalController: ControlPaneContext {
         // Keep pane identities stable during swap when one side has a single surface.
         var sourcePlaceholder: UUID?
         var targetPlaceholder: UUID?
-        if workspace.bonsplitController.tabs(inPane: sourcePane).count <= 1 {
+        if workspace.activeBonsplitController.tabs(inPane: sourcePane).count <= 1 {
             sourcePlaceholder = workspace.newTerminalSurface(
                 inPane: sourcePane,
                 focus: false,
@@ -573,7 +573,7 @@ extension TerminalController: ControlPaneContext {
                 return .sourcePlaceholderFailed
             }
         }
-        if workspace.bonsplitController.tabs(inPane: targetPane).count <= 1 {
+        if workspace.activeBonsplitController.tabs(inPane: targetPane).count <= 1 {
             targetPlaceholder = workspace.newTerminalSurface(
                 inPane: targetPane,
                 focus: false,
@@ -599,7 +599,7 @@ extension TerminalController: ControlPaneContext {
         }
 
         if focus {
-            workspace.bonsplitController.focusPane(targetPane)
+            workspace.activeBonsplitController.focusPane(targetPane)
         }
         return .swapped(
             windowID: located.windowId,
@@ -640,15 +640,15 @@ extension TerminalController: ControlPaneContext {
         }
         let sourcePane: PaneID? = {
             if let paneID {
-                return sourceWorkspace.bonsplitController.allPaneIds.first(where: { $0.id == paneID })
+                return sourceWorkspace.activeBonsplitController.allPaneIds.first(where: { $0.id == paneID })
             }
-            return sourceWorkspace.bonsplitController.focusedPaneId
+            return sourceWorkspace.activeBonsplitController.focusedPaneId
         }()
 
         let resolvedSurfaceId: UUID? = {
             if let surfaceID { return surfaceID }
             if let sourcePane,
-               let selected = sourceWorkspace.bonsplitController.selectedTab(inPane: sourcePane) {
+               let selected = sourceWorkspace.activeBonsplitController.selectedTab(inPane: sourcePane) {
                 return sourceWorkspace.panelIdFromSurfaceId(selected.id)
             }
             return sourceWorkspace.focusedPanelId
@@ -721,7 +721,7 @@ extension TerminalController: ControlPaneContext {
         var resolvedSurfaceId = surfaceID
         if resolvedSurfaceId == nil, let sourcePaneID {
             guard let sourceLocated = v2LocatePane(sourcePaneID),
-                  let selected = sourceLocated.workspace.bonsplitController.selectedTab(inPane: sourceLocated.paneId),
+                  let selected = sourceLocated.workspace.activeBonsplitController.selectedTab(inPane: sourceLocated.paneId),
                   let selectedSurface = sourceLocated.workspace.panelIdFromSurfaceId(selected.id) else {
                 return .sourceSurfaceUnresolved(sourcePaneID: sourcePaneID)
             }
@@ -773,15 +773,15 @@ extension TerminalController: ControlPaneContext {
         if let paneID = routing.paneID, ws.remoteTmuxControlPane(paneID: paneID) != nil {
             return .noAlternatePane
         }
-        guard let focused = ws.bonsplitController.focusedPaneId else {
+        guard let focused = ws.activeBonsplitController.focusedPaneId else {
             return .noFocusedPane
         }
-        guard let target = ws.bonsplitController.allPaneIds.first(where: { $0.id != focused.id }) else {
+        guard let target = ws.activeBonsplitController.allPaneIds.first(where: { $0.id != focused.id }) else {
             return .noAlternatePane
         }
 
-        ws.bonsplitController.focusPane(target)
-        let selectedSurfaceId = ws.bonsplitController.selectedTab(inPane: target)
+        ws.activeBonsplitController.focusPane(target)
+        let selectedSurfaceId = ws.activeBonsplitController.selectedTab(inPane: target)
             .flatMap { ws.panelIdFromSurfaceId($0.id) }
         let windowId = v2ResolveWindowId(tabManager: tabManager)
         return .focused(

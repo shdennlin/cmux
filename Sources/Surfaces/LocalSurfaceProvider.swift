@@ -221,7 +221,7 @@ final class LocalSurfaceProvider: SurfaceProvider {
         }
         let moveTarget = Self.moveTarget(
             for: destination,
-            focusedPane: target.bonsplitController.focusedPaneId ?? target.bonsplitController.allPaneIds.first
+            focusedPane: target.activeBonsplitController.focusedPaneId ?? target.activeBonsplitController.allPaneIds.first
         )
         guard let app = AppDelegate.shared else { throw SurfaceCatalogError.unsupported("no app delegate") }
         guard app.moveBonsplitTab(

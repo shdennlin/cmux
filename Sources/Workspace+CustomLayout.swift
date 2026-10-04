@@ -7,7 +7,7 @@ import Foundation
 extension Workspace {
 
     func applyCustomLayout(_ layout: CmuxLayoutNode, baseCwd: String, setupCommand: String? = nil) {
-        guard let rootPaneId = bonsplitController.allPaneIds.first else { return }
+        guard let rootPaneId = activeBonsplitController.allPaneIds.first else { return }
 
         var leaves: [(paneId: PaneID, surfaces: [CmuxSurfaceDefinition])] = []
         buildCustomLayoutTree(layout, inPane: rootPaneId, leaves: &leaves)
@@ -27,7 +27,7 @@ extension Workspace {
             )
         }
 
-        let liveRoot = bonsplitController.treeSnapshot()
+        let liveRoot = activeBonsplitController.treeSnapshot()
         applyCustomDividerPositions(configNode: layout, liveNode: liveRoot)
 
         if let focusPanelId {
@@ -39,8 +39,8 @@ extension Workspace {
     /// panel. Used by workspace actions/commands that define no custom layout.
     func sendConfigSetupCommand(_ command: String) {
         let firstTerminal: TerminalPanel? = focusedTerminalInputTarget()?.panel ?? {
-            for paneId in bonsplitController.allPaneIds {
-                for tab in bonsplitController.tabs(inPane: paneId) {
+            for paneId in activeBonsplitController.allPaneIds {
+                for tab in activeBonsplitController.tabs(inPane: paneId) {
                     if let panelId = panelIdFromSurfaceId(tab.id),
                        let terminal = terminalPanel(for: panelId) {
                         return terminal
@@ -71,7 +71,7 @@ extension Workspace {
                 return
             }
 
-            var anchorPanelId = bonsplitController
+            var anchorPanelId = activeBonsplitController
                 .tabs(inPane: paneId)
                 .compactMap { panelIdFromSurfaceId($0.id) }
                 .first
@@ -104,7 +104,7 @@ extension Workspace {
         focusPanelId: inout UUID?,
         pendingSetup: inout String?
     ) {
-        let existingPanelIds = bonsplitController
+        let existingPanelIds = activeBonsplitController
             .tabs(inPane: paneId)
             .compactMap { panelIdFromSurfaceId($0.id) }
 
@@ -125,9 +125,9 @@ extension Workspace {
         // The first surface either reuses or replaces the pane's placeholder.
         // Append only the remaining declarative surfaces in config order, then
         // restore the interactive "next to current" policy immediately.
-        let interactiveNewTabPosition = bonsplitController.configuration.newTabPosition
-        bonsplitController.configuration.newTabPosition = .end
-        defer { bonsplitController.configuration.newTabPosition = interactiveNewTabPosition }
+        let interactiveNewTabPosition = activeBonsplitController.configuration.newTabPosition
+        activeBonsplitController.configuration.newTabPosition = .end
+        defer { activeBonsplitController.configuration.newTabPosition = interactiveNewTabPosition }
 
         for surfaceIndex in 1..<surfaces.count {
             createNewSurface(
@@ -280,7 +280,7 @@ extension Workspace {
         switch (configNode, liveNode) {
         case (.split(let configSplit), .split(let liveSplit)):
             if let splitID = UUID(uuidString: liveSplit.id) {
-                _ = bonsplitController.setDividerPosition(
+                _ = activeBonsplitController.setDividerPosition(
                     CGFloat(configSplit.clampedSplitPosition),
                     forSplit: splitID,
                     fromExternal: true

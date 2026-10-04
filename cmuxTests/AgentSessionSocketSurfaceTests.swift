@@ -29,7 +29,7 @@ struct AgentSessionSocketSurfaceTests {
     func testWorkspaceCreatesAgentSessionSurfaceWithProviderAndRenderer() throws {
         let manager = TabManager()
         let workspace = try #require(manager.selectedWorkspace)
-        let paneId = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneId = try #require(workspace.activeBonsplitController.focusedPaneId)
 
         let panel = try #require(
             workspace.newAgentSessionSurface(
@@ -53,8 +53,8 @@ struct AgentSessionSocketSurfaceTests {
     func testMovedAgentSessionRebindsTerminalCommandRoutingToDestinationWorkspace() throws {
         let source = Workspace()
         let destination = Workspace()
-        let sourcePane = try #require(source.bonsplitController.focusedPaneId)
-        let destinationPane = try #require(destination.bonsplitController.focusedPaneId)
+        let sourcePane = try #require(source.activeBonsplitController.focusedPaneId)
+        let destinationPane = try #require(destination.activeBonsplitController.focusedPaneId)
         let panel = try #require(
             source.newAgentSessionSurface(
                 inPane: sourcePane,
@@ -90,7 +90,7 @@ struct AgentSessionSocketSurfaceTests {
     func testAgentSessionCommandTerminalDoesNotArmDeferredFocusRepair() async throws {
         let manager = TabManager()
         let workspace = try #require(manager.selectedWorkspace)
-        let paneId = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneId = try #require(workspace.activeBonsplitController.focusedPaneId)
         let panel = try #require(
             workspace.newAgentSessionSurface(
                 inPane: paneId,
@@ -107,16 +107,16 @@ struct AgentSessionSocketSurfaceTests {
         let terminalTabID = try #require(workspace.surfaceIdFromPanelId(terminalPanelID))
 
         #expect(workspace.focusedPanelId == panel.id)
-        #expect(workspace.bonsplitController.selectedTab(inPane: paneId)?.id != terminalTabID)
+        #expect(workspace.activeBonsplitController.selectedTab(inPane: paneId)?.id != terminalTabID)
 
         // Simulate a later Bonsplit selection after the background terminal was
         // created. The agent-command path must leave no queued focus repair that
         // can overwrite this newer selection on subsequent main-queue turns.
-        workspace.bonsplitController.selectTab(terminalTabID)
+        workspace.activeBonsplitController.selectTab(terminalTabID)
         await Task.yield()
         await Task.yield()
 
-        #expect(workspace.bonsplitController.selectedTab(inPane: paneId)?.id == terminalTabID)
+        #expect(workspace.activeBonsplitController.selectedTab(inPane: paneId)?.id == terminalTabID)
         #expect(workspace.focusedPanelId == terminalPanelID)
     }
 
@@ -124,7 +124,7 @@ struct AgentSessionSocketSurfaceTests {
     func testWorkspaceSessionSnapshotPersistsAgentSessionWorkingDirectory() throws {
         let manager = TabManager()
         let workspace = try #require(manager.selectedWorkspace)
-        let paneId = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneId = try #require(workspace.activeBonsplitController.focusedPaneId)
 
         let panel = try #require(
             workspace.newAgentSessionSurface(

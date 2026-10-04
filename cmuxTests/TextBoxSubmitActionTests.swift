@@ -1157,7 +1157,7 @@ struct TextBoxSubmitActionTests {
 
             let manager = TabManager()
             guard let workspace = manager.selectedWorkspace,
-                  let paneId = workspace.bonsplitController.focusedPaneId else {
+                  let paneId = workspace.activeBonsplitController.focusedPaneId else {
                 XCTFail("Expected initial terminal workspace")
                 return
             }

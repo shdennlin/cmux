@@ -387,7 +387,7 @@ extension Workspace: PaneDropContainer {
     func selectedPanelForPaneDrop(
         in paneId: PaneID
     ) -> (panelId: UUID, panel: any Panel)? {
-        guard let tabId = bonsplitController.selectedTab(inPane: paneId)?.id,
+        guard let tabId = activeBonsplitController.selectedTab(inPane: paneId)?.id,
               let panelId = panelIdFromSurfaceId(tabId),
               let panel = panels[panelId] else {
             return nil
@@ -555,7 +555,7 @@ extension AppDelegate {
             return nil
         }
         if let surfaceId = workspace.surfaceIdFromPanelId(context.panelId),
-           workspace.bonsplitController.paneId(containing: surfaceId) == context.paneId {
+           workspace.activeBonsplitController.paneId(containing: surfaceId) == context.paneId {
             return workspace
         }
         return workspace.remoteTmuxWindowMirrors.values.first {

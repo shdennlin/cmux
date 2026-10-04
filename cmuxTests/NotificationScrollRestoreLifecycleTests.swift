@@ -123,7 +123,7 @@ struct NotificationScrollRestoreLifecycleTests {
         let replayFilePath = "/tmp/cmux-replay-boundary-test"
         let workspace = Workspace()
         let paneId = try #require(
-            workspace.bonsplitController.focusedPaneId ?? workspace.bonsplitController.allPaneIds.first
+            workspace.activeBonsplitController.focusedPaneId ?? workspace.activeBonsplitController.allPaneIds.first
         )
         let panel = try #require(workspace.newTerminalSurface(
             inPane: paneId,

@@ -4,8 +4,8 @@ import Foundation
 /// Owns the active container projection for one file-preview tab.
 @MainActor
 protocol FilePreviewTabMetadataHost: AnyObject {
-    /// The split controller whose tab receives metadata updates.
-    var bonsplitController: BonsplitController { get }
+    /// The split controller that holds `panelId`'s tab and receives its metadata updates.
+    func filePreviewTabController(forPanelId panelId: UUID) -> BonsplitController?
 
     /// Returns the host-owned tab for `panelId`.
     func filePreviewTabId(forPanelId panelId: UUID) -> TabID?
@@ -24,8 +24,9 @@ extension FilePreviewTabMetadataHost {
         _ metadata: FilePreviewTabMetadata,
         panelId: UUID
     ) {
-        guard let tabId = filePreviewTabId(forPanelId: panelId),
-              let existing = bonsplitController.tab(tabId) else {
+        guard let controller = filePreviewTabController(forPanelId: panelId),
+              let tabId = filePreviewTabId(forPanelId: panelId),
+              let existing = controller.tab(tabId) else {
             return
         }
 
@@ -55,7 +56,7 @@ extension FilePreviewTabMetadataHost {
                 || dirtyUpdate != nil else {
             return
         }
-        bonsplitController.updateTab(
+        controller.updateTab(
             tabId,
             title: titleUpdate,
             icon: iconUpdate,

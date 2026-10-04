@@ -204,12 +204,12 @@ extension Workspace {
     private func refreshTabLabel(panelId: UUID, displayTitle: String) -> Bool {
         guard !isRemoteTmuxMirror,
               let tabId = surfaceIdFromPanelId(panelId),
-              let existing = bonsplitController.tab(tabId) else { return false }
+              let existing = activeBonsplitController.tab(tabId) else { return false }
         let resolvedTitle = resolvedPanelTitle(panelId: panelId, fallback: displayTitle)
         let titleUpdate: String? = existing.title == resolvedTitle ? nil : resolvedTitle
         let hasCustomTitle = panelCustomTitles[panelId] != nil
         guard titleUpdate != nil || existing.hasCustomTitle != hasCustomTitle else { return false }
-        bonsplitController.updateTab(
+        activeBonsplitController.updateTab(
             tabId,
             title: titleUpdate,
             hasCustomTitle: hasCustomTitle

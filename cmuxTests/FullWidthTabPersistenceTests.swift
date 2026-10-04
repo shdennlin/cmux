@@ -51,7 +51,7 @@ struct FullWidthTabPersistenceTests {
         let paneId = try #require(workspace.paneId(forPanelId: panelId))
 
         #expect(workspace.toggleFullWidthTabMode(panelId: panelId))
-        #expect(workspace.bonsplitController.isFullWidthTabMode(inPane: paneId))
+        #expect(workspace.activeBonsplitController.isFullWidthTabMode(inPane: paneId))
 
         let snapshot = workspace.sessionSnapshot(includeScrollback: false)
         let paneSnapshot = try #require({
@@ -67,6 +67,6 @@ struct FullWidthTabPersistenceTests {
         let restoredPanelId = try #require(restoredIds[panelId])
         let restoredPaneId = try #require(restored.paneId(forPanelId: restoredPanelId))
 
-        #expect(restored.bonsplitController.isFullWidthTabMode(inPane: restoredPaneId))
+        #expect(restored.activeBonsplitController.isFullWidthTabMode(inPane: restoredPaneId))
     }
 }

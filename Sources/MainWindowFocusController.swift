@@ -821,8 +821,8 @@ final class MainWindowFocusController {
         guard let tabManager else { return }
         for workspace in tabManager.tabs {
             let enabled = allowsBonsplitTabShortcutHints(workspaceId: workspace.id)
-            if workspace.bonsplitController.tabShortcutHintsEnabled != enabled {
-                workspace.bonsplitController.tabShortcutHintsEnabled = enabled
+            if workspace.activeBonsplitController.tabShortcutHintsEnabled != enabled {
+                workspace.activeBonsplitController.tabShortcutHintsEnabled = enabled
             }
         }
     }

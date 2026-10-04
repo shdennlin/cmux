@@ -15,7 +15,7 @@ struct TabManagerNotificationFocusRegressionTests {
         let manager = TabManager()
         let workspace = try #require(manager.selectedWorkspace)
         let firstPanelId = try #require(workspace.focusedPanelId)
-        let paneId = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneId = try #require(workspace.activeBonsplitController.focusedPaneId)
         _ = workspace.newTerminalSurface(inPane: paneId, focus: false)
         let thirdPanel = try #require(workspace.newTerminalSurface(inPane: paneId, focus: false))
         let thirdSurfaceId = try #require(workspace.surfaceIdFromPanelId(thirdPanel.id)?.uuid)
@@ -27,7 +27,7 @@ struct TabManagerNotificationFocusRegressionTests {
         await drainMainQueue()
 
         #expect(workspace.focusedPanelId == thirdPanel.id)
-        #expect(workspace.bonsplitController.selectedTab(inPane: paneId)?.id.uuid == thirdSurfaceId)
+        #expect(workspace.activeBonsplitController.selectedTab(inPane: paneId)?.id.uuid == thirdSurfaceId)
     }
 
     private func drainMainQueue() async {

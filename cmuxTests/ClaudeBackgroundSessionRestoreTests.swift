@@ -259,7 +259,7 @@ struct ClaudeBackgroundSessionRestoreTests {
         let source = Workspace(agentSessionAutoResumeDefaults: fixture.defaults)
         defer { source.teardownAllPanels() }
         let spawningPanelID = try #require(source.focusedPanelId)
-        let paneID = try #require(source.bonsplitController.allPaneIds.first)
+        let paneID = try #require(source.activeBonsplitController.allPaneIds.first)
         let viewerPanelID = try #require(source.newTerminalSurface(inPane: paneID, focus: false)).id
         var snapshot = source.sessionSnapshot(includeScrollback: false)
         for index in snapshot.panels.indices {
@@ -317,7 +317,7 @@ struct ClaudeBackgroundSessionRestoreTests {
         let workspace = Workspace(agentSessionAutoResumeDefaults: fixture.defaults)
         defer { workspace.teardownAllPanels() }
         let panel = try viewerPanelSnapshot(fixture, in: workspace)
-        let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+        let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let entry = ClosedPanelHistoryEntry(
             workspaceId: workspace.id,
             paneId: pane.id,
@@ -409,7 +409,7 @@ struct ClaudeBackgroundSessionRestoreTests {
         // Before quit: a workspace terminal moved into the Dock runs `claude attach`.
         let source = Workspace(agentSessionAutoResumeDefaults: fixture.defaults)
         defer { source.teardownAllPanels() }
-        let sourcePane = try #require(source.bonsplitController.allPaneIds.first)
+        let sourcePane = try #require(source.activeBonsplitController.allPaneIds.first)
         let movedPanelID = try #require(source.newTerminalSurface(inPane: sourcePane, focus: false)).id
         let detached = try #require(source.detachSurface(panelId: movedPanelID))
         let dock = makeDock(fixture, foreground: viewerProcess(fixture))

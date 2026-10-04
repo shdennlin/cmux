@@ -65,7 +65,7 @@ struct ManagedPolicyBrowserGateTests {
     @Test func userInitiatedCreationRefusesWhileDisabled() throws {
         try withBrowserPolicy(managed: true, userDisabled: false) {
             let workspace = Workspace()
-            let paneID = try #require(workspace.bonsplitController.focusedPaneId)
+            let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
             #expect(workspace.newBrowserSurface(inPane: paneID, url: nil, focus: false) == nil)
             #expect(!workspace.panels.values.contains { $0 is BrowserPanel })
         }
@@ -76,7 +76,7 @@ struct ManagedPolicyBrowserGateTests {
         // could create browser panes while the browser was disabled.
         try withBrowserPolicy(managed: nil, userDisabled: true) {
             let workspace = Workspace()
-            let paneID = try #require(workspace.bonsplitController.focusedPaneId)
+            let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
             #expect(workspace.newBrowserSurface(
                 inPane: paneID,
                 url: nil,
@@ -90,7 +90,7 @@ struct ManagedPolicyBrowserGateTests {
         // User-level disable: restore still re-materializes pre-existing panes.
         try withBrowserPolicy(managed: nil, userDisabled: true) {
             let workspace = Workspace()
-            let paneID = try #require(workspace.bonsplitController.focusedPaneId)
+            let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
             let restored = workspace.newBrowserSurface(
                 inPane: paneID,
                 url: nil,
@@ -103,7 +103,7 @@ struct ManagedPolicyBrowserGateTests {
         // Managed policy: nothing may create a browser pane, restore included.
         try withBrowserPolicy(managed: true, userDisabled: nil) {
             let workspace = Workspace()
-            let paneID = try #require(workspace.bonsplitController.focusedPaneId)
+            let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
             #expect(workspace.newBrowserSurface(
                 inPane: paneID,
                 url: nil,

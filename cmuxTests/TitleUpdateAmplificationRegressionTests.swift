@@ -172,7 +172,7 @@ struct TitleUpdateAmplificationRegressionTests {
         let surfaceId = try #require(workspace.surfaceIdFromPanelId(panelId))
 
         #expect(workspace.customTitle == authoredTitle)
-        #expect(workspace.bonsplitController.tab(surfaceId)?.title == authoredTitle)
+        #expect(workspace.activeBonsplitController.tab(surfaceId)?.title == authoredTitle)
     }
 
     @Test

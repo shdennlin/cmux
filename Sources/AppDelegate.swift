@@ -5860,9 +5860,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         guard destinationWorkspace.acceptsSurface(from: sourceWorkspace, panelID: panelId) else { return false }
 
         let resolvedTargetPane = targetPane.flatMap { pane in
-            destinationWorkspace.bonsplitController.allPaneIds.first(where: { $0 == pane })
-        } ?? destinationWorkspace.bonsplitController.focusedPaneId
-            ?? destinationWorkspace.bonsplitController.allPaneIds.first
+            destinationWorkspace.activeBonsplitController.allPaneIds.first(where: { $0 == pane })
+        } ?? destinationWorkspace.activeBonsplitController.focusedPaneId
+            ?? destinationWorkspace.activeBonsplitController.allPaneIds.first
 
         guard let resolvedTargetPane else {
 #if DEBUG
@@ -6877,9 +6877,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         focus: Bool
     ) {
         let rollbackPane = sourcePane.flatMap { pane in
-            workspace.bonsplitController.allPaneIds.first(where: { $0 == pane })
-        } ?? workspace.bonsplitController.focusedPaneId
-            ?? workspace.bonsplitController.allPaneIds.first
+            workspace.activeBonsplitController.allPaneIds.first(where: { $0 == pane })
+        } ?? workspace.activeBonsplitController.focusedPaneId
+            ?? workspace.activeBonsplitController.allPaneIds.first
         guard let rollbackPane else { return }
         _ = workspace.attachDetachedSurface(
             detached,
@@ -10099,8 +10099,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             ?? context.tabManager.addWorkspaceIfActive(workingDirectory: parentDirectory, select: true) else {
             return false
         }
-        guard let paneId = workspace.bonsplitController.focusedPaneId
-            ?? workspace.bonsplitController.allPaneIds.first else {
+        guard let paneId = workspace.activeBonsplitController.focusedPaneId
+            ?? workspace.activeBonsplitController.allPaneIds.first else {
             return false
         }
 
@@ -11811,7 +11811,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     private func openDebugAgentSession(rendererKind: AgentSessionRendererKind) {
         guard let manager = activeTabManagerForCommands(),
               let workspace = manager.selectedWorkspace,
-              let paneId = workspace.bonsplitController.focusedPaneId ?? workspace.bonsplitController.allPaneIds.first else {
+              let paneId = workspace.activeBonsplitController.focusedPaneId ?? workspace.activeBonsplitController.allPaneIds.first else {
             return
         }
         _ = workspace.newAgentSessionSurface(
@@ -11992,7 +11992,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         }
         await Task.yield()
 
-        let paneIds = workspace.bonsplitController.allPaneIds
+        let paneIds = workspace.activeBonsplitController.allPaneIds
         guard paneIds.count == paneCount else { return false }
 
         let additionalTabsPerPane = max(0, tabsPerPane - 1)
@@ -12104,8 +12104,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         let mountedWorkspaceCount = await waitForDebugStressMountedWorkspaces(workspaces)
 
         for (workspaceIndex, workspace) in workspaces.enumerated() {
-            for paneId in workspace.bonsplitController.allPaneIds {
-                for tab in workspace.bonsplitController.tabs(inPane: paneId) {
+            for paneId in workspace.activeBonsplitController.allPaneIds {
+                for tab in workspace.activeBonsplitController.tabs(inPane: paneId) {
                     guard let panelId = workspace.panelIdFromSurfaceId(tab.id),
                           workspace.panel(for: tab.id) is TerminalPanel else {
                         continue
@@ -12874,15 +12874,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
         let trackedPaneId = workspace.paneId(forPanelId: alphaPanelId)
             ?? workspace.paneId(forPanelId: betaPanelId)
-            ?? workspace.bonsplitController.focusedPaneId
-            ?? workspace.bonsplitController.allPaneIds.first
+            ?? workspace.activeBonsplitController.focusedPaneId
+            ?? workspace.activeBonsplitController.allPaneIds.first
         guard let trackedPaneId else { return }
 
-        let titles: [String] = workspace.bonsplitController.tabs(inPane: trackedPaneId).compactMap { tab in
+        let titles: [String] = workspace.activeBonsplitController.tabs(inPane: trackedPaneId).compactMap { tab in
             guard let panelId = workspace.panelIdFromSurfaceId(tab.id) else { return nil }
             return workspace.panelTitle(panelId: panelId)
         }
-        let selectedTitle = workspace.bonsplitController.selectedTab(inPane: trackedPaneId)
+        let selectedTitle = workspace.activeBonsplitController.selectedTab(inPane: trackedPaneId)
             .flatMap { workspace.panelIdFromSurfaceId($0.id) }
             .flatMap { workspace.panelTitle(panelId: $0) } ?? ""
 
@@ -12925,7 +12925,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
     private func gotoSplitFindStateSnapshot(for workspace: Workspace) -> [String: String] {
         var updates: [String: String] = [
-            "focusedPaneId": workspace.bonsplitController.focusedPaneId?.description ?? ""
+            "focusedPaneId": workspace.activeBonsplitController.focusedPaneId?.description ?? ""
         ]
 
         if let focusedPanelId = workspace.focusedPanelId {
@@ -13026,8 +13026,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
                 "browserPanelId": browserPanelId.uuidString,
                 "browserPaneId": browserPaneId.description,
                 "terminalPaneId": terminalPaneId.description,
-                "initialPaneCount": String(tab.bonsplitController.allPaneIds.count),
-                "focusedPaneId": tab.bonsplitController.focusedPaneId?.description ?? "",
+                "initialPaneCount": String(tab.activeBonsplitController.allPaneIds.count),
+                "focusedPaneId": tab.activeBonsplitController.focusedPaneId?.description ?? "",
                 "ghosttyGotoSplitLeftShortcut": ghosttyGotoSplitLeftShortcut?.displayString ?? "",
                 "ghosttyGotoSplitRightShortcut": ghosttyGotoSplitRightShortcut?.displayString ?? "",
                 "ghosttyGotoSplitUpShortcut": ghosttyGotoSplitUpShortcut?.displayString ?? "",
@@ -13122,13 +13122,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     }
 
     private func paneIdsForGotoSplitUITest(tab: Workspace, browserPanelId: UUID) -> (browser: PaneID, terminal: PaneID)? {
-        let paneIds = tab.bonsplitController.allPaneIds
+        let paneIds = tab.activeBonsplitController.allPaneIds
         guard paneIds.count >= 2 else { return nil }
 
         var browserPane: PaneID?
         var terminalPane: PaneID?
         for paneId in paneIds {
-            guard let selected = tab.bonsplitController.selectedTab(inPane: paneId),
+            guard let selected = tab.activeBonsplitController.selectedTab(inPane: paneId),
                   let panelId = tab.panelIdFromSurfaceId(selected.id) else { continue }
             if panelId == browserPanelId {
                 browserPane = paneId
@@ -13707,7 +13707,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
         var updates = gotoSplitFindStateSnapshot(for: workspace)
         updates["lastSplitDirection"] = directionValue
-        updates["paneCountAfterSplit"] = String(workspace.bonsplitController.allPaneIds.count)
+        updates["paneCountAfterSplit"] = String(workspace.activeBonsplitController.allPaneIds.count)
         writeGotoSplitTestData(updates)
     }
 
@@ -13721,8 +13721,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             let browserSnapshot = browserPanel.flatMap { BrowserWindowPortalRegistry.debugSnapshot(for: $0.webView) }
 
             var updates = self.gotoSplitFindStateSnapshot(for: workspace)
-            updates["splitZoomedAfterToggle"] = workspace.bonsplitController.isSplitZoomed ? "true" : "false"
-            updates["zoomedPaneIdAfterToggle"] = workspace.bonsplitController.zoomedPaneId?.description ?? ""
+            updates["splitZoomedAfterToggle"] = workspace.activeBonsplitController.isSplitZoomed ? "true" : "false"
+            updates["zoomedPaneIdAfterToggle"] = workspace.activeBonsplitController.zoomedPaneId?.description ?? ""
             updates["browserPanelIdAfterToggle"] = browserPanel?.id.uuidString ?? ""
             updates["browserContainerHiddenAfterToggle"] = browserSnapshot.map { $0.containerHidden ? "true" : "false" } ?? ""
             updates["browserVisibleFlagAfterToggle"] = browserSnapshot.map { $0.visibleInUI ? "true" : "false" } ?? ""
@@ -13750,7 +13750,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             } ?? ""
 
             let settled: Bool = {
-                if workspace.bonsplitController.isSplitZoomed {
+                if workspace.activeBonsplitController.isSplitZoomed {
                     if let focusedPanelId = workspace.focusedPanelId,
                        workspace.terminalPanel(for: focusedPanelId) != nil {
                         guard let browserSnapshot else { return false }
@@ -16992,7 +16992,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         let preferredWindow = anchorView?.window ?? shortcutRoutingActiveWindow
         let targetTabManager = synchronizeActiveMainWindowContext(preferredWindow: preferredWindow)
         guard let workspace = targetTabManager?.selectedWorkspace,
-              let paneId = workspace.bonsplitController.focusedPaneId ?? workspace.bonsplitController.allPaneIds.first else {
+              let paneId = workspace.activeBonsplitController.focusedPaneId ?? workspace.activeBonsplitController.allPaneIds.first else {
             return nil
         }
 

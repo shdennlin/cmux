@@ -133,7 +133,7 @@ struct BrowserPanelSessionRestoreTests {
     func appSessionRestoreKeepsHiddenBrowserPanelsAsLightweightPlaceholders() throws {
         let source = Workspace()
         defer { source.retireFromOwningTabManager() }
-        let sourcePane = try #require(source.bonsplitController.focusedPaneId)
+        let sourcePane = try #require(source.activeBonsplitController.focusedPaneId)
         let sourceBrowser = try #require(source.newBrowserSurface(
             inPane: sourcePane,
             // Keep this fixture offline: the test only needs browser identity
@@ -179,7 +179,7 @@ struct BrowserPanelSessionRestoreTests {
     func selectingDeferredBrowserContinuesWithLiveBrowserAutofocus() throws {
         let source = Workspace()
         defer { source.retireFromOwningTabManager() }
-        let sourcePane = try #require(source.bonsplitController.focusedPaneId)
+        let sourcePane = try #require(source.activeBonsplitController.focusedPaneId)
         let sourceBrowser = try #require(source.newBrowserSurface(
             inPane: sourcePane,
             url: URL(string: "about:blank"),

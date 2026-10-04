@@ -481,8 +481,8 @@ extension TerminalController {
             // hidden-but-selected mirror — the case that makes the on-screen assertion
             // directional.
             let selectedPanelIds: Set<UUID> = Set(
-                workspace.bonsplitController.allPaneIds
-                    .compactMap { workspace.bonsplitController.selectedTab(inPane: $0)?.id }
+                workspace.activeBonsplitController.allPaneIds
+                    .compactMap { workspace.activeBonsplitController.selectedTab(inPane: $0)?.id }
                     .compactMap { workspace.panelIdFromSurfaceId($0) }
             )
             for windowId in owners {

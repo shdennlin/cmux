@@ -132,7 +132,7 @@ extension TerminalController {
         workspace: Workspace,
         tabManager: TabManager
     ) -> ControlPaneListSnapshot {
-        let snapshot = workspace.bonsplitController.layoutSnapshot()
+        let snapshot = workspace.activeBonsplitController.layoutSnapshot()
         return ControlPaneListSnapshot(
             workspaceID: workspace.id,
             windowID: v2ResolveWindowId(tabManager: tabManager),
@@ -146,15 +146,15 @@ extension TerminalController {
         workspace: Workspace,
         snapshot: LayoutSnapshot
     ) -> [ControlPaneSummary] {
-        let focusedPaneId = workspace.bonsplitController.focusedPaneId
+        let focusedPaneId = workspace.activeBonsplitController.focusedPaneId
         let geometryByPaneId = Dictionary(
             snapshot.panes.map { ($0.paneId, $0.frame) },
             uniquingKeysWith: { first, _ in first }
         )
-        return workspace.bonsplitController.allPaneIds.flatMap { paneID -> [ControlPaneSummary] in
-            let tabs = workspace.bonsplitController.tabs(inPane: paneID)
+        return workspace.activeBonsplitController.allPaneIds.flatMap { paneID -> [ControlPaneSummary] in
+            let tabs = workspace.activeBonsplitController.tabs(inPane: paneID)
             let panelIDs = tabs.compactMap { workspace.panelIdFromSurfaceId($0.id) }
-            let selectedPanelID = workspace.bonsplitController
+            let selectedPanelID = workspace.activeBonsplitController
                 .selectedTab(inPane: paneID)
                 .flatMap { workspace.panelIdFromSurfaceId($0.id) }
             let frame = geometryByPaneId[paneID.id.uuidString].map {
@@ -246,15 +246,15 @@ extension TerminalController {
 
         let paneID: PaneID?
         if let requestedPaneID {
-            paneID = workspace.bonsplitController.allPaneIds.first(where: {
+            paneID = workspace.activeBonsplitController.allPaneIds.first(where: {
                 $0.id == requestedPaneID
             })
         } else {
-            paneID = workspace.bonsplitController.focusedPaneId
+            paneID = workspace.activeBonsplitController.focusedPaneId
         }
         guard let paneID else { return nil }
-        let selectedTab = workspace.bonsplitController.selectedTab(inPane: paneID)
-        let surfaces = workspace.bonsplitController.tabs(inPane: paneID).compactMap {
+        let selectedTab = workspace.activeBonsplitController.selectedTab(inPane: paneID)
+        let surfaces = workspace.activeBonsplitController.tabs(inPane: paneID).compactMap {
             tab -> ControlPaneSurfaceSummary? in
             guard let panelID = workspace.panelIdFromSurfaceId(tab.id),
                   !workspace.isRemoteTmuxControlContainer(panelID) else {
@@ -296,7 +296,7 @@ extension TerminalController {
                 paneID: requestedPaneID
             )
         }
-        guard let paneID = workspace.bonsplitController.allPaneIds.first(where: {
+        guard let paneID = workspace.activeBonsplitController.allPaneIds.first(where: {
             $0.id == requestedPaneID
         }) else {
             return .paneNotFound(requestedPaneID)
@@ -308,7 +308,7 @@ extension TerminalController {
         if tabManager.selectedTabId != workspace.id {
             tabManager.selectWorkspace(workspace)
         }
-        workspace.bonsplitController.focusPane(paneID)
+        workspace.activeBonsplitController.focusPane(paneID)
         return .focused(
             windowID: v2ResolveWindowId(tabManager: tabManager),
             workspaceID: workspace.id,
@@ -320,9 +320,9 @@ extension TerminalController {
         var paneByPanelID: [UUID: UUID] = [:]
         var indexInPaneByPanelID: [UUID: Int] = [:]
         var selectedInPaneByPanelID: [UUID: Bool] = [:]
-        for paneID in workspace.bonsplitController.allPaneIds {
-            let tabs = workspace.bonsplitController.tabs(inPane: paneID)
-            let selected = workspace.bonsplitController.selectedTab(inPane: paneID)
+        for paneID in workspace.activeBonsplitController.allPaneIds {
+            let tabs = workspace.activeBonsplitController.tabs(inPane: paneID)
+            let selected = workspace.activeBonsplitController.selectedTab(inPane: paneID)
             for (index, tab) in tabs.enumerated() {
                 guard let panelID = workspace.panelIdFromSurfaceId(tab.id) else { continue }
                 paneByPanelID[panelID] = paneID.id

@@ -31,7 +31,7 @@ struct WorkspaceDragSplitFocusSwiftTests {
         #expect(fixture.originalPanel.hostedView.isSurfaceViewFirstResponder())
 
         let newPane = try #require(
-            fixture.workspace.bonsplitController.splitPane(
+            fixture.workspace.activeBonsplitController.splitPane(
                 fixture.sourcePane,
                 orientation: .vertical,
                 movingTab: fixture.movedTab,
@@ -39,7 +39,7 @@ struct WorkspaceDragSplitFocusSwiftTests {
             )
         )
 
-        #expect(fixture.workspace.bonsplitController.focusedPaneId == newPane)
+        #expect(fixture.workspace.activeBonsplitController.focusedPaneId == newPane)
         #expect(fixture.workspace.focusedPanelId == fixture.movedPanel.id)
         #expect(!fixture.originalPanel.surface.debugDesiredFocusState())
         #expect(fixture.movedPanel.surface.debugDesiredFocusState())
@@ -48,7 +48,7 @@ struct WorkspaceDragSplitFocusSwiftTests {
         fixture.workspace.debugAttemptEventDrivenLayoutFollowUpForTesting()
 
         #expect(!fixture.originalPanel.hostedView.debugIsSuppressingReparentFocusForTesting())
-        #expect(fixture.workspace.bonsplitController.focusedPaneId == newPane)
+        #expect(fixture.workspace.activeBonsplitController.focusedPaneId == newPane)
         #expect(fixture.workspace.focusedPanelId == fixture.movedPanel.id)
         #expect(!fixture.originalPanel.surface.debugDesiredFocusState())
         #expect(fixture.movedPanel.surface.debugDesiredFocusState())
@@ -90,7 +90,7 @@ struct WorkspaceDragSplitFocusSwiftTests {
             )
         )
 
-        #expect(fixture.workspace.bonsplitController.focusedPaneId == newPane)
+        #expect(fixture.workspace.activeBonsplitController.focusedPaneId == newPane)
         #expect(fixture.workspace.focusedPanelId == fixture.movedPanel.id)
         #expect(fixture.movedPanel.hostedView.isSurfaceViewFirstResponder())
         #expect(!fixture.workspace.debugHasPendingReparentFocusSuppressionsForTesting())
@@ -102,7 +102,7 @@ struct WorkspaceDragSplitFocusSwiftTests {
 
         fixture.workspace.debugAttemptEventDrivenLayoutFollowUpForTesting()
 
-        #expect(fixture.workspace.bonsplitController.focusedPaneId == newPane)
+        #expect(fixture.workspace.activeBonsplitController.focusedPaneId == newPane)
         #expect(fixture.workspace.focusedPanelId == fixture.movedPanel.id)
         #expect(!fixture.originalPanel.surface.debugDesiredFocusState())
         #expect(fixture.movedPanel.surface.debugDesiredFocusState())
@@ -164,10 +164,10 @@ struct WorkspaceDragSplitFocusSwiftTests {
         await AppKitTestEventPump().drain()
 
         #expect(
-            fixture.workspace.bonsplitController.tabs(inPane: newPane)
+            fixture.workspace.activeBonsplitController.tabs(inPane: newPane)
                 .contains { $0.id == fixture.movedTab }
         )
-        #expect(fixture.workspace.bonsplitController.focusedPaneId == fixture.sourcePane)
+        #expect(fixture.workspace.activeBonsplitController.focusedPaneId == fixture.sourcePane)
         #expect(fixture.workspace.focusedPanelId == fixture.originalPanel.id)
         #expect(fixture.originalPanel.surface.debugDesiredFocusState())
         #expect(!fixture.movedPanel.surface.debugDesiredFocusState())

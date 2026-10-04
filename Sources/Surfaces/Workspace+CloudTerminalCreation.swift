@@ -25,7 +25,7 @@ extension Workspace {
         guard let panelID = cloudPaneCreationFailureStore.failure?.sourcePanelID,
               let paneID = paneId(forPanelId: panelID),
               let surfaceID = surfaceIdFromPanelId(panelID),
-              bonsplitController.selectedTab(inPane: paneID)?.id == surfaceID else { return nil }
+              activeBonsplitController.selectedTab(inPane: paneID)?.id == surfaceID else { return nil }
         if let terminal = panels[panelID] as? TerminalPanel { return terminal.hostedView }
         if let browser = panels[panelID] as? BrowserPanel { return browser.webView }
         return nil
@@ -95,7 +95,7 @@ extension Workspace {
 
     /// The cloud resource behind the selected tab of a pane (the Cmd+T anchor).
     func cloudProjectedResource(inPane paneID: PaneID) -> SurfaceResource? {
-        guard let selectedTabID = bonsplitController.selectedTab(inPane: paneID)?.id,
+        guard let selectedTabID = activeBonsplitController.selectedTab(inPane: paneID)?.id,
               let panelID = panelIdFromSurfaceId(selectedTabID) else { return nil }
         return cloudProjectedResource(forPanel: panelID)
     }
@@ -141,7 +141,7 @@ extension Workspace {
     /// resource to that machine. False reports rejection; the caller's prior Cloud
     /// ownership check prevents a rejected request from entering local creation.
     func routeCloudPaneTerminalTab(inPane paneID: PaneID, focus: Bool) -> Bool {
-        guard let selectedTab = bonsplitController.selectedTab(inPane: paneID),
+        guard let selectedTab = activeBonsplitController.selectedTab(inPane: paneID),
               let selectedPanelID = panelIdFromSurfaceId(selectedTab.id),
               let source = cloudTerminalSourcePlacement(forPanel: selectedPanelID) else { return false }
         return routeCloudPaneTerminalCreate(
@@ -418,9 +418,9 @@ extension Workspace {
 
     /// Removes a pane a split created that never received a tab.
     private func closeUntouchedPane(_ pane: PaneID) {
-        guard bonsplitController.allPaneIds.contains(pane),
-              bonsplitController.tabs(inPane: pane).isEmpty else { return }
-        _ = bonsplitController.closePane(pane)
+        guard activeBonsplitController.allPaneIds.contains(pane),
+              activeBonsplitController.tabs(inPane: pane).isEmpty else { return }
+        _ = activeBonsplitController.closePane(pane)
     }
 
     /// Publishes a non-modal failure card for a cloud terminal request.

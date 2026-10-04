@@ -557,7 +557,7 @@ import Testing
             ),
             autoConnect: false
         )
-        let paneId = try #require(remoteWorkspace.bonsplitController.allPaneIds.first)
+        let paneId = try #require(remoteWorkspace.activeBonsplitController.allPaneIds.first)
         let localDirectory = localDirectoryURL.path
         let localPanel = try #require(remoteWorkspace.newTerminalSurface(
             inPane: paneId,

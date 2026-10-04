@@ -68,10 +68,10 @@ private extension Workspace {
     @discardableResult
     func seedPiFeedPanel(id: UUID = UUID()) throws -> PiFeedDockPanel {
         let panel = PiFeedDockPanel(id: id)
-        let pane = try #require(bonsplitController.allPaneIds.first)
+        let pane = try #require(activeBonsplitController.allPaneIds.first)
         panels[panel.id] = panel
         let tabID = try #require(
-            bonsplitController.createTab(
+            activeBonsplitController.createTab(
                 title: panel.displayTitle,
                 icon: panel.displayIcon,
                 kind: panel.panelType.rawValue,

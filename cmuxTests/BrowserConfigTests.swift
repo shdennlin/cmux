@@ -1197,7 +1197,7 @@ final class CmuxWebViewKeyEquivalentTests: XCTestCase {
         let previousActiveManager = TerminalController.shared.activeTabManagerForCallerNotification()
         let manager = TabManager(autoWelcomeIfNeeded: false)
         let workspace = try XCTUnwrap(manager.selectedWorkspace)
-        let paneId = try XCTUnwrap(workspace.bonsplitController.focusedPaneId)
+        let paneId = try XCTUnwrap(workspace.activeBonsplitController.focusedPaneId)
         let panel = try XCTUnwrap(workspace.newBrowserSurface(
             inPane: paneId,
             focus: true,
@@ -1291,7 +1291,7 @@ final class CmuxWebViewKeyEquivalentTests: XCTestCase {
         let previousActiveManager = TerminalController.shared.activeTabManagerForCallerNotification()
         let manager = TabManager(autoWelcomeIfNeeded: false)
         let workspace = try XCTUnwrap(manager.selectedWorkspace)
-        let paneId = try XCTUnwrap(workspace.bonsplitController.focusedPaneId)
+        let paneId = try XCTUnwrap(workspace.activeBonsplitController.focusedPaneId)
         let panel = try XCTUnwrap(workspace.newBrowserSurface(
             inPane: paneId,
             focus: true,
@@ -3054,7 +3054,7 @@ final class BrowserSessionHistoryRestoreTests: XCTestCase {
     func testResetSidebarContextClearsBrowserPanelsIntoNewTabState() throws {
         let workspace = Workspace()
         defer { workspace.teardownAllPanels() }
-        let paneId = try XCTUnwrap(workspace.bonsplitController.allPaneIds.first)
+        let paneId = try XCTUnwrap(workspace.activeBonsplitController.allPaneIds.first)
         let contextPanelId = try XCTUnwrap(workspace.focusedPanelId)
         let browser = try XCTUnwrap(
             workspace.newBrowserSurface(

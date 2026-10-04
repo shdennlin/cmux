@@ -37,7 +37,7 @@ extension Workspace {
                   let remoteTabID = projection.remoteTabID else { continue }
             remoteTabs[tab.uuid.uuidString] = remoteTabID
         }
-        return Self.cloudLayoutSyncTree(bonsplitController.treeSnapshot(), remoteTabs: remoteTabs)
+        return Self.cloudLayoutSyncTree(activeBonsplitController.treeSnapshot(), remoteTabs: remoteTabs)
     }
 
     private static func cloudLayoutSyncTree(_ node: ExternalTreeNode, remoteTabs: [String: String]) -> CloudLayoutSyncTree? {

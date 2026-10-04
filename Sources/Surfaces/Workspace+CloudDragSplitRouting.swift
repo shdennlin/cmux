@@ -8,7 +8,7 @@ extension Workspace {
     /// A one-tab edge drag leaves a placeholder behind. The moved surface owns
     /// its replacement's execution context, even though it is now in another pane.
     func repairDraggedTabPlaceholder(in originalPane: PaneID, movedTabPane: PaneID, orientation: SplitOrientation) {
-        let controller = bonsplitController
+        let controller = activeBonsplitController
         let originalTabs = controller.tabs(inPane: originalPane)
         if let tab = controller.selectedTab(inPane: movedTabPane),
            let panelID = panelIdFromSurfaceId(tab.id),
@@ -40,7 +40,7 @@ extension Workspace {
 
     /// Keeps the pre-Cloud placeholder repair behavior for genuinely local tabs.
     private func repairLocalDraggedTabPlaceholder(in originalPane: PaneID, originalTabs: [Bonsplit.Tab]) {
-        let controller = bonsplitController
+        let controller = activeBonsplitController
         let placeholderTabs = originalTabs.filter { panelIdFromSurfaceId($0.id) == nil }
     #if DEBUG
         cmuxDebugLog(
@@ -66,7 +66,7 @@ extension Workspace {
             panelTitles[replacementPanel.id] = replacementPanel.displayTitle
             bindSurface(replacementTab.id, toPanelId: replacementPanel.id)
 
-            bonsplitController.updateTab(
+            activeBonsplitController.updateTab(
                 replacementTab.id,
                 title: replacementPanel.displayTitle,
                 icon: .some(replacementPanel.displayIcon),
@@ -82,7 +82,7 @@ extension Workspace {
             publishCmuxSurfaceCreated(replacementPanel.id, paneId: originalPane, kind: "terminal", origin: "placeholder_repair", focused: false)
 
             for extraPlaceholder in placeholderTabs.dropFirst() {
-                bonsplitController.closeTab(extraPlaceholder.id)
+                activeBonsplitController.closeTab(extraPlaceholder.id)
             }
         } else {
     #if DEBUG
@@ -94,7 +94,7 @@ extension Workspace {
             _ = newTerminalSurface(inPane: originalPane, focus: false)
             for tab in controller.tabs(inPane: originalPane) {
                 if panelIdFromSurfaceId(tab.id) == nil {
-                    bonsplitController.closeTab(tab.id)
+                    activeBonsplitController.closeTab(tab.id)
                 }
             }
         }

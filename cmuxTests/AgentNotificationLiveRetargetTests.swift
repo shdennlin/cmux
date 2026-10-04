@@ -198,7 +198,7 @@ extension AgentNotificationRegressionTests {
         fixture.owningWorkspace.activeRemoteSessionControllerID = UUID()
         fixture.owningWorkspace.trackRemoteTerminalSurface(fixture.panelId)
 
-        let paneID = try #require(fixture.owningWorkspace.bonsplitController.allPaneIds.first)
+        let paneID = try #require(fixture.owningWorkspace.activeBonsplitController.allPaneIds.first)
         let localPanel = try #require(fixture.owningWorkspace.newTerminalSurface(
             inPane: paneID,
             focus: true

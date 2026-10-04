@@ -13,7 +13,7 @@ extension SurfacePaneFactory {
         guard let workspace = AppDelegate.shared?.tabManagerFor(tabId: workspaceID)?.tabs.first(where: { $0.id == workspaceID }) else {
             return
         }
-        let controller = workspace.bonsplitController
+        let controller = workspace.activeBonsplitController
         apply(layout, to: controller.treeSnapshot(), controller: controller)
     }
 

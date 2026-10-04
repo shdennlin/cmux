@@ -82,7 +82,7 @@ extension Workspace {
         guard let fileURL = CmuxExtensionSidebarSelection.customSidebarFileURL(forName: name) else {
             return nil
         }
-        let shouldFocusNewTab = focus ?? (bonsplitController.focusedPaneId == paneId)
+        let shouldFocusNewTab = focus ?? (activeBonsplitController.focusedPaneId == paneId)
         let previousFocusedPanelId = focusedPanelId
         let previousHostedView = focusedTerminalInputTarget()?.panel.hostedView
 
@@ -90,7 +90,7 @@ extension Workspace {
         panels[customPanel.id] = customPanel
         panelTitles[customPanel.id] = customPanel.displayTitle
 
-        guard let newTabId = bonsplitController.createTab(
+        guard let newTabId = activeBonsplitController.createTab(
             title: customPanel.displayTitle,
             icon: customPanel.displayIcon,
             kind: SurfaceKind.customSidebar.rawValue,
@@ -106,7 +106,7 @@ extension Workspace {
 
         bindSurface(newTabId, toPanelId: customPanel.id)
         if let targetIndex {
-            _ = bonsplitController.reorderTab(newTabId, toIndex: targetIndex)
+            _ = activeBonsplitController.reorderTab(newTabId, toIndex: targetIndex)
         }
         publishCmuxSurfaceCreated(
             customPanel.id,
@@ -160,7 +160,7 @@ extension Workspace {
 
         isProgrammaticSplit = true
         defer { isProgrammaticSplit = false }
-        guard let newPaneId = bonsplitController.splitPane(
+        guard let newPaneId = activeBonsplitController.splitPane(
             paneId,
             orientation: orientation,
             withTab: newTab,
@@ -173,7 +173,7 @@ extension Workspace {
             return nil
         }
 
-        bonsplitController.selectTab(newTab.id)
+        activeBonsplitController.selectTab(newTab.id)
         suppressReparentFocusUntilLayoutFollowUp(
             previousHostedView,
             reason: "workspace.customSidebarSplitReparent"

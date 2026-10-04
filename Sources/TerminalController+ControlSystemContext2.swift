@@ -101,7 +101,7 @@ extension TerminalController {
         }
 
         func insertionIndexToRight(anchorTabId: TabID, inPane paneId: PaneID) -> Int {
-            let tabs = workspace.bonsplitController.tabs(inPane: paneId)
+            let tabs = workspace.activeBonsplitController.tabs(inPane: paneId)
             guard let anchorIndex = tabs.firstIndex(where: { $0.id == anchorTabId }) else { return tabs.count }
             let pinnedCount = tabs.reduce(into: 0) { count, tab in
                 if let panelId = workspace.panelIdFromSurfaceId(tab.id),
@@ -178,7 +178,7 @@ extension TerminalController {
             guard workspace.toggleFullWidthTabMode(panelId: panelId) else {
                 return .fullWidthTabToggleFailed
             }
-            return finish(.fullWidthTabMode(workspace.bonsplitController.isFullWidthTabMode(inPane: paneId)))
+            return finish(.fullWidthTabMode(workspace.activeBonsplitController.isFullWidthTabMode(inPane: paneId)))
 
         case "move_to_new_workspace", "detach_to_workspace", "detach_to_new_workspace":
             // The move-to-new-workspace family stays app-side (it re-homes
@@ -285,7 +285,7 @@ extension TerminalController {
                   let paneId = workspace.paneId(forPanelId: panelId) else {
                 return .tabPaneNotFound
             }
-            let tabs = workspace.bonsplitController.tabs(inPane: paneId)
+            let tabs = workspace.activeBonsplitController.tabs(inPane: paneId)
             guard let index = tabs.firstIndex(where: { $0.id == anchorTabId }) else {
                 return .tabNotFoundInPane
             }
@@ -297,7 +297,7 @@ extension TerminalController {
                   let paneId = workspace.paneId(forPanelId: panelId) else {
                 return .tabPaneNotFound
             }
-            let tabs = workspace.bonsplitController.tabs(inPane: paneId)
+            let tabs = workspace.activeBonsplitController.tabs(inPane: paneId)
             guard let index = tabs.firstIndex(where: { $0.id == anchorTabId }) else {
                 return .tabNotFoundInPane
             }
@@ -309,7 +309,7 @@ extension TerminalController {
                   let paneId = workspace.paneId(forPanelId: panelId) else {
                 return .tabPaneNotFound
             }
-            let targetIds = workspace.bonsplitController.tabs(inPane: paneId)
+            let targetIds = workspace.activeBonsplitController.tabs(inPane: paneId)
                 .map(\.id)
                 .filter { $0 != anchorTabId }
             return closeTabs(targetIds)

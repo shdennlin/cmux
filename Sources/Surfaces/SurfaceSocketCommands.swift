@@ -1008,7 +1008,7 @@ extension TerminalController {
                     if let explicitWorkspaceID {
                         let workspace = self.tabManager?.tabs.first(where: { $0.id == explicitWorkspaceID })
                             ?? AppDelegate.shared?.tabManagerFor(tabId: explicitWorkspaceID)?.tabs.first(where: { $0.id == explicitWorkspaceID })
-                        return workspace?.bonsplitController.allPaneIds.contains(where: { $0.id == paneID }) == true
+                        return workspace?.activeBonsplitController.allPaneIds.contains(where: { $0.id == paneID }) == true
                             ? explicitWorkspaceID
                             : nil
                     }

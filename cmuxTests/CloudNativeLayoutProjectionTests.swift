@@ -57,7 +57,7 @@ struct CloudNativeLayoutProjectionTests {
     func closingDeviceProjectionUpdatesSource(reason: SurfaceProjectionEndReason, mixed: Bool) async throws {
         let manager = TabManager(autoWelcomeIfNeeded: false)
         let viewer = try #require(manager.selectedWorkspace)
-        let pane = try #require(viewer.bonsplitController.allPaneIds.first)
+        let pane = try #require(viewer.activeBonsplitController.allPaneIds.first)
         let first = try #require(viewer.focusedPanelId)
         let second = try #require(viewer.newTerminalSurface(inPane: pane, focus: false)?.id)
         defer { viewer.teardownAllPanels(); manager.tabs = [] }
@@ -114,7 +114,7 @@ struct CloudNativeLayoutProjectionTests {
         coordinator.accept(source)
         await coordinator.waitForIdle()
         if mixed {
-            let localPane = try #require(viewer.bonsplitController.allPaneIds.first)
+            let localPane = try #require(viewer.activeBonsplitController.allPaneIds.first)
             let localPanel = try #require(viewer.newTerminalSurface(inPane: localPane, focus: false))
             let localResource = SurfaceResource(
                 id: .init(machine: .local, kind: .terminal, key: localPanel.id.uuidString),
@@ -142,7 +142,7 @@ struct CloudNativeLayoutProjectionTests {
     func deviceSplitDoesNotPaintInTheFocusedPaneFirst() async throws {
         let manager = TabManager(autoWelcomeIfNeeded: false)
         let viewer = try #require(manager.selectedWorkspace)
-        let sourcePane = try #require(viewer.bonsplitController.allPaneIds.first)
+        let sourcePane = try #require(viewer.activeBonsplitController.allPaneIds.first)
         let sourcePanel = try #require(viewer.focusedPanelId)
         defer { viewer.teardownAllPanels(); manager.tabs = [] }
 
@@ -498,7 +498,7 @@ struct CloudNativeLayoutProjectionTests {
         /// creation path projects through; otherwise it owns a private catalog.
         init(app: VaultPaneAppFixture? = nil) throws {
             viewer = try app?.workspace ?? #require(manager.selectedWorkspace)
-            sourcePane = try #require(viewer.bonsplitController.allPaneIds.first)
+            sourcePane = try #require(viewer.activeBonsplitController.allPaneIds.first)
             let sourcePanel = try #require(viewer.focusedPanelId)
             live.register(viewer)
             catalog = app == nil ? SurfaceCatalog(live: live) : .shared
@@ -604,7 +604,7 @@ struct CloudNativeLayoutProjectionTests {
     @Test func nativeMirrorTabInsertionHonorsTheSourceOrder() throws {
         let manager = TabManager(autoWelcomeIfNeeded: false)
         let workspace = try #require(manager.selectedWorkspace)
-        let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+        let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
         defer { workspace.teardownAllPanels(); manager.tabs = [] }
         var ids: [String: UUID] = [:]
         for (name, index) in [("C", 0), ("A", 0), ("B", 1), ("D", 3)] {
@@ -614,7 +614,7 @@ struct CloudNativeLayoutProjectionTests {
                 focus: name == "C", isLoading: false)
         }
         let expected = ["A", "B", "C", "D"].compactMap { ids[$0] }.compactMap { workspace.surfaceIdFromPanelId($0) }
-        let actual = workspace.bonsplitController.tabs(inPane: pane).map(\.id)
+        let actual = workspace.activeBonsplitController.tabs(inPane: pane).map(\.id)
             .filter { expected.contains($0) }
         #expect(actual == expected)
         #expect(workspace.focusedPanelId == ids["C"])
@@ -624,7 +624,7 @@ struct CloudNativeLayoutProjectionTests {
     func deviceLayoutsRoundTripWithoutEchoAndPreserveTheNewestGesture() async throws {
         let manager = TabManager(autoWelcomeIfNeeded: false)
         let viewer = try #require(manager.selectedWorkspace)
-        let pane = try #require(viewer.bonsplitController.allPaneIds.first)
+        let pane = try #require(viewer.activeBonsplitController.allPaneIds.first)
         let first = try #require(viewer.focusedPanelId)
         let second = try #require(viewer.newTerminalSurface(inPane: pane, focus: false)?.id)
         defer { viewer.teardownAllPanels(); manager.tabs = [] }
@@ -688,7 +688,7 @@ struct CloudNativeLayoutProjectionTests {
         receiver = coordinator
         provider.onProjectionEnd = { coordinator.projectionDidEnd($0, reason: $1) }
         provider.materializeProjection = { resource, view, _ in
-            let pane = try #require(viewer.bonsplitController.allPaneIds.first)
+            let pane = try #require(viewer.activeBonsplitController.allPaneIds.first)
             let panel = try #require(viewer.newTerminalSurface(inPane: pane, focus: false))
             return SurfaceProjection(resource: resource.id, workspaceID: viewer.id, panelID: panel.id,
                 remoteWorkspaceID: view?.workspace.id, remoteTabID: view?.tabID)
@@ -885,7 +885,7 @@ struct CloudNativeLayoutProjectionTests {
         let manager = TabManager(autoWelcomeIfNeeded: false)
         let workspace = try #require(manager.selectedWorkspace)
         defer { for panel in workspace.panels.values { panel.close() }; manager.tabs = [] }
-        let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+        let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let first = try #require(workspace.focusedPanelId)
         var panels = [first]
         for _ in 0..<3 { panels.append(try #require(workspace.newTerminalSurface(inPane: pane, focus: false)?.id)) }
@@ -901,7 +901,7 @@ struct CloudNativeLayoutProjectionTests {
             first: .leaf(placements: Array(placements[0...1])),
             second: .split(direction: .down, ratio: 0.3,
                 first: .leaf(placements: [placements[2]]), second: .leaf(placements: [placements[3]]))), projections: projections)
-        workspace.bonsplitController.selectTab(try #require(workspace.surfaceIdFromPanelId(panels[1])))
+        workspace.activeBonsplitController.selectTab(try #require(workspace.surfaceIdFromPanelId(panels[1])))
 
         let captured = try #require(workspace.deviceWorkspaceLayoutSnapshot())
         guard case .split(let direction, let ratio, let left, let right) = captured,
@@ -922,7 +922,7 @@ struct CloudNativeLayoutProjectionTests {
     @Test func topologyReusesPanelsAndPreservesSelectedTerminal() throws {
         let manager = TabManager()
         let workspace = try #require(manager.selectedWorkspace)
-        let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+        let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let first = try #require(workspace.focusedPanelId)
         let second = try #require(workspace.newTerminalSurface(inPane: pane, focus: false)?.id)
         let third = try #require(workspace.newTerminalSurface(inPane: pane, focus: false)?.id)
@@ -935,18 +935,18 @@ struct CloudNativeLayoutProjectionTests {
             SurfaceResourcePlacement(resource: $0.resource, remoteWorkspaceID: $0.remoteWorkspaceID, remoteTabID: $0.remoteTabID)
         }
         let secondTab = try #require(workspace.surfaceIdFromPanelId(second))
-        workspace.bonsplitController.selectTab(secondTab)
+        workspace.activeBonsplitController.selectTab(secondTab)
         let originalPanels = Set(workspace.panels.keys)
         let layout = SurfaceProjectionLayout.split(direction: .right, ratio: 0.6,
             first: .leaf(placements: [placements[0]]), second: .split(direction: .down, ratio: 0.4,
                 first: .leaf(placements: [placements[1]]), second: .leaf(placements: [placements[2]])))
         workspace.applyCloudWorkspaceLayout(layout, projections: projections)
         #expect(Set(workspace.panels.keys) == originalPanels)
-        #expect(workspace.bonsplitController.allPaneIds.count == 3)
-        #expect(workspace.bonsplitController.focusedPaneId == workspace.paneId(forPanelId: second))
+        #expect(workspace.activeBonsplitController.allPaneIds.count == 3)
+        #expect(workspace.activeBonsplitController.focusedPaneId == workspace.paneId(forPanelId: second))
         let secondPane = try #require(workspace.paneId(forPanelId: second))
-        #expect(workspace.bonsplitController.selectedTab(inPane: secondPane)?.id == secondTab)
-        let tree = workspace.bonsplitController.treeSnapshot()
+        #expect(workspace.activeBonsplitController.selectedTab(inPane: secondPane)?.id == secondTab)
+        let tree = workspace.activeBonsplitController.treeSnapshot()
         guard case .split(let root) = tree, case .split(let right) = root.second else {
             Issue.record("Expected the daemon split structure"); return
         }
@@ -954,11 +954,11 @@ struct CloudNativeLayoutProjectionTests {
         #expect(abs(root.dividerPosition - 0.6) < 0.001)
         #expect(abs(right.dividerPosition - 0.4) < 0.001)
         workspace.applyCloudWorkspaceLayout(layout, projections: projections)
-        #expect(workspace.bonsplitController.treeSnapshot() == tree, "repeated refresh is a geometry no-op")
+        #expect(workspace.activeBonsplitController.treeSnapshot() == tree, "repeated refresh is a geometry no-op")
         workspace.applyCloudWorkspaceLayout(.leaf(placements: Array(placements.reversed())), projections: projections)
-        #expect(workspace.bonsplitController.allPaneIds.count == 1)
-        let finalPane = try #require(workspace.bonsplitController.allPaneIds.first)
-        #expect(workspace.bonsplitController.tabs(inPane: finalPane).map(\.id) == [third, second, first].compactMap { workspace.surfaceIdFromPanelId($0) })
+        #expect(workspace.activeBonsplitController.allPaneIds.count == 1)
+        let finalPane = try #require(workspace.activeBonsplitController.allPaneIds.first)
+        #expect(workspace.activeBonsplitController.tabs(inPane: finalPane).map(\.id) == [third, second, first].compactMap { workspace.surfaceIdFromPanelId($0) })
         #expect(Set(workspace.panels.keys) == originalPanels)
     }
 
@@ -967,7 +967,7 @@ struct CloudNativeLayoutProjectionTests {
         let manager = TabManager(autoWelcomeIfNeeded: false)
         let workspace = try #require(manager.selectedWorkspace)
         defer { for panel in workspace.panels.values { panel.close() }; manager.tabs = [] }
-        let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+        let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let first = try #require(workspace.focusedPanelId)
         var panels = [first]
         for _ in 0..<3 {
@@ -998,7 +998,7 @@ struct CloudNativeLayoutProjectionTests {
             )
         )
         workspace.applyCloudWorkspaceLayout(complete, projections: projections)
-        let before = workspace.bonsplitController.treeSnapshot()
+        let before = workspace.activeBonsplitController.treeSnapshot()
 
         // This models a daemon snapshot whose resource inventory has not caught
         // up with the right-most tab. Applying it would otherwise move every
@@ -1009,7 +1009,7 @@ struct CloudNativeLayoutProjectionTests {
             second: .leaf(placements: [placements[2]])
         )
         workspace.applyCloudWorkspaceLayout(incomplete, projections: projections)
-        #expect(workspace.bonsplitController.treeSnapshot() == before)
-        #expect(workspace.bonsplitController.allPaneIds.count == 3)
+        #expect(workspace.activeBonsplitController.treeSnapshot() == before)
+        #expect(workspace.activeBonsplitController.allPaneIds.count == 3)
     }
 }

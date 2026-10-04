@@ -10,7 +10,7 @@ extension Workspace {
         CmuxNavigationTargetResolver.WorkspaceDescriptor(
             workspaceId: id,
             stableId: stableId,
-            paneIds: bonsplitController.allPaneIds.map(\.id),
+            paneIds: activeBonsplitController.allPaneIds.map(\.id),
             surfaces: panels.compactMap { panelId, panel in
                 guard surfaceIdFromPanelId(panelId) != nil else { return nil }
                 let runtimeSurfaceIds = remoteTmuxControlPanes(containerPanelID: panelId)

@@ -57,7 +57,7 @@ struct RemoteRelayTmuxCompatAuthorizationTests {
         let destination = try Fixture()
         defer { destination.tearDown() }
         let transfer = try #require(source.workspace.detachSurface(panelId: source.panelID))
-        let pane = try #require(destination.workspace.bonsplitController.allPaneIds.first)
+        let pane = try #require(destination.workspace.activeBonsplitController.allPaneIds.first)
         #expect(destination.workspace.attachDetachedSurface(transfer, inPane: pane, focus: false) == source.panelID)
         #expect(destination.workspace.isRemoteTerminalContext(source.panelID))
         for fixture in [source, destination] {

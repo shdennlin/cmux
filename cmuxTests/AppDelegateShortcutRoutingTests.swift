@@ -2190,7 +2190,7 @@ final class AppDelegateShortcutRoutingTests: XCTestCase {
         // size first (same fix as #15434).
         window.setContentSize(NSSize(width: 1_000, height: 700))
         window.contentView?.layoutSubtreeIfNeeded()
-        workspace.bonsplitController.setContainerFrame(CGRect(x: 0, y: 0, width: 1_000, height: 700))
+        workspace.activeBonsplitController.setContainerFrame(CGRect(x: 0, y: 0, width: 1_000, height: 700))
 
         guard let rightPanel = newTerminalSplitForSplitAdmissionTesting(window: window, workspace: workspace, from: leftPanelId, orientation: .horizontal) else {
             XCTFail("Expected split terminal panels")
@@ -2203,7 +2203,7 @@ final class AppDelegateShortcutRoutingTests: XCTestCase {
             XCTFail("Expected split pane IDs")
             return
         }
-        let layoutBefore = workspace.bonsplitController.layoutSnapshot()
+        let layoutBefore = workspace.activeBonsplitController.layoutSnapshot()
         guard let leftPaneBeforeFrame = layoutBefore.panes.first(where: { $0.paneId == leftPaneBefore.id.uuidString })?.frame,
               let rightPaneBeforeFrame = layoutBefore.panes.first(where: { $0.paneId == rightPaneBefore.id.uuidString })?.frame else {
             XCTFail("Expected pane frames before shortcut split")
@@ -2246,7 +2246,7 @@ final class AppDelegateShortcutRoutingTests: XCTestCase {
             XCTFail("Expected pane IDs after shortcut split")
             return
         }
-        let layoutAfter = workspace.bonsplitController.layoutSnapshot()
+        let layoutAfter = workspace.activeBonsplitController.layoutSnapshot()
         guard let newPaneFrame = layoutAfter.panes.first(where: { $0.paneId == newPaneId.id.uuidString })?.frame,
               let rightPaneAfterFrame = layoutAfter.panes.first(where: { $0.paneId == rightPaneAfter.id.uuidString })?.frame else {
             XCTFail("Expected pane frames after shortcut split")
@@ -3350,7 +3350,7 @@ final class AppDelegateShortcutRoutingTests: XCTestCase {
 
         // Recreate the regression shape: the window chrome state says minimal +
         // collapsed sidebar, but the selected workspace's live Bonsplit inset is stale.
-        sourceWorkspace.bonsplitController.configuration.appearance.tabBarLeadingInset = 0
+        sourceWorkspace.activeBonsplitController.configuration.appearance.tabBarLeadingInset = 0
 
         // This API deliberately routes to the focused window. Reassert focus after
         // draining the run loop so unrelated window activity cannot redirect the test.
@@ -3368,7 +3368,7 @@ final class AppDelegateShortcutRoutingTests: XCTestCase {
         }
 
         XCTAssertEqual(
-            newWorkspace.bonsplitController.configuration.appearance.tabBarLeadingInset,
+            newWorkspace.activeBonsplitController.configuration.appearance.tabBarLeadingInset,
             80,
             accuracy: 0.5,
             "New minimal-mode workspaces should reserve traffic-light space immediately even when the source workspace inset is stale"
@@ -3416,7 +3416,7 @@ final class AppDelegateShortcutRoutingTests: XCTestCase {
         // No RunLoop spin before reading the inset — the seed must be applied by the
         // time createMainWindow returns, not lazily after onAppear runs.
         XCTAssertEqual(
-            initialWorkspace.bonsplitController.configuration.appearance.tabBarLeadingInset,
+            initialWorkspace.activeBonsplitController.configuration.appearance.tabBarLeadingInset,
             80,
             accuracy: 0.5,
             "New minimal-mode windows with collapsed sidebar should reserve traffic-light space on the initial workspace before first render"
