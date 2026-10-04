@@ -32,8 +32,8 @@ extension Workspace {
             listeningPorts: listeningPorts,
             unreadCount: unreadCount,
             surfaces: customSidebarSurfaceSnapshots(focusedPanelId: focusedPanelId),
-            surfaceCount: bonsplitController.allPaneIds.reduce(0) {
-                $0 + bonsplitController.tabs(inPane: $1).count
+            surfaceCount: activeBonsplitController.allPaneIds.reduce(0) {
+                $0 + activeBonsplitController.tabs(inPane: $1).count
             },
             customDescription: customDescription,
             customColor: customColor,
@@ -69,8 +69,8 @@ extension Workspace {
         let records = service.sessionRecords(workspaceID: nil)
         guard !records.isEmpty else { return [] }
         var surfaceIdByPanelId: [UUID: UUID] = [:]
-        for paneId in bonsplitController.allPaneIds {
-            for tab in bonsplitController.tabs(inPane: paneId) {
+        for paneId in activeBonsplitController.allPaneIds {
+            for tab in activeBonsplitController.tabs(inPane: paneId) {
                 guard let panelId = panelIdFromSurfaceId(tab.id) else { continue }
                 surfaceIdByPanelId[panelId] = tab.id.uuid
             }
@@ -132,8 +132,8 @@ extension Workspace {
 
     private func customSidebarSurfaceSnapshots(focusedPanelId: UUID?) -> [CustomSidebarSurfaceSnapshot] {
         var surfaces: [CustomSidebarSurfaceSnapshot] = []
-        for paneId in bonsplitController.allPaneIds {
-            for tab in bonsplitController.tabs(inPane: paneId) {
+        for paneId in activeBonsplitController.allPaneIds {
+            for tab in activeBonsplitController.tabs(inPane: paneId) {
                 guard let panelId = panelIdFromSurfaceId(tab.id) else { continue }
                 // Keep tab identity stable, but expose only IDs accepted by surface.*.
                 // A mirror without a projection stays visible without a focus target.

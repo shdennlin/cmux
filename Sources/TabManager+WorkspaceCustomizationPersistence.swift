@@ -54,7 +54,7 @@ extension TabManager {
             // Workspace construction admits automatic titles before this
             // explicit custom-title path runs. Keep the initial Bonsplit tab
             // faithful to an authored creation name.
-            workspace.bonsplitController.updateTab(surfaceId, title: explicitTitle)
+            workspace.activeBonsplitController.updateTab(surfaceId, title: explicitTitle)
         }
     }
 

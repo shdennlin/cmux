@@ -72,28 +72,28 @@ struct WorkspaceAdjacentPaneMoveTests {
         #expect(orderedPaneIds == [leftPaneId.id, topRightPaneId.id, bottomRightPaneId.id])
 
         workspace.focusPanel(leftPanelId)
-        var visited = [try #require(workspace.bonsplitController.focusedPaneId?.id)]
+        var visited = [try #require(workspace.activeBonsplitController.focusedPaneId?.id)]
         for _ in 0..<3 {
             #expect(workspace.cycleFocus(forward: true))
-            visited.append(try #require(workspace.bonsplitController.focusedPaneId?.id))
+            visited.append(try #require(workspace.activeBonsplitController.focusedPaneId?.id))
         }
 
         #expect(visited == [orderedPaneIds[0], orderedPaneIds[1], orderedPaneIds[2], orderedPaneIds[0]])
         #expect(workspace.focusedPanelId == leftPanelId)
 
         #expect(workspace.cycleFocus(forward: false))
-        #expect(workspace.bonsplitController.focusedPaneId?.id == orderedPaneIds[2])
+        #expect(workspace.activeBonsplitController.focusedPaneId?.id == orderedPaneIds[2])
         #expect(workspace.focusedPanelId == bottomRightPanel.id)
     }
 
     @Test func cycleFocusReturnsFalseWithASinglePane() throws {
         let workspace = Workspace()
         let panelId = try #require(workspace.focusedPanelId)
-        let paneId = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneId = try #require(workspace.activeBonsplitController.focusedPaneId)
 
         #expect(!workspace.cycleFocus(forward: true))
         #expect(!workspace.cycleFocus(forward: false))
-        #expect(workspace.bonsplitController.focusedPaneId == paneId)
+        #expect(workspace.activeBonsplitController.focusedPaneId == paneId)
         #expect(workspace.focusedPanelId == panelId)
     }
 
@@ -111,21 +111,21 @@ struct WorkspaceAdjacentPaneMoveTests {
         workspace.setLayoutMode(.canvas)
 
         let focusedPanelBefore = try #require(workspace.focusedPanelId)
-        let focusedPaneBefore = try #require(workspace.bonsplitController.focusedPaneId)
+        let focusedPaneBefore = try #require(workspace.activeBonsplitController.focusedPaneId)
         let selectedTabsBefore = Dictionary(
-            uniqueKeysWithValues: workspace.bonsplitController.allPaneIds.compactMap { paneId in
-                workspace.bonsplitController.selectedTab(inPane: paneId).map { (paneId, $0.id) }
+            uniqueKeysWithValues: workspace.activeBonsplitController.allPaneIds.compactMap { paneId in
+                workspace.activeBonsplitController.selectedTab(inPane: paneId).map { (paneId, $0.id) }
             }
         )
 
         #expect(!workspace.cycleFocus(forward: true))
         #expect(!workspace.cycleFocus(forward: false))
         #expect(workspace.focusedPanelId == focusedPanelBefore)
-        #expect(workspace.bonsplitController.focusedPaneId == focusedPaneBefore)
+        #expect(workspace.activeBonsplitController.focusedPaneId == focusedPaneBefore)
         #expect(
             Dictionary(
-                uniqueKeysWithValues: workspace.bonsplitController.allPaneIds.compactMap { paneId in
-                    workspace.bonsplitController.selectedTab(inPane: paneId).map { (paneId, $0.id) }
+                uniqueKeysWithValues: workspace.activeBonsplitController.allPaneIds.compactMap { paneId in
+                    workspace.activeBonsplitController.selectedTab(inPane: paneId).map { (paneId, $0.id) }
                 }
             ) == selectedTabsBefore
         )
@@ -194,7 +194,7 @@ struct WorkspaceAdjacentPaneMoveTests {
             workspace.surfaceIdFromPanelId(movedPanelId)
         )
         #expect(
-            workspace.bonsplitController.selectedTab(inPane: destinationPaneId)?.id ==
+            workspace.activeBonsplitController.selectedTab(inPane: destinationPaneId)?.id ==
                 movedTabId
         )
         #expect(workspace.paneId(forPanelId: sourceRemainder.id) == sourcePaneId)
@@ -218,8 +218,8 @@ struct WorkspaceAdjacentPaneMoveTests {
         workspace.focusPanel(movedPanelId)
 
         #expect(workspace.moveFocusedSurface(to: .right))
-        #expect(workspace.bonsplitController.allPaneIds.count == 1)
-        #expect(!workspace.bonsplitController.allPaneIds.contains(sourcePaneId))
+        #expect(workspace.activeBonsplitController.allPaneIds.count == 1)
+        #expect(!workspace.activeBonsplitController.allPaneIds.contains(sourcePaneId))
         #expect(workspace.paneId(forPanelId: movedPanelId) == destinationPaneId)
         #expect((workspace.panels[movedPanelId] as? TerminalPanel) === terminal)
     }
@@ -278,7 +278,7 @@ struct WorkspaceAdjacentPaneMoveTests {
         )
 
         #expect(workspace.moveFocusedSurface(to: movement))
-        #expect(workspace.bonsplitController.allPaneIds.count == 2)
+        #expect(workspace.activeBonsplitController.allPaneIds.count == 2)
 
         let destinationPaneId = try #require(
             workspace.paneId(forPanelId: movedPanelId)
@@ -286,7 +286,7 @@ struct WorkspaceAdjacentPaneMoveTests {
         #expect(destinationPaneId != sourcePaneId)
         #expect((workspace.panels[movedPanelId] as? TerminalPanel) === movedTerminal)
         #expect(workspace.focusedPanelId == movedPanelId)
-        #expect(workspace.bonsplitController.focusedPaneId == destinationPaneId)
+        #expect(workspace.activeBonsplitController.focusedPaneId == destinationPaneId)
 
         let replacementPanelIds = panelOrder(in: workspace, paneId: sourcePaneId)
         #expect(replacementPanelIds.count == 1)
@@ -294,7 +294,7 @@ struct WorkspaceAdjacentPaneMoveTests {
         #expect(replacementPanelId != movedPanelId)
         #expect(workspace.panels[replacementPanelId] is TerminalPanel)
 
-        guard case .split(let split) = workspace.bonsplitController.treeSnapshot() else {
+        guard case .split(let split) = workspace.activeBonsplitController.treeSnapshot() else {
             Issue.record("Expected a split for \(movement)")
             return
         }
@@ -347,7 +347,7 @@ struct WorkspaceAdjacentPaneMoveTests {
             workspace.paneId(forPanelId: movedPanelId)
         )
 
-        guard case .split(let root) = workspace.bonsplitController.treeSnapshot() else {
+        guard case .split(let root) = workspace.activeBonsplitController.treeSnapshot() else {
             Issue.record("Expected the parent split for \(movement)")
             return
         }
@@ -400,7 +400,7 @@ struct WorkspaceAdjacentPaneMoveTests {
         #expect((workspace.panels[browser.id] as? BrowserPanel) === browser)
         #expect(browser.webView === webView)
         #expect(workspace.focusedPanelId == browser.id)
-        #expect(workspace.bonsplitController.focusedPaneId == destinationPaneId)
+        #expect(workspace.activeBonsplitController.focusedPaneId == destinationPaneId)
 
         let replacementPanelIds = panelOrder(in: workspace, paneId: sourcePaneId)
         #expect(replacementPanelIds.count == 1)
@@ -419,7 +419,7 @@ struct WorkspaceAdjacentPaneMoveTests {
             #expect(!workspace.moveFocusedSurface(to: movement))
         }
 
-        #expect(workspace.bonsplitController.allPaneIds == [paneId])
+        #expect(workspace.activeBonsplitController.allPaneIds == [paneId])
         #expect(panelOrder(in: workspace, paneId: paneId) == [panelId])
         #expect((workspace.panels[panelId] as? TerminalPanel) === panel)
     }
@@ -440,12 +440,12 @@ struct WorkspaceAdjacentPaneMoveTests {
         workspace.focusPanel(movedPanelId)
         #expect(workspace.toggleSplitZoom(panelId: movedPanelId))
 
-        var configuration = workspace.bonsplitController.configuration
+        var configuration = workspace.activeBonsplitController.configuration
         configuration.allowCrossPaneTabMove = false
-        workspace.bonsplitController.configuration = configuration
+        workspace.activeBonsplitController.configuration = configuration
 
         #expect(!workspace.moveFocusedSurface(to: .right))
-        #expect(workspace.bonsplitController.zoomedPaneId == sourcePaneId)
+        #expect(workspace.activeBonsplitController.zoomedPaneId == sourcePaneId)
         #expect(workspace.paneId(forPanelId: movedPanelId) == sourcePaneId)
         #expect(workspace.focusedPanelId == movedPanelId)
     }
@@ -465,15 +465,15 @@ struct WorkspaceAdjacentPaneMoveTests {
         )
         workspace.focusPanel(movedPanelId)
         #expect(workspace.toggleSplitZoom(panelId: movedPanelId))
-        let treeBeforeMove = workspace.bonsplitController.treeSnapshot()
+        let treeBeforeMove = workspace.activeBonsplitController.treeSnapshot()
 
-        var configuration = workspace.bonsplitController.configuration
+        var configuration = workspace.activeBonsplitController.configuration
         configuration.allowCrossPaneTabMove = false
-        workspace.bonsplitController.configuration = configuration
+        workspace.activeBonsplitController.configuration = configuration
 
         #expect(!workspace.moveFocusedSurface(to: .right))
-        #expect(workspace.bonsplitController.treeSnapshot() == treeBeforeMove)
-        #expect(workspace.bonsplitController.zoomedPaneId == sourcePaneId)
+        #expect(workspace.activeBonsplitController.treeSnapshot() == treeBeforeMove)
+        #expect(workspace.activeBonsplitController.zoomedPaneId == sourcePaneId)
         #expect(workspace.paneId(forPanelId: movedPanelId) == sourcePaneId)
         #expect(workspace.focusedPanelId == movedPanelId)
     }
@@ -504,7 +504,7 @@ struct WorkspaceAdjacentPaneMoveTests {
                 panelOrder(in: workspace, paneId: destinationPaneId) ==
                     [destinationPanel.id]
             )
-            #expect(workspace.bonsplitController.allPaneIds.count == 2)
+            #expect(workspace.activeBonsplitController.allPaneIds.count == 2)
         }
     }
 
@@ -521,10 +521,10 @@ struct WorkspaceAdjacentPaneMoveTests {
         )
         let rightPaneId = try #require(workspace.paneId(forPanelId: rightPanel.id))
         let leftTabId = try #require(workspace.surfaceIdFromPanelId(leftPanelId))
-        let leftTab = try #require(workspace.bonsplitController.tab(leftTabId))
+        let leftTab = try #require(workspace.activeBonsplitController.tab(leftTabId))
 
         workspace.splitTabBar(
-            workspace.bonsplitController,
+            workspace.activeBonsplitController,
             didRequestTabContextAction: .moveToRightPane,
             for: leftTab,
             inPane: leftPaneId
@@ -576,7 +576,7 @@ struct WorkspaceAdjacentPaneMoveTests {
     }
 
     private func panelOrder(in workspace: Workspace, paneId: PaneID) -> [UUID] {
-        workspace.bonsplitController.tabs(inPane: paneId).compactMap {
+        workspace.activeBonsplitController.tabs(inPane: paneId).compactMap {
             workspace.panelIdFromSurfaceId($0.id)
         }
     }

@@ -19,7 +19,7 @@ final class WorkspaceCustomSidebarPullRequestContextTests: XCTestCase {
             defer { CmuxEventBus.shared.resetForTesting() }
 
             let workspace = Workspace()
-            let paneId = try XCTUnwrap(workspace.bonsplitController.focusedPaneId)
+            let paneId = try XCTUnwrap(workspace.activeBonsplitController.focusedPaneId)
             CmuxEventBus.shared.resetForTesting()
             let panel = try XCTUnwrap(
                 workspace.newCustomSidebarSurface(inPane: paneId, name: sidebarName, focus: true)
@@ -43,7 +43,7 @@ final class WorkspaceCustomSidebarPullRequestContextTests: XCTestCase {
             )
             XCTAssertEqual(restoredPanel.panelType, .customSidebar)
             XCTAssertEqual(
-                restored.surfaceIdFromPanelId(restoredPanel.id).flatMap { restored.bonsplitController.tab($0)?.kind },
+                restored.surfaceIdFromPanelId(restoredPanel.id).flatMap { restored.activeBonsplitController.tab($0)?.kind },
                 SurfaceKind.customSidebar.rawValue
             )
         }
@@ -59,7 +59,7 @@ final class WorkspaceCustomSidebarPullRequestContextTests: XCTestCase {
             defer { CmuxEventBus.shared.resetForTesting() }
 
             let workspace = Workspace()
-            let sourcePaneId = try XCTUnwrap(workspace.bonsplitController.focusedPaneId)
+            let sourcePaneId = try XCTUnwrap(workspace.activeBonsplitController.focusedPaneId)
             CmuxEventBus.shared.resetForTesting()
 
             let panel = try XCTUnwrap(

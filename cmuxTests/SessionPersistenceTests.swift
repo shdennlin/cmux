@@ -54,7 +54,7 @@ final class SessionPersistenceTests: XCTestCase {
         try "# hello\n".write(to: markdownURL, atomically: true, encoding: .utf8)
 
         let workspace = Workspace()
-        let paneId = try XCTUnwrap(workspace.bonsplitController.allPaneIds.first)
+        let paneId = try XCTUnwrap(workspace.activeBonsplitController.allPaneIds.first)
         let panel = try XCTUnwrap(
             workspace.newMarkdownSurface(
                 inPane: paneId,
@@ -149,7 +149,7 @@ final class SessionPersistenceTests: XCTestCase {
         XCTAssertFalse(restoredNotification.isRead)
         XCTAssertTrue(store.hasUnreadNotification(forTabId: restored.id, surfaceId: restoredPanelId))
         let restoredSurfaceId = try XCTUnwrap(restored.surfaceIdFromPanelId(restoredPanelId))
-        XCTAssertEqual(restored.bonsplitController.tab(restoredSurfaceId)?.showsNotificationBadge, true)
+        XCTAssertEqual(restored.activeBonsplitController.tab(restoredSurfaceId)?.showsNotificationBadge, true)
         XCTAssertEqual(store.unreadCount(forTabId: restored.id), 1)
         XCTAssertFalse(restored.hasRestoredUnreadIndicator(panelId: restoredPanelId))
         XCTAssertTrue(store.notificationMenuSnapshot.hasNotifications)
@@ -7223,7 +7223,7 @@ extension SessionPersistenceTests {
         for (workspaceIndex, workspace) in workspaces.enumerated() {
             let workspaceTitle = "Project \(workspaceIndex + 1)"
             workspace.setCustomTitle(workspaceTitle)
-            let paneId = try XCTUnwrap(workspace.bonsplitController.allPaneIds.first)
+            let paneId = try XCTUnwrap(workspace.activeBonsplitController.allPaneIds.first)
             let firstPanelId = try XCTUnwrap(workspace.focusedPanelId)
             let secondPanelId = try XCTUnwrap(workspace.newTerminalSurface(inPane: paneId, focus: true)?.id)
             for (panelIndex, panelId) in [firstPanelId, secondPanelId].enumerated() {

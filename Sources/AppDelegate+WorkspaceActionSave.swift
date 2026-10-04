@@ -311,8 +311,8 @@ extension AppDelegate {
 
         guard let context = targetContext,
               let workspace = context.tabManager.selectedWorkspace,
-              let paneId = workspace.bonsplitController.focusedPaneId
-                  ?? workspace.bonsplitController.allPaneIds.first,
+              let paneId = workspace.activeBonsplitController.focusedPaneId
+                  ?? workspace.activeBonsplitController.allPaneIds.first,
               !workspace.openFileSurfaces(
                   inPane: paneId,
                   filePaths: [configURL.path],

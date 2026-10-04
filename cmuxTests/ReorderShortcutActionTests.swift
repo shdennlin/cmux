@@ -208,7 +208,7 @@ struct ReorderShortcutActionTests {
     }
 
     private func panelOrder(in workspace: Workspace, paneId: PaneID) -> [UUID] {
-        workspace.bonsplitController.tabs(inPane: paneId).compactMap {
+        workspace.activeBonsplitController.tabs(inPane: paneId).compactMap {
             workspace.panelIdFromSurfaceId($0.id)
         }
     }

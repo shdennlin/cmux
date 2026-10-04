@@ -43,7 +43,7 @@ extension TerminalController {
             var targetWindowId = source.windowId
             var targetTabManager = source.tabManager
             var targetWorkspace = sourceWorkspace
-            var targetPane = sourcePane ?? sourceWorkspace.bonsplitController.focusedPaneId ?? sourceWorkspace.bonsplitController.allPaneIds.first
+            var targetPane = sourcePane ?? sourceWorkspace.activeBonsplitController.focusedPaneId ?? sourceWorkspace.activeBonsplitController.allPaneIds.first
             var targetIndex = explicitIndex
 
             if let anchorSurfaceId = beforeSurfaceId ?? afterSurfaceId {
@@ -77,7 +77,7 @@ extension TerminalController {
                 targetTabManager = tm
                 targetWorkspace = ws
                 targetWindowId = app.windowId(for: tm) ?? targetWindowId
-                targetPane = ws.bonsplitController.focusedPaneId ?? ws.bonsplitController.allPaneIds.first
+                targetPane = ws.activeBonsplitController.focusedPaneId ?? ws.activeBonsplitController.allPaneIds.first
             } else if let windowUUID = requestedWindowUUID {
                 guard let tm = app.tabManagerFor(windowId: windowUUID) else {
                     result = .err(code: "not_found", message: "Window not found", data: ["window_id": windowUUID.uuidString])
@@ -91,7 +91,7 @@ extension TerminalController {
                     return
                 }
                 targetWorkspace = ws
-                targetPane = ws.bonsplitController.focusedPaneId ?? ws.bonsplitController.allPaneIds.first
+                targetPane = ws.activeBonsplitController.focusedPaneId ?? ws.activeBonsplitController.allPaneIds.first
             }
 
             guard targetWorkspace.acceptsSurface(from: sourceWorkspace, panelID: surfaceId) else {
@@ -129,9 +129,9 @@ extension TerminalController {
 
             if targetWorkspace.attachDetachedSurface(transfer, inPane: destinationPane, atIndex: targetIndex, focus: focus) == nil {
                 // Roll back to source workspace if attach fails.
-                let rollbackPane = sourcePane.flatMap { sp in sourceWorkspace.bonsplitController.allPaneIds.first(where: { $0 == sp }) }
-                    ?? sourceWorkspace.bonsplitController.focusedPaneId
-                    ?? sourceWorkspace.bonsplitController.allPaneIds.first
+                let rollbackPane = sourcePane.flatMap { sp in sourceWorkspace.activeBonsplitController.allPaneIds.first(where: { $0 == sp }) }
+                    ?? sourceWorkspace.activeBonsplitController.focusedPaneId
+                    ?? sourceWorkspace.activeBonsplitController.allPaneIds.first
                 if let rollbackPane {
                     _ = sourceWorkspace.attachDetachedSurface(transfer, inPane: rollbackPane, atIndex: sourceIndex, focus: focus)
                 }

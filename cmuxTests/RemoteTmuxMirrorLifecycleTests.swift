@@ -236,8 +236,8 @@ struct RemoteTmuxMirrorLifecycleTests {
     @Test func backgroundDisplayPaneCreationPreservesSelectedSurface() throws {
         let workspace = Workspace()
         defer { workspace.teardownAllPanels() }
-        let pane = try #require(workspace.bonsplitController.focusedPaneId)
-        let selectedBefore = try #require(workspace.bonsplitController.selectedTab(inPane: pane)?.id)
+        let pane = try #require(workspace.activeBonsplitController.focusedPaneId)
+        let selectedBefore = try #require(workspace.activeBonsplitController.selectedTab(inPane: pane)?.id)
 
         let mirrorPanel = workspace.addRemoteTmuxDisplayPane(
             remotePaneId: 7,
@@ -247,8 +247,8 @@ struct RemoteTmuxMirrorLifecycleTests {
         )
 
         #expect(mirrorPanel != nil)
-        #expect(workspace.bonsplitController.focusedPaneId == pane)
-        #expect(workspace.bonsplitController.selectedTab(inPane: pane)?.id == selectedBefore)
+        #expect(workspace.activeBonsplitController.focusedPaneId == pane)
+        #expect(workspace.activeBonsplitController.selectedTab(inPane: pane)?.id == selectedBefore)
     }
 
     @Test func detachingMirrorReplacesRetiredContainerWithUsableTerminal() throws {
@@ -298,8 +298,8 @@ struct RemoteTmuxMirrorLifecycleTests {
             window.close()
         }
 
-        let pane = try #require(workspace.bonsplitController.focusedPaneId)
-        let selectedBefore = try #require(workspace.bonsplitController.selectedTab(inPane: pane)?.id)
+        let pane = try #require(workspace.activeBonsplitController.focusedPaneId)
+        let selectedBefore = try #require(workspace.activeBonsplitController.selectedTab(inPane: pane)?.id)
         _ = try #require(workspace.addRemoteTmuxDisplayPane(
             remotePaneId: 7,
             title: "first mirror",
@@ -312,7 +312,7 @@ struct RemoteTmuxMirrorLifecycleTests {
             focus: false,
             onInput: ignoreInput
         ))
-        workspace.bonsplitController.selectTab(selectedBefore)
+        workspace.activeBonsplitController.selectTab(selectedBefore)
         window.orderOut(nil)
         await confirmation("hidden mirror window became key", expectedCount: 0) { becameKey in
             let keyObserver = NotificationCenter.default.addObserver(
@@ -327,8 +327,8 @@ struct RemoteTmuxMirrorLifecycleTests {
             #expect(workspace.removeRemoteTmuxDisplayPane(closingPanel.id))
         }
 
-        #expect(workspace.bonsplitController.focusedPaneId == pane)
-        #expect(workspace.bonsplitController.selectedTab(inPane: pane)?.id == selectedBefore)
+        #expect(workspace.activeBonsplitController.focusedPaneId == pane)
+        #expect(workspace.activeBonsplitController.selectedTab(inPane: pane)?.id == selectedBefore)
         #expect(!window.isVisible)
         #expect(!window.isKeyWindow)
     }

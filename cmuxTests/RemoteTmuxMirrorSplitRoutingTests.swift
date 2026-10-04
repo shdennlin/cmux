@@ -452,7 +452,7 @@ import Testing
             let window = try #require(appDelegate.mainWindow(for: windowId))
             window.setContentSize(Self.contentSize)
             window.contentView?.layoutSubtreeIfNeeded()
-            workspace.bonsplitController.setContainerFrame(CGRect(origin: .zero, size: Self.contentSize))
+            workspace.activeBonsplitController.setContainerFrame(CGRect(origin: .zero, size: Self.contentSize))
         }
 
         private static let contentSize = CGSize(width: 1_000, height: 700)

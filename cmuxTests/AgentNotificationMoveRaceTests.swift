@@ -114,7 +114,7 @@ struct AgentNotificationRegressionTests {
 
     func movePanel(_ fixture: Fixture) throws {
         let transfer = try #require(fixture.source.detachSurface(panelId: fixture.panelId))
-        let destinationPaneId = try #require(fixture.destination.bonsplitController.allPaneIds.first)
+        let destinationPaneId = try #require(fixture.destination.activeBonsplitController.allPaneIds.first)
         #expect(
             fixture.destination.attachDetachedSurface(
                 transfer,

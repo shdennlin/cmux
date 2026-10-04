@@ -182,7 +182,7 @@ extension TerminalController: ControlSystemContext {
         let dockPaneSummaries = dockStores.flatMap { controlDockPaneSummaries(dock: $0) }
         let paneSummaries = controlPaneSummaries(
             workspace: workspace,
-            snapshot: workspace.bonsplitController.layoutSnapshot()
+            snapshot: workspace.activeBonsplitController.layoutSnapshot()
         ) + dockPaneSummaries
         let panes: [ControlSystemTreePaneNode] = paneSummaries.enumerated().map { paneIndex, pane in
             ControlSystemTreePaneNode(
@@ -204,7 +204,7 @@ extension TerminalController: ControlSystemContext {
         // panes rather than emitting a partial layout whose leaves disagree
         // with the authoritative flat `panes` array.
         let layout = dockPaneSummaries.isEmpty
-            ? systemTreeLayoutNode(from: workspace.bonsplitController.treeSnapshot())
+            ? systemTreeLayoutNode(from: workspace.activeBonsplitController.treeSnapshot())
             : nil
 
         return ControlSystemTreeWorkspaceNode(

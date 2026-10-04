@@ -45,9 +45,9 @@ extension Workspace {
     func syncTerminalTabAgentIconAsset(forPanelId panelId: UUID) {
         guard panels[panelId] is TerminalPanel,
               let tabID = surfaceIdFromPanelId(panelId),
-              let tab = bonsplitController.tab(tabID) else { return }
+              let tab = activeBonsplitController.tab(tabID) else { return }
         let asset = terminalTabAgentIconAsset(forPanelId: panelId)
         guard tab.iconAsset != asset else { return }
-        bonsplitController.updateTab(tabID, iconAsset: .some(asset))
+        activeBonsplitController.updateTab(tabID, iconAsset: .some(asset))
     }
 }

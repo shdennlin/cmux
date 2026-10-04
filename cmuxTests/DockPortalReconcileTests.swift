@@ -583,7 +583,7 @@ struct DockPortalReconcileTests {
             }
 
             let workspace = try #require(manager.tabs.first)
-            let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+            let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
             let simulator = try #require(workspace.newSimulatorSurface(inPane: pane, focus: false))
             let sourceTabId = try #require(workspace.surfaceIdFromPanelId(simulator.id))
             let dock = workspace.requiredDockSplitForTesting

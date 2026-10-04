@@ -9,11 +9,11 @@ extension Workspace {
         let reordered: Bool
         if let mirrorPaneId {
             reordered = performRemoteTmuxMirrorOrderMutation(in: mirrorPaneId) {
-                bonsplitController.reorderTab(tabId, toIndex: index)
+                activeBonsplitController.reorderTab(tabId, toIndex: index)
             }
         } else {
             guard !isRemoteTmuxMirror else { return false }
-            reordered = bonsplitController.reorderTab(tabId, toIndex: index)
+            reordered = activeBonsplitController.reorderTab(tabId, toIndex: index)
         }
         guard reordered else { return false }
         if focus, let paneId = paneId(forPanelId: panelId) {
@@ -32,12 +32,12 @@ extension Workspace {
         onVerification: ((Bool) -> Void)? = nil,
         _ mutation: () -> Bool
     ) -> Bool {
-        let tabs = bonsplitController.tabs(inPane: paneId)
+        let tabs = activeBonsplitController.tabs(inPane: paneId)
         let previousPanelOrder = tabs.compactMap { panelIdFromSurfaceId($0.id) }
         guard previousPanelOrder.count == tabs.count, remoteTmuxWindowOrderSync != nil else { return false }
         return performRemoteTmuxMirrorMutation {
             guard mutation() else { return false }
-            let desiredPanelOrder = bonsplitController.tabs(inPane: paneId).compactMap {
+            let desiredPanelOrder = activeBonsplitController.tabs(inPane: paneId).compactMap {
                 panelIdFromSurfaceId($0.id)
             }
             guard desiredPanelOrder.count == tabs.count,
@@ -74,7 +74,7 @@ extension Workspace {
         // A global tmux window order cannot span multiple cmux panes.
         let presentPaneIds = Set(panelOrder.compactMap { paneId(forPanelId: $0) })
         guard presentPaneIds.count == 1, let paneId = presentPaneIds.first else { return false }
-        let currentPanelIds = bonsplitController.tabs(inPane: paneId).compactMap { panelIdFromSurfaceId($0.id) }
+        let currentPanelIds = activeBonsplitController.tabs(inPane: paneId).compactMap { panelIdFromSurfaceId($0.id) }
         guard let desired = RemoteTmuxSessionMirror.mirrorTabReorder(
             current: currentPanelIds,
             requested: panelOrder
@@ -86,7 +86,7 @@ extension Workspace {
         performRemoteTmuxMirrorMutation {
             for (index, panelId) in desired.enumerated() {
                 guard let tabId = surfaceIdFromPanelId(panelId) else { continue }
-                _ = bonsplitController.reorderTab(tabId, toIndex: index)
+                _ = activeBonsplitController.reorderTab(tabId, toIndex: index)
             }
         }
 

@@ -423,7 +423,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
     private static func prepareSplitFixture(window: NSWindow, workspace: Workspace) {
         window.setContentSize(splitFixtureContentSize)
         window.contentView?.layoutSubtreeIfNeeded()
-        workspace.bonsplitController.setContainerFrame(
+        workspace.activeBonsplitController.setContainerFrame(
             CGRect(x: 0, y: 0, width: splitFixtureContentSize.width, height: 1_000)
         )
     }
@@ -456,7 +456,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
 
             workspace.focusPanel(browserPanel.id)
             XCTAssertEqual(workspace.focusedPanelId, browserPanel.id)
-            XCTAssertFalse(workspace.bonsplitController.isSplitZoomed)
+            XCTAssertFalse(workspace.activeBonsplitController.isSplitZoomed)
 
             var attachedPresentationView: NSView?
             if browserPanel.webView.cmuxBrowserViewportAttachmentSuperview == nil,
@@ -476,14 +476,14 @@ final class AppDelegateEqualizeSplitsShortcutTests {
 
 #if DEBUG
             XCTAssertTrue(appDelegate.debugHandleShortcutMonitorEvent(event: event))
-            XCTAssertTrue(workspace.bonsplitController.isSplitZoomed)
+            XCTAssertTrue(workspace.activeBonsplitController.isSplitZoomed)
             XCTAssertTrue(workspace.clearSplitZoom())
 #else
             XCTFail("debugHandleShortcutMonitorEvent is only available in DEBUG")
 #endif
 
             XCTAssertTrue(browserPanel.webView.performKeyEquivalent(with: event))
-            XCTAssertTrue(workspace.bonsplitController.isSplitZoomed)
+            XCTAssertTrue(workspace.activeBonsplitController.isSplitZoomed)
         }
     }
 
@@ -523,7 +523,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
 
         window.makeKeyAndOrderFront(nil)
         RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.05))
-        let seededSplits = shortcutRoutingSplitNodes(in: workspace.bonsplitController.treeSnapshot())
+        let seededSplits = shortcutRoutingSplitNodes(in: workspace.activeBonsplitController.treeSnapshot())
         XCTAssertGreaterThanOrEqual(seededSplits.count, 2, "Expected nested splits")
         var seededTargetsBySplitId: [String: Double] = [:]
         for (index, split) in seededSplits.enumerated() {
@@ -533,9 +533,9 @@ final class AppDelegateEqualizeSplitsShortcutTests {
             }
             let targetPosition: CGFloat = index.isMultiple(of: 2) ? 0.2 : 0.8
             seededTargetsBySplitId[split.id] = Double(targetPosition)
-            XCTAssertTrue(workspace.bonsplitController.setDividerPosition(targetPosition, forSplit: splitId))
+            XCTAssertTrue(workspace.activeBonsplitController.setDividerPosition(targetPosition, forSplit: splitId))
         }
-        let postSeedSplits = shortcutRoutingSplitNodes(in: workspace.bonsplitController.treeSnapshot())
+        let postSeedSplits = shortcutRoutingSplitNodes(in: workspace.activeBonsplitController.treeSnapshot())
         XCTAssertEqual(postSeedSplits.count, seededSplits.count)
         for split in postSeedSplits {
             guard let targetPosition = seededTargetsBySplitId[split.id] else {
@@ -545,15 +545,15 @@ final class AppDelegateEqualizeSplitsShortcutTests {
             XCTAssertEqual(split.dividerPosition, targetPosition, accuracy: 0.000_1)
             XCTAssertNotEqual(split.dividerPosition, 0.5, accuracy: 0.000_1)
         }
-        workspace.splitTabBar(workspace.bonsplitController, didChangeGeometry: workspace.bonsplitController.layoutSnapshot())
+        workspace.splitTabBar(workspace.activeBonsplitController, didChangeGeometry: workspace.activeBonsplitController.layoutSnapshot())
         guard let seededLayoutSnapshot = await shortcutRoutingAwaitPublishedLayout(workspace, until: {
-            $0.panes == workspace.bonsplitController.layoutSnapshot().panes
+            $0.panes == workspace.activeBonsplitController.layoutSnapshot().panes
         }) else {
             XCTFail("tmuxLayoutSnapshot never caught up to the seeded 3-pane tree; the geometry publish Task did not run")
             return
         }
         let expectedEqualizedPositions = shortcutRoutingExpectedEqualizedDividerPositions(
-            in: workspace.bonsplitController.treeSnapshot()
+            in: workspace.activeBonsplitController.treeSnapshot()
         )
         guard let event = makeKeyDownEvent(key: "=", modifiers: [.command, .control, .shift], keyCode: 24, windowNumber: window.windowNumber) else {
             XCTFail("Failed to construct Cmd+Ctrl+Shift+= event")
@@ -566,10 +566,10 @@ final class AppDelegateEqualizeSplitsShortcutTests {
         return
 #endif
         RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.35))
-        let equalizedSplits = shortcutRoutingSplitNodes(in: workspace.bonsplitController.treeSnapshot())
+        let equalizedSplits = shortcutRoutingSplitNodes(in: workspace.activeBonsplitController.treeSnapshot())
         XCTAssertEqual(equalizedSplits.count, seededSplits.count)
         let equalizedLeafCount = shortcutRoutingAssertProportionalEqualizedTree(
-            workspace.bonsplitController.treeSnapshot()
+            workspace.activeBonsplitController.treeSnapshot()
         )
         XCTAssertEqual(equalizedLeafCount, 3)
         for split in equalizedSplits {
@@ -590,7 +590,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
             XCTFail("tmuxLayoutSnapshot never left the seeded geometry; the geometry publish Task did not run")
             return
         }
-        let liveEqualizedLayout = workspace.bonsplitController.layoutSnapshot()
+        let liveEqualizedLayout = workspace.activeBonsplitController.layoutSnapshot()
         XCTAssertNotEqual(
             shortcutRoutingPaneFramesById(in: seededLayoutSnapshot),
             shortcutRoutingPaneFramesById(in: liveEqualizedLayout)
@@ -1902,11 +1902,11 @@ final class AppDelegateEqualizeSplitsShortcutTests {
         let destinationManager = TabManager()
         guard let sourceWorkspace = sourceManager.selectedWorkspace,
               let sourcePane =
-                sourceWorkspace.bonsplitController.focusedPaneId,
+                sourceWorkspace.activeBonsplitController.focusedPaneId,
               let destinationWorkspace =
                 destinationManager.selectedWorkspace,
               let destinationPane =
-                destinationWorkspace.bonsplitController
+                destinationWorkspace.activeBonsplitController
                     .focusedPaneId else {
             XCTFail("Expected source and destination panes")
             return
@@ -2004,11 +2004,11 @@ final class AppDelegateEqualizeSplitsShortcutTests {
         let destinationManager = TabManager()
         guard let sourceWorkspace = sourceManager.selectedWorkspace,
               let sourcePane =
-                sourceWorkspace.bonsplitController.focusedPaneId,
+                sourceWorkspace.activeBonsplitController.focusedPaneId,
               let destinationWorkspace =
                 destinationManager.selectedWorkspace,
               let destinationPane =
-                destinationWorkspace.bonsplitController
+                destinationWorkspace.activeBonsplitController
                     .focusedPaneId else {
             XCTFail("Expected source and destination panes")
             return
@@ -2098,11 +2098,11 @@ final class AppDelegateEqualizeSplitsShortcutTests {
         let destinationManager = TabManager()
         guard let sourceWorkspace = sourceManager.selectedWorkspace,
               let sourcePane =
-                sourceWorkspace.bonsplitController.focusedPaneId,
+                sourceWorkspace.activeBonsplitController.focusedPaneId,
               let destinationWorkspace =
                 destinationManager.selectedWorkspace,
               let destinationPane =
-                destinationWorkspace.bonsplitController
+                destinationWorkspace.activeBonsplitController
                     .focusedPaneId else {
             XCTFail("Expected source and destination panes")
             return
@@ -2499,7 +2499,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
         let manager = TabManager()
         let workspace = try XCTUnwrap(manager.selectedWorkspace)
         let pane = try XCTUnwrap(
-            workspace.bonsplitController.focusedPaneId
+            workspace.activeBonsplitController.focusedPaneId
         )
         let terminalPanels =
             workspace.panels.values.compactMap {
@@ -2732,7 +2732,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
         let manager = TabManager()
         let workspace = try XCTUnwrap(manager.selectedWorkspace)
         let pane = try XCTUnwrap(
-            workspace.bonsplitController.focusedPaneId
+            workspace.activeBonsplitController.focusedPaneId
         )
         for _ in 0..<12 {
             _ = workspace.newTerminalSurface(
@@ -2837,12 +2837,12 @@ final class AppDelegateEqualizeSplitsShortcutTests {
         let sourceWorkspace =
             try XCTUnwrap(sourceManager.selectedWorkspace)
         let sourcePane = try XCTUnwrap(
-            sourceWorkspace.bonsplitController.focusedPaneId
+            sourceWorkspace.activeBonsplitController.focusedPaneId
         )
         let destinationWorkspace =
             try XCTUnwrap(destinationManager.selectedWorkspace)
         let destinationPane = try XCTUnwrap(
-            destinationWorkspace.bonsplitController
+            destinationWorkspace.activeBonsplitController
                 .focusedPaneId
         )
 
@@ -3152,7 +3152,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
         let destinationManager = TabManager()
         guard let movedWorkspace = sourceManager.selectedWorkspace,
               let movedPane =
-                movedWorkspace.bonsplitController.focusedPaneId,
+                movedWorkspace.activeBonsplitController.focusedPaneId,
               let destinationWorkspace =
                 destinationManager.selectedWorkspace else {
             XCTFail("Expected source and destination workspace panes")
@@ -3300,7 +3300,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
               let unrelatedWorkspace =
                 destinationManager.selectedWorkspace,
               let unrelatedPane =
-                unrelatedWorkspace.bonsplitController.focusedPaneId else {
+                unrelatedWorkspace.activeBonsplitController.focusedPaneId else {
             XCTFail("Expected source and destination workspaces")
             return
         }
@@ -3892,7 +3892,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
     func testTransferredDescendantPreservesEveryReconciledRequestToken() {
         let manager = TabManager()
         guard let workspace = manager.selectedWorkspace,
-              let pane = workspace.bonsplitController.focusedPaneId else {
+              let pane = workspace.activeBonsplitController.focusedPaneId else {
             XCTFail("Expected a workspace pane")
             return
         }
@@ -3987,11 +3987,11 @@ final class AppDelegateEqualizeSplitsShortcutTests {
         let destinationManager = TabManager()
         guard let sourceWorkspace = sourceManager.selectedWorkspace,
               let sourcePane =
-                sourceWorkspace.bonsplitController.focusedPaneId,
+                sourceWorkspace.activeBonsplitController.focusedPaneId,
               let destinationWorkspace =
                 destinationManager.selectedWorkspace,
               let destinationPane =
-                destinationWorkspace.bonsplitController
+                destinationWorkspace.activeBonsplitController
                     .focusedPaneId else {
             XCTFail("Expected source and destination workspace panes")
             return
@@ -4216,7 +4216,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
         }
         destinationManager.attachWorkspace(detached, select: true)
         let pane = try? XCTUnwrap(
-            workspace.bonsplitController.focusedPaneId
+            workspace.activeBonsplitController.focusedPaneId
         )
         guard let pane,
               let projectedTerminal =
@@ -4279,13 +4279,13 @@ final class AppDelegateEqualizeSplitsShortcutTests {
         let manager = TabManager()
         guard let sourceWorkspace = manager.selectedWorkspace,
               let sourcePane =
-                sourceWorkspace.bonsplitController.focusedPaneId else {
+                sourceWorkspace.activeBonsplitController.focusedPaneId else {
             XCTFail("Expected a source workspace pane")
             return
         }
         let destinationWorkspace = manager.requiredAddTabForTesting(select: false)
         guard let destinationPane =
-                destinationWorkspace.bonsplitController.focusedPaneId else {
+                destinationWorkspace.activeBonsplitController.focusedPaneId else {
             XCTFail("Expected a destination workspace pane")
             return
         }
@@ -4368,13 +4368,13 @@ final class AppDelegateEqualizeSplitsShortcutTests {
         let manager = TabManager()
         guard let sourceWorkspace = manager.selectedWorkspace,
               let sourcePane =
-                sourceWorkspace.bonsplitController.focusedPaneId else {
+                sourceWorkspace.activeBonsplitController.focusedPaneId else {
             XCTFail("Expected a source workspace pane")
             return
         }
         let destinationWorkspace = manager.requiredAddTabForTesting(select: false)
         guard let destinationPane =
-                destinationWorkspace.bonsplitController.focusedPaneId else {
+                destinationWorkspace.activeBonsplitController.focusedPaneId else {
             XCTFail("Expected a destination workspace pane")
             return
         }
@@ -4467,13 +4467,13 @@ final class AppDelegateEqualizeSplitsShortcutTests {
         let manager = TabManager()
         guard let sourceWorkspace = manager.selectedWorkspace,
               let sourcePane =
-                sourceWorkspace.bonsplitController.focusedPaneId else {
+                sourceWorkspace.activeBonsplitController.focusedPaneId else {
             XCTFail("Expected a source workspace pane")
             return
         }
         let destinationWorkspace = manager.requiredAddTabForTesting(select: false)
         guard let destinationPane =
-                destinationWorkspace.bonsplitController.focusedPaneId else {
+                destinationWorkspace.activeBonsplitController.focusedPaneId else {
             XCTFail("Expected a destination workspace pane")
             return
         }
@@ -6666,11 +6666,11 @@ final class AppDelegateEqualizeSplitsShortcutTests {
         let destinationManager = TabManager()
         guard let sourceWorkspace = sourceManager.selectedWorkspace,
               let sourcePane =
-                sourceWorkspace.bonsplitController.focusedPaneId,
+                sourceWorkspace.activeBonsplitController.focusedPaneId,
               let destinationWorkspace =
                 destinationManager.selectedWorkspace,
               let destinationPane =
-                destinationWorkspace.bonsplitController.focusedPaneId else {
+                destinationWorkspace.activeBonsplitController.focusedPaneId else {
             XCTFail("Expected source and destination workspace panes")
             return
         }
@@ -6760,7 +6760,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
     func testSessionRestoreDuringActiveDrainReceivesOutstandingChange() {
         let manager = TabManager()
         guard let workspace = manager.selectedWorkspace,
-              let pane = workspace.bonsplitController.focusedPaneId else {
+              let pane = workspace.activeBonsplitController.focusedPaneId else {
             XCTFail("Expected an initial workspace pane")
             return
         }
@@ -6930,7 +6930,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
         }
         let sourceWorkspace = manager.requiredAddTabForTesting(select: false)
         guard let sourcePane =
-                sourceWorkspace.bonsplitController.focusedPaneId else {
+                sourceWorkspace.activeBonsplitController.focusedPaneId else {
             XCTFail("Expected an unrelated source workspace pane")
             return
         }
@@ -7033,7 +7033,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
         let manager = TabManager()
         guard let workspace = manager.selectedWorkspace,
               let workspacePane =
-                workspace.bonsplitController.focusedPaneId else {
+                workspace.activeBonsplitController.focusedPaneId else {
             XCTFail("Expected an initial workspace pane")
             return
         }
@@ -7221,7 +7221,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
         guard let workspace = manager.selectedWorkspace,
               let firstPanelID = workspace.focusedPanelId,
               let workspacePane =
-                workspace.bonsplitController.focusedPaneId else {
+                workspace.activeBonsplitController.focusedPaneId else {
             XCTFail("Expected an initial workspace pane")
             return
         }
@@ -7310,7 +7310,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
         let manager = TabManager()
         guard let workspace = manager.selectedWorkspace,
               let destinationPane =
-                workspace.bonsplitController.focusedPaneId else {
+                workspace.activeBonsplitController.focusedPaneId else {
             XCTFail("Expected a workspace pane")
             return
         }
@@ -7822,7 +7822,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
                             orientation: .horizontal
                           ),
                           let split = shortcutRoutingSplitNodes(
-                            in: workspace.bonsplitController.treeSnapshot()
+                            in: workspace.activeBonsplitController.treeSnapshot()
                           ).first,
                           let splitId = UUID(uuidString: split.id),
                           let event = makeKeyDownEvent(
@@ -7837,7 +7837,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
                     XCTAssertNil(firstPanel.surface.fontSizeLineageSnapshot())
                     XCTAssertNil(secondPanel.surface.fontSizeLineageSnapshot())
                     XCTAssertTrue(
-                        workspace.bonsplitController.setDividerPosition(0.2, forSplit: splitId)
+                        workspace.activeBonsplitController.setDividerPosition(0.2, forSplit: splitId)
                     )
                     window.makeKeyAndOrderFront(nil)
 #if DEBUG
@@ -7847,7 +7847,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
                     return
 #endif
                     guard let updatedSplit = shortcutRoutingSplitNodes(
-                        in: workspace.bonsplitController.treeSnapshot()
+                        in: workspace.activeBonsplitController.treeSnapshot()
                     ).first(where: { $0.id == split.id }) else {
                         XCTFail("Expected split to remain present")
                         return
@@ -7923,7 +7923,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
                         XCTAssertEqual(workspace.panels.count, panelCountBefore + 1)
                         XCTAssertEqual(
                             shortcutRoutingSplitNodes(
-                                in: workspace.bonsplitController.treeSnapshot()
+                                in: workspace.activeBonsplitController.treeSnapshot()
                             ).count,
                             1
                         )
@@ -7982,7 +7982,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
                     XCTAssertEqual(workspace.panels.count, panelCountBefore + 1)
                     XCTAssertEqual(
                         shortcutRoutingSplitNodes(
-                            in: workspace.bonsplitController.treeSnapshot()
+                            in: workspace.activeBonsplitController.treeSnapshot()
                         ).count,
                         1
                     )

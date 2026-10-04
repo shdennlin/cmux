@@ -141,7 +141,7 @@ struct TerminalNotificationOpenPanelFallbackTests {
         store.replaceNotificationsForTesting([notification])
 
         let transfer = try #require(authorizedWorkspace.detachSurface(panelId: movedPanelId))
-        let destinationPaneId = try #require(liveWorkspace.bonsplitController.allPaneIds.first)
+        let destinationPaneId = try #require(liveWorkspace.activeBonsplitController.allPaneIds.first)
         _ = try #require(liveWorkspace.attachDetachedSurface(transfer, inPane: destinationPaneId, focus: false))
         manager.selectTab(liveWorkspace)
 

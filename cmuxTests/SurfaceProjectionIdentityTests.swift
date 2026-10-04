@@ -64,7 +64,7 @@ struct SurfaceProjectionIdentityTests {
             let catalog = await localCatalog(workspaces)
             let before = await read(catalog, workspaces: workspaces)
             let detached = try #require(source.detachSurface(panelId: panel.id))
-            let targetPane = try #require(destination.bonsplitController.allPaneIds.first)
+            let targetPane = try #require(destination.activeBonsplitController.allPaneIds.first)
             #expect(destination.attachDetachedSurface(detached, inPane: targetPane) != nil)
             // The workspace hooks target the shared catalog; feed the same owner hook
             // to this test's isolated provider/catalog.

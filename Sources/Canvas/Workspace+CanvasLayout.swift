@@ -73,8 +73,8 @@ extension Workspace {
     /// canvas panes that host split-mode SwiftUI panel views.
     func bonsplitPaneId(forPanelId panelId: UUID) -> PaneID? {
         guard let tabId = surfaceIdFromPanelId(panelId) else { return nil }
-        for paneId in bonsplitController.allPaneIds {
-            if bonsplitController.tabs(inPane: paneId).contains(where: { $0.id == tabId }) {
+        for paneId in activeBonsplitController.allPaneIds {
+            if activeBonsplitController.tabs(inPane: paneId).contains(where: { $0.id == tabId }) {
                 return paneId
             }
         }
@@ -145,7 +145,7 @@ extension Workspace {
     /// tab of each split pane has on-screen geometry; the rest are placed by
     /// the canvas placer afterwards.
     private func splitPaneFramesByPanelId() -> [UUID: CGRect] {
-        let snapshot = bonsplitController.layoutSnapshot()
+        let snapshot = activeBonsplitController.layoutSnapshot()
         var frames: [UUID: CGRect] = [:]
         for pane in snapshot.panes {
             guard let selectedTabId = pane.selectedTabId,
@@ -242,7 +242,7 @@ extension Workspace {
         animated: Bool = true
     ) -> UUID? {
         guard layoutMode == .canvas else { return nil }
-        guard let focusedPaneId = bonsplitController.focusedPaneId else { return nil }
+        guard let focusedPaneId = activeBonsplitController.focusedPaneId else { return nil }
         let anchorPanelId = focusedPanelId
         let preferredSize: CanvasSize? = anchorPanelId
             .flatMap { canvasModel.frame(of: $0) }

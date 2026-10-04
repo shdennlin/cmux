@@ -39,7 +39,7 @@ struct CloudSurfaceMoveOwnershipTests {
             let fixture = try VaultPaneAppFixture()
             defer { fixture.tearDown() }
             let source = fixture.workspace
-            let pane = try #require(source.bonsplitController.allPaneIds.first)
+            let pane = try #require(source.activeBonsplitController.allPaneIds.first)
             let browser = try #require(source.newBrowserSurface(inPane: pane, focus: false))
             let display = resource(machine: owner, kind: .display)
             let catalog = SurfaceCatalog.shared
@@ -75,7 +75,7 @@ struct CloudSurfaceMoveOwnershipTests {
             let fixture = try VaultPaneAppFixture()
             defer { fixture.tearDown() }
             let workspace = fixture.workspace
-            let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+            let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
             let browser = try #require(workspace.newBrowserSurface(inPane: pane, focus: false))
             workspace.cloudVMBinding = WorkspaceCloudVMBinding(vmID: "a", isBase: false)
             let catalog = SurfaceCatalog.shared
@@ -106,7 +106,7 @@ struct CloudSurfaceMoveOwnershipTests {
             let destination = fixture.manager.addWorkspace(title: "Cloud", select: false)
             defer { destination.teardownAllPanels() }
             destination.cloudVMBinding = WorkspaceCloudVMBinding(vmID: "browser-destination", isBase: false)
-            let pane = try #require(source.bonsplitController.allPaneIds.first)
+            let pane = try #require(source.activeBonsplitController.allPaneIds.first)
             let browser = try #require(source.newBrowserSurface(inPane: pane, url: URL(string: "about:blank"), focus: false))
             let tab = try #require(source.surfaceIdFromPanelId(browser.id))
             let transfer = PaneDragTransfer(tabId: tab.uuid, sourcePaneId: pane.id,
@@ -131,7 +131,7 @@ struct CloudSurfaceMoveOwnershipTests {
             let target = fixture.manager.addWorkspace(title: "same name", select: false)
             defer { target.teardownAllPanels() }
             target.cloudVMBinding = WorkspaceCloudVMBinding(vmID: owner == "a" ? "b" : "a", isBase: false)
-            let sourcePane = try #require(source.bonsplitController.allPaneIds.first)
+            let sourcePane = try #require(source.activeBonsplitController.allPaneIds.first)
             let panelID: UUID
             if kind == .terminal {
                 panelID = try #require(source.focusedPanelId)
@@ -145,7 +145,7 @@ struct CloudSurfaceMoveOwnershipTests {
             catalog.record(SurfaceProjection(resource: resource.id, workspaceID: source.id, panelID: panelID))
             defer { catalog.endProjections(panelID: panelID, reason: .replaced); catalog.remove(resource.id) }
             let tabID = try #require(source.surfaceIdFromPanelId(panelID))
-            let targetPane = try #require(target.bonsplitController.allPaneIds.first)
+            let targetPane = try #require(target.activeBonsplitController.allPaneIds.first)
             let sourcePanels = Set(source.panels.keys)
             let targetPanels = Set(target.panels.keys)
             let projection = catalog.projection(forPanel: panelID)
@@ -181,7 +181,7 @@ struct CloudSurfaceMoveOwnershipTests {
                 tabId: tabID, sourcePaneId: sourcePane,
                 destination: .split(targetPane: targetPane, orientation: .horizontal, insertFirst: false)
             )
-            #expect(target.bonsplitController.onExternalTabDrop?(request) == false)
+            #expect(target.activeBonsplitController.onExternalTabDrop?(request) == false)
             let result = TerminalController.shared.v2SurfaceMove(params: [
                 "surface_id": panelID.uuidString, "workspace_id": target.id.uuidString, "focus": false
             ])
@@ -193,7 +193,7 @@ struct CloudSurfaceMoveOwnershipTests {
             #expect(message == SurfaceTransferRejection.cloudMachineMismatch.message)
             #expect(Set(source.panels.keys) == sourcePanels)
             #expect(Set(target.panels.keys) == targetPanels)
-            #expect(target.bonsplitController.allPaneIds == [targetPane])
+            #expect(target.activeBonsplitController.allPaneIds == [targetPane])
             #expect(source.surfaceIdFromPanelId(panelID) == tabID)
             #expect(catalog.projection(forPanel: panelID) == projection)
         }
@@ -233,7 +233,7 @@ struct CloudSurfaceMoveOwnershipTests {
             let target = fixture.manager.addWorkspace(title: "Cloud", select: false)
             defer { target.teardownAllPanels() }
             target.cloudVMBinding = WorkspaceCloudVMBinding(vmID: "b", isBase: false)
-            let pane = try #require(target.bonsplitController.allPaneIds.first)
+            let pane = try #require(target.activeBonsplitController.allPaneIds.first)
             let panels = Set(target.panels.keys)
             let sourcePanels = Set(dock.panels.keys)
             let transfer = PaneDragTransfer(
@@ -262,7 +262,7 @@ struct CloudSurfaceMoveOwnershipTests {
             let target = fixture.manager.addWorkspace(title: "Cloud", select: false)
             defer { target.teardownAllPanels() }
             target.cloudVMBinding = WorkspaceCloudVMBinding(vmID: "b", isBase: false)
-            let pane = try #require(source.bonsplitController.allPaneIds.first)
+            let pane = try #require(source.activeBonsplitController.allPaneIds.first)
             let panelID: UUID
             if kind == .terminal {
                 panelID = try #require(source.newTerminalSurface(inPane: pane, focus: false)).id
@@ -307,7 +307,7 @@ struct CloudSurfaceMoveOwnershipTests {
             workspace.cloudVMBinding = WorkspaceCloudVMBinding(vmID: "b", isBase: false)
             let dock = workspace.requiredDockSplitForTesting
             let dockPane = try #require(dock.bonsplitController.allPaneIds.first)
-            let targetPane = try #require(workspace.bonsplitController.allPaneIds.first)
+            let targetPane = try #require(workspace.activeBonsplitController.allPaneIds.first)
             let panelID = try #require(dock.newSurface(kind: .terminal, inPane: dockPane, focus: false))
             let targetPanels = Set(workspace.panels.keys)
             let transfer = try #require(dock.detachSurface(panelId: panelID))
@@ -333,7 +333,7 @@ struct CloudSurfaceMoveOwnershipTests {
             let fixture = try VaultPaneAppFixture()
             defer { fixture.tearDown() }
             let source = fixture.workspace
-            let sourcePane = try #require(source.bonsplitController.allPaneIds.first)
+            let sourcePane = try #require(source.activeBonsplitController.allPaneIds.first)
             let remote = try #require(source.newTerminalSurface(inPane: sourcePane, focus: false))
             source.configureRemoteConnection(WorkspaceRemoteConfiguration(
                 destination: "fixture.invalid", port: 22, identityFile: nil, sshOptions: [],
@@ -370,7 +370,7 @@ struct CloudSurfaceMoveOwnershipTests {
             let fixture = try VaultPaneAppFixture()
             defer { fixture.tearDown() }
             let source = fixture.workspace
-            let sourcePane = try #require(source.bonsplitController.allPaneIds.first)
+            let sourcePane = try #require(source.activeBonsplitController.allPaneIds.first)
             let panel = try #require(source.newTerminalSurface(inPane: sourcePane, focus: false))
             source.configureRemoteConnection(WorkspaceRemoteConfiguration(
                 destination: "fixture.invalid", port: 22, identityFile: nil, sshOptions: [],

@@ -1706,7 +1706,7 @@ struct AppDelegateIssue2907RoutingTests {
 
         let browserOnlyWorkspace = try assertions.require(browserOnlyManager.selectedWorkspace)
         let browserOnlyTerminal = try assertions.require(browserOnlyWorkspace.focusedTerminalPanel)
-        let browserPaneId = try assertions.require(browserOnlyWorkspace.bonsplitController.allPaneIds.first)
+        let browserPaneId = try assertions.require(browserOnlyWorkspace.activeBonsplitController.allPaneIds.first)
         let browserPanel = try assertions.require(
             browserOnlyWorkspace.newBrowserSurface(
                 inPane: browserPaneId,

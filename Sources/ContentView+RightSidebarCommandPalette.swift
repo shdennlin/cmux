@@ -261,7 +261,7 @@ extension ContentView {
            workspace.openOrFocusCustomSidebarSplit(from: focusedPanelId, name: name) != nil {
             return
         }
-        guard let paneId = workspace.bonsplitController.focusedPaneId ?? workspace.bonsplitController.allPaneIds.first,
+        guard let paneId = workspace.activeBonsplitController.focusedPaneId ?? workspace.activeBonsplitController.allPaneIds.first,
               workspace.openOrFocusCustomSidebarSurface(inPane: paneId, name: name, focus: true) != nil else {
             NSSound.beep()
             return

@@ -560,7 +560,7 @@ struct DockSocketLifecycleTests {
         try withDockAvailable {
             try withSocketAppContext { _, workspace, windowId in
                 let mainPanelIds = Set(workspace.panels.keys)
-                let mainFocusedPane = workspace.bonsplitController.focusedPaneId
+                let mainFocusedPane = workspace.activeBonsplitController.focusedPaneId
 
                 _ = try v2Result(
                     method: "surface.create",
@@ -578,7 +578,7 @@ struct DockSocketLifecycleTests {
 
                 #expect(envelope["ok"] as? Bool == false)
                 #expect(Set(workspace.panels.keys) == mainPanelIds)
-                #expect(workspace.bonsplitController.focusedPaneId == mainFocusedPane)
+                #expect(workspace.activeBonsplitController.focusedPaneId == mainFocusedPane)
             }
         }
     }

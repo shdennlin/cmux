@@ -100,9 +100,9 @@ struct CloudSurfaceOwnershipTests {
     func rejectsForeignResourceDrop(kind: SurfaceResourceKind) throws {
         let workspace = cloudWorkspace()
         defer { workspace.teardownAllPanels() }
-        let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+        let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let originalPanels = Set(workspace.panels.keys)
-        let originalPanes = workspace.bonsplitController.allPaneIds
+        let originalPanes = workspace.activeBonsplitController.allPaneIds
         let catalog = SurfaceCatalog()
         for source in [SurfaceMachineID.local, .cloud("ownership-a")] {
             let group = SurfaceResourceGroup(single: resource(source, kind: kind))
@@ -112,7 +112,7 @@ struct CloudSurfaceOwnershipTests {
                 catalog: catalog
             ))
             #expect(Set(workspace.panels.keys) == originalPanels)
-            #expect(workspace.bonsplitController.allPaneIds == originalPanes)
+            #expect(workspace.activeBonsplitController.allPaneIds == originalPanes)
             #expect(catalog.snapshot.projections.isEmpty)
         }
     }

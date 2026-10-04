@@ -490,8 +490,8 @@ struct MachinesPanelView: View {
         nodeActions.refreshDevices = { [weak devicesModel] in devicesModel?.refresh() }
         nodeActions.openCoderouterGuidePane = { [weak tabManager] in
             guard let workspace = tabManager?.selectedWorkspace,
-                  let paneId = workspace.bonsplitController.focusedPaneId
-                    ?? workspace.bonsplitController.allPaneIds.first else { return }
+                  let paneId = workspace.activeBonsplitController.focusedPaneId
+                    ?? workspace.activeBonsplitController.allPaneIds.first else { return }
             _ = workspace.openOrFocusCoderouterGuideSurface(inPane: paneId, focus: true)
         }
         return CloudTreeOutlineView(

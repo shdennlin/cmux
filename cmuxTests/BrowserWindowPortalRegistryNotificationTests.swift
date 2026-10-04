@@ -212,7 +212,7 @@ struct BrowserWindowPortalRegistryNotificationTests {
         // is deliberately unattached, leaving a real browser retry outstanding.
         #expect(browser.portalAnchorView.window == nil)
         #expect(workspace.toggleSplitZoom(panelId: browserID))
-        #expect(workspace.bonsplitController.zoomedPaneId == workspace.paneId(forPanelId: browserID))
+        #expect(workspace.activeBonsplitController.zoomedPaneId == workspace.paneId(forPanelId: browserID))
         contentView.layoutFlushCount = 0
         unrelatedContentView.layoutFlushCount = 0
 

@@ -3,7 +3,7 @@ import Foundation
 
 extension Workspace {
     func configureForkAgentConversationContextMenuAvailability() {
-        bonsplitController.tabContextForkConversationAvailabilityProvider = { [weak self] tabId, _ in
+        activeBonsplitController.tabContextForkConversationAvailabilityProvider = { [weak self] tabId, _ in
             guard let self,
                   let panelId = self.panelIdFromSurfaceId(tabId) else { return .hidden }
             switch self.forkAgentConversationContextMenuPresentationAvailability(forPanelId: panelId) {
@@ -18,7 +18,7 @@ extension Workspace {
                 return .hidden
             }
         }
-        bonsplitController.tabContextForkConversationAvailabilityRefreshHandler = { [weak self] tabId, _ in
+        activeBonsplitController.tabContextForkConversationAvailabilityRefreshHandler = { [weak self] tabId, _ in
             guard let self,
                   let panelId = self.panelIdFromSurfaceId(tabId) else { return }
             await self.resolveForkAgentConversationContextMenuAvailability(forPanelId: panelId)

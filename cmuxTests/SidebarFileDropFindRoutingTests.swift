@@ -60,7 +60,7 @@ struct SidebarFileDropFindRoutingTests {
         )
 
         // The drop that a shift-drag from the sidebar performs.
-        let paneId = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneId = try #require(workspace.activeBonsplitController.focusedPaneId)
         #expect(
             workspace.handleExternalFileDrop(
                 BonsplitController.ExternalFileDropRequest(

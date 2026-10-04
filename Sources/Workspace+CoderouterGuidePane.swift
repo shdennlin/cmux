@@ -11,7 +11,7 @@ extension Workspace {
         targetIndex: Int? = nil
     ) -> CoderouterGuidePanel? {
         guard !isRetiredFromOwningTabManager else { return nil }
-        let shouldFocusNewTab = focus ?? (bonsplitController.focusedPaneId == paneId)
+        let shouldFocusNewTab = focus ?? (bonsplitController(owningPane: paneId).focusedPaneId == paneId)
         let previousFocusedPanelId = focusedPanelId
         let previousHostedView = focusedTerminalInputTarget()?.panel.hostedView
 
@@ -19,7 +19,7 @@ extension Workspace {
         panels[guidePanel.id] = guidePanel
         panelTitles[guidePanel.id] = guidePanel.displayTitle
 
-        guard let newTabId = bonsplitController.createTab(
+        guard let newTabId = bonsplitController(owningPane: paneId).createTab(
             title: guidePanel.displayTitle,
             icon: guidePanel.displayIcon,
             kind: SurfaceKind.coderouterGuide.rawValue,
@@ -35,7 +35,7 @@ extension Workspace {
 
         bindSurface(newTabId, toPanelId: guidePanel.id)
         if let targetIndex {
-            _ = bonsplitController.reorderTab(newTabId, toIndex: targetIndex)
+            _ = bonsplitController(owningPane: paneId).reorderTab(newTabId, toIndex: targetIndex)
         }
         publishCmuxSurfaceCreated(
             guidePanel.id,
@@ -45,8 +45,8 @@ extension Workspace {
             focused: shouldFocusNewTab
         )
         if shouldFocusNewTab {
-            bonsplitController.focusPane(paneId)
-            bonsplitController.selectTab(newTabId)
+            bonsplitController(owningPane: paneId).focusPane(paneId)
+            bonsplitController(owningPane: paneId).selectTab(newTabId)
             applyTabSelection(tabId: newTabId, inPane: paneId)
         } else {
             preserveFocusAfterNonFocusSplit(

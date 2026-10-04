@@ -889,7 +889,7 @@ final class WorkspaceManualUnreadTests: XCTestCase {
         // narrow for the minimum-width split admission check.
         window.setContentSize(NSSize(width: 1_000, height: 700))
         window.contentView?.layoutSubtreeIfNeeded()
-        workspace.bonsplitController.setContainerFrame(
+        workspace.activeBonsplitController.setContainerFrame(
             CGRect(x: 0, y: 0, width: 1_000, height: 1_000)
         )
         let rightPanel = try XCTUnwrap(workspace.newTerminalSplit(from: leftPanelId, orientation: .horizontal, focus: false))
@@ -902,15 +902,15 @@ final class WorkspaceManualUnreadTests: XCTestCase {
         XCTAssertTrue(appDelegate.toggleFocusedNotificationUnread(preferredWindow: window))
         XCTAssertTrue(workspace.manualUnreadPanelIds.contains(leftPanelId))
         XCTAssertFalse(workspace.manualUnreadPanelIds.contains(rightPanel.id))
-        XCTAssertTrue(workspace.bonsplitController.tab(leftTabId)?.showsNotificationBadge ?? false)
-        XCTAssertFalse(workspace.bonsplitController.tab(rightTabId)?.showsNotificationBadge ?? true)
+        XCTAssertTrue(workspace.activeBonsplitController.tab(leftTabId)?.showsNotificationBadge ?? false)
+        XCTAssertFalse(workspace.activeBonsplitController.tab(rightTabId)?.showsNotificationBadge ?? true)
 
         workspace.focusPanel(rightPanel.id)
 
         XCTAssertTrue(workspace.manualUnreadPanelIds.contains(leftPanelId))
         XCTAssertFalse(workspace.manualUnreadPanelIds.contains(rightPanel.id))
-        XCTAssertTrue(workspace.bonsplitController.tab(leftTabId)?.showsNotificationBadge ?? false)
-        XCTAssertFalse(workspace.bonsplitController.tab(rightTabId)?.showsNotificationBadge ?? true)
+        XCTAssertTrue(workspace.activeBonsplitController.tab(leftTabId)?.showsNotificationBadge ?? false)
+        XCTAssertFalse(workspace.activeBonsplitController.tab(rightTabId)?.showsNotificationBadge ?? true)
     }
 
     func testMarkOldestUnreadAndJumpNextExcludesNewManualWorkspaceUnread() throws {
@@ -1507,7 +1507,7 @@ final class WorkspaceManualUnreadTests: XCTestCase {
         workspace.markPanelUnread(panelId)
         store.markUnread(forTabId: workspace.id)
 
-        XCTAssertTrue(workspace.bonsplitController.tab(tabId)?.showsNotificationBadge ?? false, line: line)
+        XCTAssertTrue(workspace.activeBonsplitController.tab(tabId)?.showsNotificationBadge ?? false, line: line)
 
         action(store, workspace.id)
 
@@ -1515,7 +1515,7 @@ final class WorkspaceManualUnreadTests: XCTestCase {
         XCTAssertFalse(store.hasManualUnread(forTabId: workspace.id), line: line)
         XCTAssertFalse(store.hasPanelDerivedUnread(forTabId: workspace.id), line: line)
         XCTAssertFalse(store.workspaceIsUnread(forTabId: workspace.id), line: line)
-        XCTAssertFalse(workspace.bonsplitController.tab(tabId)?.showsNotificationBadge ?? true, line: line)
+        XCTAssertFalse(workspace.activeBonsplitController.tab(tabId)?.showsNotificationBadge ?? true, line: line)
     }
 
     private func assertWorkspaceReadFlowClearsNotificationBackedPanelBadge(
@@ -1560,18 +1560,18 @@ final class WorkspaceManualUnreadTests: XCTestCase {
                 isRead: false
             ),
         ])
-        workspace.bonsplitController.updateTab(notificationTabId, showsNotificationBadge: true)
+        workspace.activeBonsplitController.updateTab(notificationTabId, showsNotificationBadge: true)
 
-        XCTAssertTrue(workspace.bonsplitController.tab(manualTabId)?.showsNotificationBadge ?? false, line: line)
-        XCTAssertTrue(workspace.bonsplitController.tab(notificationTabId)?.showsNotificationBadge ?? false, line: line)
+        XCTAssertTrue(workspace.activeBonsplitController.tab(manualTabId)?.showsNotificationBadge ?? false, line: line)
+        XCTAssertTrue(workspace.activeBonsplitController.tab(notificationTabId)?.showsNotificationBadge ?? false, line: line)
 
         action(store, workspace.id)
 
         XCTAssertFalse(workspace.manualUnreadPanelIds.contains(manualPanelId), line: line)
         XCTAssertFalse(store.hasUnreadNotification(forTabId: workspace.id, surfaceId: notificationPanel.id), line: line)
         XCTAssertFalse(store.hasPanelDerivedUnread(forTabId: workspace.id), line: line)
-        XCTAssertFalse(workspace.bonsplitController.tab(manualTabId)?.showsNotificationBadge ?? true, line: line)
-        XCTAssertFalse(workspace.bonsplitController.tab(notificationTabId)?.showsNotificationBadge ?? true, line: line)
+        XCTAssertFalse(workspace.activeBonsplitController.tab(manualTabId)?.showsNotificationBadge ?? true, line: line)
+        XCTAssertFalse(workspace.activeBonsplitController.tab(notificationTabId)?.showsNotificationBadge ?? true, line: line)
     }
 
     func testClearUnreadAfterJumpClearsWorkspaceLevelRepresentativeFallback() throws {
@@ -1751,14 +1751,14 @@ final class WorkspaceManualUnreadTests: XCTestCase {
         // setting the indicator as well would count the same notification twice.
         XCTAssertFalse(restored.hasRestoredUnreadIndicator(panelId: restoredPanelId))
         XCTAssertTrue(store.hasUnreadNotification(forTabId: restored.id, surfaceId: restoredPanelId))
-        XCTAssertTrue(restored.bonsplitController.tab(restoredTabId)?.showsNotificationBadge ?? false)
+        XCTAssertTrue(restored.activeBonsplitController.tab(restoredTabId)?.showsNotificationBadge ?? false)
         XCTAssertFalse(store.hasManualUnread(forTabId: restored.id))
         XCTAssertEqual(store.unreadCount(forTabId: restored.id), 1)
 
         restored.markPanelRead(restoredPanelId)
 
         XCTAssertFalse(restored.hasRestoredUnreadIndicator(panelId: restoredPanelId))
-        XCTAssertFalse(restored.bonsplitController.tab(restoredTabId)?.showsNotificationBadge ?? true)
+        XCTAssertFalse(restored.activeBonsplitController.tab(restoredTabId)?.showsNotificationBadge ?? true)
         XCTAssertFalse(store.hasManualUnread(forTabId: restored.id))
         XCTAssertEqual(store.unreadCount(forTabId: restored.id), 0)
     }
@@ -1845,13 +1845,13 @@ final class WorkspaceManualUnreadTests: XCTestCase {
         let restoredTabId = try XCTUnwrap(restored.surfaceIdFromPanelId(restoredPanelId))
         XCTAssertFalse(restored.manualUnreadPanelIds.contains(restoredPanelId))
         XCTAssertTrue(restored.hasRestoredUnreadIndicator(panelId: restoredPanelId))
-        XCTAssertTrue(restored.bonsplitController.tab(restoredTabId)?.showsNotificationBadge ?? false)
+        XCTAssertTrue(restored.activeBonsplitController.tab(restoredTabId)?.showsNotificationBadge ?? false)
         XCTAssertEqual(store.unreadCount(forTabId: restored.id), 0)
 
         restored.markPanelRead(restoredPanelId)
 
         XCTAssertFalse(restored.hasRestoredUnreadIndicator(panelId: restoredPanelId))
-        XCTAssertFalse(restored.bonsplitController.tab(restoredTabId)?.showsNotificationBadge ?? true)
+        XCTAssertFalse(restored.activeBonsplitController.tab(restoredTabId)?.showsNotificationBadge ?? true)
         XCTAssertEqual(store.unreadCount(forTabId: restored.id), 0)
     }
 
@@ -1898,7 +1898,7 @@ final class WorkspaceManualUnreadTests: XCTestCase {
         let restoredPanelId = try XCTUnwrap(restored.focusedPanelId)
         let restoredTabId = try XCTUnwrap(restored.surfaceIdFromPanelId(restoredPanelId))
         XCTAssertTrue(restored.hasRestoredUnreadIndicator(panelId: restoredPanelId))
-        XCTAssertTrue(restored.bonsplitController.tab(restoredTabId)?.showsNotificationBadge ?? false)
+        XCTAssertTrue(restored.activeBonsplitController.tab(restoredTabId)?.showsNotificationBadge ?? false)
         XCTAssertFalse(store.hasPanelDerivedUnread(forTabId: restored.id))
         XCTAssertEqual(store.unreadCount(forTabId: restored.id), 0)
 
@@ -1913,7 +1913,7 @@ final class WorkspaceManualUnreadTests: XCTestCase {
         let legacyRestoredPanelId = try XCTUnwrap(legacyRestored.focusedPanelId)
         let legacyRestoredTabId = try XCTUnwrap(legacyRestored.surfaceIdFromPanelId(legacyRestoredPanelId))
         XCTAssertTrue(legacyRestored.hasRestoredUnreadIndicator(panelId: legacyRestoredPanelId))
-        XCTAssertTrue(legacyRestored.bonsplitController.tab(legacyRestoredTabId)?.showsNotificationBadge ?? false)
+        XCTAssertTrue(legacyRestored.activeBonsplitController.tab(legacyRestoredTabId)?.showsNotificationBadge ?? false)
         XCTAssertFalse(store.hasPanelDerivedUnread(forTabId: legacyRestored.id))
         XCTAssertEqual(store.unreadCount(forTabId: legacyRestored.id), 0)
     }
@@ -1943,7 +1943,7 @@ final class WorkspaceManualUnreadTests: XCTestCase {
         let representativePanelId = try XCTUnwrap(restored.representativePanelIdForWorkspaceManualUnread())
         let representativeTabId = try XCTUnwrap(restored.surfaceIdFromPanelId(representativePanelId))
         XCTAssertTrue(store.hasManualUnread(forTabId: restored.id))
-        XCTAssertTrue(restored.bonsplitController.tab(representativeTabId)?.showsNotificationBadge ?? false)
+        XCTAssertTrue(restored.activeBonsplitController.tab(representativeTabId)?.showsNotificationBadge ?? false)
         XCTAssertEqual(store.unreadCount(forTabId: restored.id), 1)
     }
 
@@ -2220,13 +2220,13 @@ final class WorkspaceManualUnreadTests: XCTestCase {
         store.markUnread(forTabId: workspace.id)
         workspace.focusPanel(initialPanelId)
 
-        XCTAssertTrue(workspace.bonsplitController.tab(initialTabId)?.showsNotificationBadge ?? false)
-        XCTAssertFalse(workspace.bonsplitController.tab(splitTabId)?.showsNotificationBadge ?? true)
+        XCTAssertTrue(workspace.activeBonsplitController.tab(initialTabId)?.showsNotificationBadge ?? false)
+        XCTAssertFalse(workspace.activeBonsplitController.tab(splitTabId)?.showsNotificationBadge ?? true)
 
         workspace.focusPanel(splitPanel.id)
 
-        XCTAssertFalse(workspace.bonsplitController.tab(initialTabId)?.showsNotificationBadge ?? true)
-        XCTAssertTrue(workspace.bonsplitController.tab(splitTabId)?.showsNotificationBadge ?? false)
+        XCTAssertFalse(workspace.activeBonsplitController.tab(initialTabId)?.showsNotificationBadge ?? true)
+        XCTAssertTrue(workspace.activeBonsplitController.tab(splitTabId)?.showsNotificationBadge ?? false)
     }
 }
 

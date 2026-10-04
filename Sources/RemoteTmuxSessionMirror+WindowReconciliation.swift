@@ -33,8 +33,8 @@ extension RemoteTmuxSessionMirror {
             panelId: panelId,
             connection: connection,
             layout: window.layout,
-            appearance: workspace.bonsplitController.configuration.appearance,
-            workspaceBonsplitController: workspace.bonsplitController,
+            appearance: workspace.activeBonsplitController.configuration.appearance,
+            workspaceBonsplitController: workspace.activeBonsplitController,
             controlPaneID: { [weak self] in self?.controlPaneID(forPane: $0) },
             onControlSurfaceChanged: { [weak self] tmuxPaneID, surfaceID in
                 self?.updateControlSurface(

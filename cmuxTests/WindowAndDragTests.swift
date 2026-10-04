@@ -4013,7 +4013,7 @@ final class FilePreviewPanelTextSavingTests: XCTestCase {
         let workspace = Workspace()
         defer { workspace.teardownAllPanels() }
 
-        let sourcePane = try XCTUnwrap(workspace.bonsplitController.allPaneIds.first)
+        let sourcePane = try XCTUnwrap(workspace.activeBonsplitController.allPaneIds.first)
         let sourcePanel = try XCTUnwrap(workspace.newFilePreviewSurface(
             inPane: sourcePane,
             filePath: sourceURL.path,
@@ -4025,17 +4025,17 @@ final class FilePreviewPanelTextSavingTests: XCTestCase {
             filePath: firstURL.path
         ))
         let rightPane = try XCTUnwrap(workspace.paneId(forPanelId: firstPanel.id))
-        let paneCountAfterFirstOpen = workspace.bonsplitController.allPaneIds.count
-        let rightTabsAfterFirstOpen = workspace.bonsplitController.tabs(inPane: rightPane).count
+        let paneCountAfterFirstOpen = workspace.activeBonsplitController.allPaneIds.count
+        let rightTabsAfterFirstOpen = workspace.activeBonsplitController.tabs(inPane: rightPane).count
 
         let secondPanel = try XCTUnwrap(workspace.openOrFocusFilePreviewSplit(
             from: sourcePanel.id,
             filePath: secondURL.path
         ))
 
-        XCTAssertEqual(workspace.bonsplitController.allPaneIds.count, paneCountAfterFirstOpen)
+        XCTAssertEqual(workspace.activeBonsplitController.allPaneIds.count, paneCountAfterFirstOpen)
         XCTAssertEqual(workspace.paneId(forPanelId: secondPanel.id)?.id, rightPane.id)
-        XCTAssertEqual(workspace.bonsplitController.tabs(inPane: rightPane).count, rightTabsAfterFirstOpen + 1)
+        XCTAssertEqual(workspace.activeBonsplitController.tabs(inPane: rightPane).count, rightTabsAfterFirstOpen + 1)
     }
 
     func testCmdClickMarkdownRoutingReusesRightSidePane() throws {
@@ -4051,7 +4051,7 @@ final class FilePreviewPanelTextSavingTests: XCTestCase {
         let workspace = Workspace()
         defer { workspace.teardownAllPanels() }
 
-        let sourcePane = try XCTUnwrap(workspace.bonsplitController.allPaneIds.first)
+        let sourcePane = try XCTUnwrap(workspace.activeBonsplitController.allPaneIds.first)
         let sourcePanel = try XCTUnwrap(workspace.newFilePreviewSurface(
             inPane: sourcePane,
             filePath: sourceURL.path,
@@ -4063,17 +4063,17 @@ final class FilePreviewPanelTextSavingTests: XCTestCase {
             filePath: firstURL.path
         ))
         let rightPane = try XCTUnwrap(workspace.paneId(forPanelId: firstPanel.id))
-        let paneCountAfterFirstOpen = workspace.bonsplitController.allPaneIds.count
-        let rightTabsAfterFirstOpen = workspace.bonsplitController.tabs(inPane: rightPane).count
+        let paneCountAfterFirstOpen = workspace.activeBonsplitController.allPaneIds.count
+        let rightTabsAfterFirstOpen = workspace.activeBonsplitController.tabs(inPane: rightPane).count
 
         let secondPanel = try XCTUnwrap(workspace.openOrFocusMarkdownSplit(
             from: sourcePanel.id,
             filePath: secondURL.path
         ))
 
-        XCTAssertEqual(workspace.bonsplitController.allPaneIds.count, paneCountAfterFirstOpen)
+        XCTAssertEqual(workspace.activeBonsplitController.allPaneIds.count, paneCountAfterFirstOpen)
         XCTAssertEqual(workspace.paneId(forPanelId: secondPanel.id)?.id, rightPane.id)
-        XCTAssertEqual(workspace.bonsplitController.tabs(inPane: rightPane).count, rightTabsAfterFirstOpen + 1)
+        XCTAssertEqual(workspace.activeBonsplitController.tabs(inPane: rightPane).count, rightTabsAfterFirstOpen + 1)
     }
 
     private func temporaryTextFile(

@@ -31,17 +31,17 @@ struct WorkspaceSplitZoomTabCloseTests {
             workspace.newTerminalSurface(inPane: zoomedPaneId, focus: true)
         )
         let secondTabId = try #require(workspace.surfaceIdFromPanelId(secondPanel.id))
-        workspace.bonsplitController.selectTab(secondTabId)
+        workspace.activeBonsplitController.selectTab(secondTabId)
 
         #expect(workspace.toggleSplitZoom(panelId: secondPanel.id))
-        #expect(workspace.bonsplitController.zoomedPaneId == zoomedPaneId)
-        #expect(workspace.bonsplitController.tabs(inPane: zoomedPaneId).count == 2)
-        #expect(workspace.bonsplitController.selectedTab(inPane: zoomedPaneId)?.id == secondTabId)
+        #expect(workspace.activeBonsplitController.zoomedPaneId == zoomedPaneId)
+        #expect(workspace.activeBonsplitController.tabs(inPane: zoomedPaneId).count == 2)
+        #expect(workspace.activeBonsplitController.selectedTab(inPane: zoomedPaneId)?.id == secondTabId)
 
         #expect(workspace.closePanel(secondPanel.id, force: true))
 
-        #expect(workspace.bonsplitController.tabs(inPane: zoomedPaneId).count == 1)
-        #expect(workspace.bonsplitController.zoomedPaneId == zoomedPaneId)
+        #expect(workspace.activeBonsplitController.tabs(inPane: zoomedPaneId).count == 1)
+        #expect(workspace.activeBonsplitController.zoomedPaneId == zoomedPaneId)
     }
 
     /// The zoom still ends when the close takes the zoomed pane with it, so the
@@ -59,12 +59,12 @@ struct WorkspaceSplitZoomTabCloseTests {
         let zoomedPaneId = try #require(workspace.paneId(forPanelId: firstPanelId))
 
         #expect(workspace.toggleSplitZoom(panelId: firstPanelId))
-        #expect(workspace.bonsplitController.zoomedPaneId == zoomedPaneId)
-        #expect(workspace.bonsplitController.tabs(inPane: zoomedPaneId).count == 1)
+        #expect(workspace.activeBonsplitController.zoomedPaneId == zoomedPaneId)
+        #expect(workspace.activeBonsplitController.tabs(inPane: zoomedPaneId).count == 1)
 
         #expect(workspace.closePanel(firstPanelId, force: true))
 
-        #expect(workspace.bonsplitController.zoomedPaneId == nil)
+        #expect(workspace.activeBonsplitController.zoomedPaneId == nil)
         #expect(workspace.panels[siblingPanel.id] != nil)
     }
 }

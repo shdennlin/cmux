@@ -23,14 +23,14 @@ struct GotoSplitActionTests {
         let manager = TabManager()
         let workspace = try #require(manager.selectedWorkspace)
         let panelId = try #require(workspace.focusedPanelId)
-        let paneId = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneId = try #require(workspace.activeBonsplitController.focusedPaneId)
 
         #expect(!manager.moveSplitFocus(
             tabId: workspace.id,
             surfaceId: panelId,
             direction: direction
         ))
-        #expect(workspace.bonsplitController.focusedPaneId == paneId)
+        #expect(workspace.activeBonsplitController.focusedPaneId == paneId)
         #expect(workspace.focusedPanelId == panelId)
     }
 }

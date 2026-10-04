@@ -79,13 +79,13 @@ struct VaultPaneDropRoutingTests {
         )
         defer { drag.finish() }
         let baselinePanelIDs = Set(workspace.panels.keys)
-        let baselinePaneCount = workspace.bonsplitController.allPaneIds.count
+        let baselinePaneCount = workspace.activeBonsplitController.allPaneIds.count
         let request = try dropHarness.dropRequest(
             for: drag,
             placement: dropCase.placement,
             targetPane: targetPane
         )
-        let dropHandler = try #require(workspace.bonsplitController.onExternalTabDrop)
+        let dropHandler = try #require(workspace.activeBonsplitController.onExternalTabDrop)
         let handled = dropHandler(request)
 
         #expect(handled)
@@ -101,11 +101,11 @@ struct VaultPaneDropRoutingTests {
         switch dropCase.placement {
         case .center:
             #expect(createdPane == targetPane)
-            #expect(workspace.bonsplitController.allPaneIds.count == baselinePaneCount)
+            #expect(workspace.activeBonsplitController.allPaneIds.count == baselinePaneCount)
         case .right:
             #expect(createdPane != targetPane)
-            #expect(workspace.bonsplitController.allPaneIds.count == baselinePaneCount + 1)
-            #expect(workspace.bonsplitController.adjacentPane(to: targetPane, direction: .right) == createdPane)
+            #expect(workspace.activeBonsplitController.allPaneIds.count == baselinePaneCount + 1)
+            #expect(workspace.activeBonsplitController.adjacentPane(to: targetPane, direction: .right) == createdPane)
         }
     }
 
@@ -158,7 +158,7 @@ struct VaultPaneDropRoutingTests {
                 placement: .center,
                 targetPane: targetPane
             )
-            let dropHandler = try #require(workspace.bonsplitController.onExternalTabDrop)
+            let dropHandler = try #require(workspace.activeBonsplitController.onExternalTabDrop)
             let handled = dropHandler(request)
 
             #expect(handled)
@@ -273,7 +273,7 @@ struct VaultPaneDropRoutingTests {
             placement: .center,
             targetPane: targetPane
         )
-        let dropHandler = try #require(workspace.bonsplitController.onExternalTabDrop)
+        let dropHandler = try #require(workspace.activeBonsplitController.onExternalTabDrop)
         #expect(dropHandler(request))
 
         let createdPanelIDs = Set(workspace.panels.keys).subtracting(baselinePanelIDs)

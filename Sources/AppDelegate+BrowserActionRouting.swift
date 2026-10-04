@@ -260,8 +260,8 @@ extension AppDelegate {
         guard let workspace else { return nil }
         let paneID = preferredPanelID.flatMap {
             workspace.paneId(forPanelId: $0)
-        } ?? workspace.bonsplitController.focusedPaneId
-            ?? workspace.bonsplitController.allPaneIds.first
+        } ?? workspace.activeBonsplitController.focusedPaneId
+            ?? workspace.activeBonsplitController.allPaneIds.first
         guard let paneID else { return nil }
         return (workspace, paneID)
     }

@@ -230,7 +230,7 @@ import Testing
     @Test func panelOnlyIfMultipleSuppressesSinglePanelWorkspace() throws {
         try withAutoNamingSetting(true) {
             try withManager { _, workspace in
-                let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+                let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
                 let panelId = try #require(workspace.newTerminalSurface(inPane: pane, focus: true)?.id)
 
                 // One panel: the tab write is suppressed, the workspace still names.
@@ -311,7 +311,7 @@ import Testing
     @Test func panelIdTargetsTabTitleAndWorkspaceOnlyLeavesTabsAlone() throws {
         try withAutoNamingSetting(true) {
             try withManager { _, workspace in
-                let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+                let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
                 let panelId = try #require(workspace.newTerminalSurface(inPane: pane, focus: true)?.id)
 
                 // Workspace-only call: tabs untouched.
@@ -339,7 +339,7 @@ import Testing
     @Test func codexNativeTitleSyncAppliesToRawPanelTitleWithAutoNamingDisabled() async throws {
         try await withAutoNamingSettingAsync(false) {
             try await withManagerAsync { _, workspace in
-                let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+                let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
                 let panelId = try #require(workspace.newTerminalSurface(inPane: pane, focus: true)?.id)
 
                 let envelope = try await callAsync(method: "surface.sync_codex_native_title", params: [
@@ -390,13 +390,13 @@ import Testing
     /// Repairs the visible tab header when the raw title was already stored.
     @Test func codexNativeTitleSyncReconcilesVisibleTabHeader() async throws {
         try await withManagerAsync { _, workspace in
-            let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+            let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
             let panelId = try #require(workspace.newTerminalSurface(inPane: pane, focus: false)?.id)
             let tabId = try #require(workspace.surfaceIdFromPanelId(panelId))
             let title = "Codex conversation title"
             workspace.panelTitles[panelId] = title
 
-            #expect(workspace.bonsplitController.tab(tabId)?.title != title)
+            #expect(workspace.activeBonsplitController.tab(tabId)?.title != title)
             let envelope = try await callAsync(method: "surface.sync_codex_native_title", params: [
                 "workspace_id": workspace.id.uuidString,
                 "panel_id": panelId.uuidString,
@@ -404,14 +404,14 @@ import Testing
             ])
             let result = try #require(envelope["result"] as? [String: Any])
             #expect(result["applied"] as? Bool == true)
-            #expect(workspace.bonsplitController.tab(tabId)?.title == title)
+            #expect(workspace.activeBonsplitController.tab(tabId)?.title == title)
         }
     }
 
     /// Leaves an explicitly renamed panel unchanged when Codex syncs a title.
     @Test func codexNativeTitleSyncPreservesExistingCustomPanelTitle() async throws {
         try await withManagerAsync { _, workspace in
-            let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+            let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
             let panelId = try #require(workspace.newTerminalSurface(inPane: pane, focus: true)?.id)
             _ = workspace.setPanelCustomTitle(panelId: panelId, title: "my renamed tab", source: .user)
 

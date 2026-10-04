@@ -5,7 +5,7 @@ import Foundation
 
 extension Workspace {
     func didProgrammaticallyChangeSplitGeometry() {
-        splitTabBar(bonsplitController, didChangeGeometry: bonsplitController.layoutSnapshot())
+        splitTabBar(activeBonsplitController, didChangeGeometry: activeBonsplitController.layoutSnapshot())
     }
 
     func applyInitialSplitDividerPosition(
@@ -17,9 +17,9 @@ extension Workspace {
               let splitId = splitNodeJoiningPaneIds(
                 sourcePaneId.id.uuidString,
                 newPaneId.id.uuidString,
-                in: bonsplitController.treeSnapshot()
+                in: activeBonsplitController.treeSnapshot()
               ).flatMap({ UUID(uuidString: $0.id) }) else { return }
-        _ = bonsplitController.setDividerPosition(position, forSplit: splitId, fromExternal: true)
+        _ = activeBonsplitController.setDividerPosition(position, forSplit: splitId, fromExternal: true)
         // The divider moved after bonsplit's didSplitPane projection; re-derive
         // the provisional pane frames from the same pre-split base.
         applyProvisionalSplitPaneGeometry(originalPane: sourcePaneId, newPane: newPaneId)
@@ -66,8 +66,8 @@ extension Workspace {
               !isRemoteTmuxMirror else { return false }
         let result = PaneLayoutService().equalizeSplitRun(
             containingPaneId: newPaneId.id.uuidString,
-            in: bonsplitController.treeSnapshot(),
-            controller: bonsplitController
+            in: activeBonsplitController.treeSnapshot(),
+            controller: activeBonsplitController
         )
         guard result.foundSplit else { return false }
         didProgrammaticallyChangeSplitGeometry()
@@ -76,7 +76,7 @@ extension Workspace {
         // `applyInitialSplitDividerPosition` does. When the run spans more
         // than the new split, the other panes' terminals keep their frames
         // until their anchors re-layout, as with the Equalize Splits command.
-        if let sourcePaneId = siblingPaneId(of: newPaneId, in: bonsplitController.treeSnapshot()) {
+        if let sourcePaneId = siblingPaneId(of: newPaneId, in: activeBonsplitController.treeSnapshot()) {
             applyProvisionalSplitPaneGeometry(originalPane: sourcePaneId, newPane: newPaneId)
         }
         return true
@@ -88,8 +88,8 @@ extension Workspace {
         guard case .split(let split) = node else { return nil }
         let target = paneId.id.uuidString
         if case .pane(let first) = split.first, case .pane(let second) = split.second {
-            if first.id == target { return bonsplitController.allPaneIds.first { $0.id.uuidString == second.id } }
-            if second.id == target { return bonsplitController.allPaneIds.first { $0.id.uuidString == first.id } }
+            if first.id == target { return activeBonsplitController.allPaneIds.first { $0.id.uuidString == second.id } }
+            if second.id == target { return activeBonsplitController.allPaneIds.first { $0.id.uuidString == first.id } }
         }
         return siblingPaneId(of: paneId, in: split.first) ?? siblingPaneId(of: paneId, in: split.second)
     }

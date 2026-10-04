@@ -423,7 +423,7 @@ struct WindowTitleTemplateTests {
         )
         workspace.updateRemotePanelDirectory(panelId: remotePanelId, directory: remoteDirectory)
 
-        let paneId = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneId = try #require(workspace.activeBonsplitController.focusedPaneId)
         let agentPanel = try #require(workspace.newAgentSessionSurface(
             inPane: paneId,
             rendererKind: .react,
@@ -490,7 +490,7 @@ struct WindowTitleTemplateTests {
         let localDirectory = "/Users/alice/local-agent"
         let workspace = Workspace(workingDirectory: "/Users/alice/development")
         workspace.configureRemoteConnection(sshRemoteConfiguration(command: "ssh seepine@192.168.5.20"), autoConnect: false)
-        let paneId = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneId = try #require(workspace.activeBonsplitController.focusedPaneId)
         let agentPanel = try #require(workspace.newAgentSessionSurface(
             inPane: paneId,
             rendererKind: .react,

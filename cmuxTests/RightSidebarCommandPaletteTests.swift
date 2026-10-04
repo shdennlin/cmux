@@ -236,14 +236,14 @@ final class RightSidebarCommandPaletteTests: XCTestCase {
         let workspace = try XCTUnwrap(manager.selectedWorkspace)
         let initialPanelID = try XCTUnwrap(workspace.focusedPanelId)
         XCTAssertNotNil(workspace.newTerminalSplit(from: initialPanelID, orientation: .horizontal, focus: false))
-        let initialPaneID = workspace.bonsplitController.focusedPaneId
+        let initialPaneID = workspace.activeBonsplitController.focusedPaneId
 
         XCTAssertTrue(AppDelegate.moveMainAreaPaneFocus(.next, tabManager: manager, window: nil))
-        let movedPaneID = workspace.bonsplitController.focusedPaneId
+        let movedPaneID = workspace.activeBonsplitController.focusedPaneId
         XCTAssertNotEqual(movedPaneID, initialPaneID)
 
         XCTAssertTrue(AppDelegate.moveMainAreaPaneFocus(.previous, tabManager: manager, window: nil))
-        XCTAssertEqual(workspace.bonsplitController.focusedPaneId, initialPaneID)
+        XCTAssertEqual(workspace.activeBonsplitController.focusedPaneId, initialPaneID)
 
         XCTAssertFalse(AppDelegate.moveMainAreaPaneFocus(.next, tabManager: nil, window: nil))
     }

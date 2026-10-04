@@ -47,8 +47,8 @@ extension Workspace {
             requestedWorkingDirectory: workingDirectory,
             sourcePanelId: panelId
         )
-        let selectedInPane = bonsplitController.selectedTab(inPane: paneId)?.id == tabId
-        let paneWasFocused = bonsplitController.focusedPaneId == paneId
+        let selectedInPane = activeBonsplitController.selectedTab(inPane: paneId)?.id == tabId
+        let paneWasFocused = activeBonsplitController.focusedPaneId == paneId
         let shouldFocus = focus ?? (selectedInPane && paneWasFocused)
         let customTitle = panelCustomTitles[panelId]
         let customTitleSource = panelCustomTitleSources[panelId]
@@ -144,7 +144,7 @@ extension Workspace {
         }
         bindSurface(tabId, toPanelId: panelId)
         let resolvedTitle = resolvedPanelTitle(panelId: panelId, fallback: replacementPanel.displayTitle)
-        bonsplitController.updateTab(
+        activeBonsplitController.updateTab(
             tabId,
             title: resolvedTitle,
             icon: .some(replacementPanel.displayIcon),
@@ -159,11 +159,11 @@ extension Workspace {
         )
 
         if shouldFocus {
-            bonsplitController.focusPane(paneId)
-            bonsplitController.selectTab(tabId)
+            activeBonsplitController.focusPane(paneId)
+            activeBonsplitController.selectTab(tabId)
             focusPanel(panelId)
         } else if selectedInPane {
-            bonsplitController.selectTab(tabId)
+            activeBonsplitController.selectTab(tabId)
             applyTabSelection(tabId: tabId, inPane: paneId)
         } else {
             replacementPanel.unfocus()

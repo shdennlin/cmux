@@ -65,7 +65,7 @@ import SwiftUI
         let harness = try Harness()
         defer { harness.tearDown() }
         let workspace = harness.workspace
-        let paneID = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
         let before = try #require(workspace.focusedPanelId)
         #expect(TerminalController.currentSocketCommandFocusAllowanceStack().isEmpty)
 
@@ -79,7 +79,7 @@ import SwiftUI
         #expect(created.workspaceID == workspace.id)
         #expect(created.panelID != before)
         #expect(workspace.focusedPanelId == created.panelID)
-        let selectedSurface = try #require(workspace.bonsplitController.selectedTab(inPane: paneID)?.id)
+        let selectedSurface = try #require(workspace.activeBonsplitController.selectedTab(inPane: paneID)?.id)
         #expect(workspace.panelIdFromSurfaceId(selectedSurface) == created.panelID)
     }
 
@@ -95,11 +95,11 @@ import SwiftUI
         let window = try #require(harness.appDelegate.mainWindow(for: harness.windowId))
         window.setContentSize(narrow)
         window.contentView?.layoutSubtreeIfNeeded()
-        workspace.bonsplitController.setContainerFrame(CGRect(origin: .zero, size: narrow))
+        workspace.activeBonsplitController.setContainerFrame(CGRect(origin: .zero, size: narrow))
         let first = try #require(workspace.focusedPanelId)
         #expect(workspace.newTerminalSplitOutcome(from: first, orientation: .horizontal).panel != nil)
-        let paneID = try #require(workspace.bonsplitController.focusedPaneId)
-        let paneCount = workspace.bonsplitController.allPaneIds.count
+        let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
+        let paneCount = workspace.activeBonsplitController.allPaneIds.count
         let destination = SurfaceDestination.split(workspaceID: workspace.id, paneID: paneID.id.uuidString, direction: .right)
 
         // Layout replay and socket callers still see the refusal.
@@ -111,7 +111,7 @@ import SwiftUI
         }
 
         #expect(created.workspaceID == workspace.id)
-        #expect(workspace.bonsplitController.allPaneIds.count == paneCount)
+        #expect(workspace.activeBonsplitController.allPaneIds.count == paneCount)
         #expect(workspace.paneId(forPanelId: created.panelID) == paneID)
     }
 
@@ -120,7 +120,7 @@ import SwiftUI
         let harness = try Harness()
         defer { harness.tearDown() }
         let workspace = harness.workspace
-        let sourcePane = try #require(workspace.bonsplitController.focusedPaneId)
+        let sourcePane = try #require(workspace.activeBonsplitController.focusedPaneId)
         let localPanelID = try #require(workspace.focusedPanelId)
         let cloudPanel = try #require(workspace.makeRemoteTmuxPanePanel(onInput: { _ in }))
         cloudPanel.cloudAttachment = CloudTerminalAttachmentStatus(machineID: "focus-ring-test")
@@ -161,7 +161,7 @@ import SwiftUI
         let manager = try #require(harness.appDelegate.tabManagerFor(windowId: harness.windowId))
         let destination = manager.addWorkspace(select: false, eagerLoadTerminal: false)
         let detached = try #require(workspace.detachSurface(panelId: cloudPanel.id))
-        let destinationPane = try #require(destination.bonsplitController.allPaneIds.first)
+        let destinationPane = try #require(destination.activeBonsplitController.allPaneIds.first)
         #expect(destination.attachDetachedSurface(detached, inPane: destinationPane, focus: false) == cloudPanel.id)
         manager.selectWorkspace(destination)
         // Bonsplit selects a tab it creates, so an unfocused attach into the
@@ -185,7 +185,7 @@ import SwiftUI
         let harness = try Harness()
         defer { harness.tearDown() }
         let workspace = harness.workspace
-        let paneID = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
         let sourcePanelID = try #require(workspace.focusedPanelId)
         let machine = SurfaceMachineID.cloud("cwd-\(UUID().uuidString)")
         let provider = CloudCreationProvider(machine: machine, workingDirectory: "/remote/project-a")
@@ -236,7 +236,7 @@ import SwiftUI
         harness.appDelegate.cloudOperations = recorder
         defer { harness.appDelegate.cloudOperations = previousRecorder }
         let workspace = harness.workspace
-        let paneID = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
         let sourcePanelID = try #require(workspace.focusedPanelId)
         let machine = SurfaceMachineID.cloud("failed-pane-\(UUID().uuidString)")
         let error = CmuxTuiSurfaceProvider.ProviderError.remoteTabNotFound("tab-failure")
@@ -441,7 +441,7 @@ import SwiftUI
         let harness = try Harness()
         defer { harness.tearDown() }
         let workspace = harness.workspace
-        let paneID = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
         let sourcePanelID = try #require(workspace.focusedPanelId)
         let machine = SurfaceMachineID.cloud("missing-provider-\(UUID().uuidString)")
         let remoteWorkspace = SurfaceRemoteWorkspace(id: "ws-missing-provider", name: "missing", index: 0, focused: true)
@@ -473,15 +473,15 @@ import SwiftUI
         case "tab":
             #expect(!workspace.newTerminalSurfaceOutcome(inPane: paneID, focus: false).isAccepted)
         case "splitButton":
-            workspace.bonsplitController.splitPane(paneID, orientation: .horizontal)
+            workspace.activeBonsplitController.splitPane(paneID, orientation: .horizontal)
         default:
             #expect(!workspace.newTerminalSplitOutcome(
                 from: sourcePanelID, orientation: .horizontal, focus: false
             ).isAccepted)
         }
         #expect(workspace.panels.count == panelCount)
-        #expect(workspace.bonsplitController.allPaneIds.count == 1)
-        #expect(workspace.bonsplitController.tabs(inPane: paneID).count == 1)
+        #expect(workspace.activeBonsplitController.allPaneIds.count == 1)
+        #expect(workspace.activeBonsplitController.tabs(inPane: paneID).count == 1)
     }
 
     @Test("Cloud placement errors have a specific diagnostic")
@@ -676,7 +676,7 @@ import SwiftUI
         let harness = try Harness()
         defer { harness.tearDown() }
         let workspace = harness.workspace
-        let paneID = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
         let before = try #require(workspace.focusedPanelId)
 
         let created = try SurfacePaneFactory.makeTerminalPane(
@@ -688,7 +688,7 @@ import SwiftUI
 
         #expect(created.panelID != before)
         #expect(workspace.focusedPanelId == before)
-        let selectedSurface = try #require(workspace.bonsplitController.selectedTab(inPane: paneID)?.id)
+        let selectedSurface = try #require(workspace.activeBonsplitController.selectedTab(inPane: paneID)?.id)
         #expect(workspace.panelIdFromSurfaceId(selectedSurface) == before)
     }
 
@@ -698,7 +698,7 @@ import SwiftUI
         let harness = try Harness()
         defer { harness.tearDown() }
         let workspace = harness.workspace
-        let paneID = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
         let before = try #require(workspace.focusedPanelId)
 
         let created = try SurfacePaneFactory.makeTerminalPane(
@@ -720,7 +720,7 @@ import SwiftUI
         let harness = try Harness()
         defer { harness.tearDown() }
         let workspace = harness.workspace
-        let paneID = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
         let source = try #require(workspace.focusedPanelId.flatMap { workspace.terminalPanel(for: $0) })
         let panel = try #require(workspace.makeRemoteTmuxPanePanel(onInput: { _ in }))
 
@@ -746,7 +746,7 @@ import SwiftUI
         let harness = try Harness()
         defer { harness.tearDown() }
         let workspace = harness.workspace
-        let sourcePane = try #require(workspace.bonsplitController.focusedPaneId)
+        let sourcePane = try #require(workspace.activeBonsplitController.focusedPaneId)
         let localPanelID = try #require(workspace.focusedPanelId)
         let cloudPanel = try #require(workspace.makeRemoteTmuxPanePanel(onInput: { _ in }))
 
@@ -775,7 +775,7 @@ import SwiftUI
         let harness = try Harness()
         defer { harness.tearDown() }
         let workspace = harness.workspace
-        let paneID = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
         let before = try #require(workspace.focusedPanelId)
 
         let created = try SurfacePaneFactory.makeBrowserPane(
@@ -786,7 +786,7 @@ import SwiftUI
 
         #expect(created.panelID != before)
         #expect(workspace.focusedPanelId == created.panelID)
-        let selectedSurface = try #require(workspace.bonsplitController.selectedTab(inPane: paneID)?.id)
+        let selectedSurface = try #require(workspace.activeBonsplitController.selectedTab(inPane: paneID)?.id)
         #expect(workspace.panelIdFromSurfaceId(selectedSurface) == created.panelID)
     }
 
@@ -796,7 +796,7 @@ import SwiftUI
         defer { harness.tearDown() }
         let window = try #require(harness.appDelegate.mainWindow(for: harness.windowId))
         let workspace = harness.workspace
-        let paneID = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
         let catalog = SurfaceCatalog()
         let provider = CloudCreationProvider(machine: .cloud("drop-fixture"), workingDirectory: nil)
         catalog.register(provider)
@@ -840,7 +840,7 @@ import SwiftUI
         let harness = try Harness()
         defer { harness.tearDown() }
         let workspace = harness.workspace
-        let paneID = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
         let before = try #require(workspace.focusedPanelId)
 
         let created = try TerminalController.withSocketCommandPolicyStack([false]) {
@@ -854,7 +854,7 @@ import SwiftUI
 
         #expect(created.panelID != before)
         #expect(workspace.focusedPanelId == before)
-        let selectedSurface = try #require(workspace.bonsplitController.selectedTab(inPane: paneID)?.id)
+        let selectedSurface = try #require(workspace.activeBonsplitController.selectedTab(inPane: paneID)?.id)
         #expect(workspace.panelIdFromSurfaceId(selectedSurface) == before)
     }
 
@@ -885,7 +885,7 @@ import SwiftUI
             // Surface split behavior should not depend on AppKit having laid out
             // a hidden test window yet. Install deterministic geometry so the
             // factory can allocate the new pane immediately on a cold runner.
-            workspace.bonsplitController.setContainerFrame(CGRect(origin: .zero, size: Self.contentSize))
+            workspace.activeBonsplitController.setContainerFrame(CGRect(origin: .zero, size: Self.contentSize))
         }
 
         private static let contentSize = CGSize(width: 1_000, height: 700)

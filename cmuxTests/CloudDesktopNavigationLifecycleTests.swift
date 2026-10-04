@@ -143,13 +143,13 @@ struct CloudDesktopNavigationLifecycleTests {
     func rejectsForeignMachine(machineID: String) async throws {
         try await withFixture(machineID: machineID) { fixture in
             fixture.app.selectedID = fixture.app.other.id
-            let before = fixture.app.other.bonsplitController.treeSnapshot()
+            let before = fixture.app.other.activeBonsplitController.treeSnapshot()
             try fixture.app.activate(try fixture.app.poolNode())
             // The ownership hint rejects synchronously; no operation starts.
             #expect(fixture.app.completions == 0)
             #expect(fixture.app.failures == [SurfaceTransferRejection.cloudMachineMismatch.message])
             #expect(fixture.app.catalog.projections.isEmpty)
-            #expect(fixture.app.other.bonsplitController.treeSnapshot() == before)
+            #expect(fixture.app.other.activeBonsplitController.treeSnapshot() == before)
             #expect(fixture.model.phase == .needsVPN)
             #expect(fixture.server.authorizedTargets.isEmpty)
         }

@@ -150,7 +150,7 @@ extension TerminalController {
             if focus, let focusedPanelId = workspace.focusedPanelId {
                 panel = workspace.openOrFocusCustomSidebarSplit(from: focusedPanelId, name: name)
             }
-            if panel == nil, let paneId = workspace.bonsplitController.focusedPaneId ?? workspace.bonsplitController.allPaneIds.first {
+            if panel == nil, let paneId = workspace.activeBonsplitController.focusedPaneId ?? workspace.activeBonsplitController.allPaneIds.first {
                 panel = workspace.openOrFocusCustomSidebarSurface(inPane: paneId, name: name, focus: focus)
             }
             guard let panel else {

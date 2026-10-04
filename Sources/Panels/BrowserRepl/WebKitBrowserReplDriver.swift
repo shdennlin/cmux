@@ -826,7 +826,7 @@ final class WebKitBrowserReplDriver: BrowserReplDriver, @unchecked Sendable {
         // the insecure-HTTP prompt that nobody can answer).
         let url = URL(string: "about:blank")
         let paneID = workspace.focusedPanelId.flatMap { workspace.paneId(forPanelId: $0) }
-            ?? workspace.bonsplitController.focusedPaneId
+            ?? workspace.activeBonsplitController.focusedPaneId
         guard let paneID,
               let panel = workspace.newBrowserSurface(
                   inPane: paneID,
@@ -964,7 +964,7 @@ final class WebKitBrowserReplDriver: BrowserReplDriver, @unchecked Sendable {
         let workspace = try workspace()
         activeTargetID = panel.id.uuidString
         if let tabID = workspace.surfaceIdFromPanelId(panel.id) {
-            workspace.bonsplitController.selectTab(tabID)
+            workspace.activeBonsplitController.selectTab(tabID)
         }
         return nil
     }

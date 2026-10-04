@@ -106,7 +106,7 @@ struct MobileWorkspaceListFidelityTests {
 
         // It must equal bonsplit's own allTabIds mapping (the spatial source of
         // truth), not dictionary/UUID order.
-        let expected = workspace.bonsplitController.allTabIds.compactMap {
+        let expected = workspace.activeBonsplitController.allTabIds.compactMap {
             workspace.panelIdFromSurfaceId($0)
         }
         #expect(ordered == expected)
@@ -125,7 +125,7 @@ struct MobileWorkspaceListFidelityTests {
 
         // Move the first terminal to the end. Same panel set, different spatial order.
         let firstTabId = try #require(workspace.surfaceIdFromPanelId(ordered[0]))
-        #expect(workspace.bonsplitController.reorderTab(firstTabId, toIndex: 2))
+        #expect(workspace.activeBonsplitController.reorderTab(firstTabId, toIndex: 2))
 
         // Sanity: the id set is unchanged, but the order changed.
         let afterOrder = workspace.orderedPanelIds
@@ -698,7 +698,7 @@ struct MobileWorkspaceListFidelityTests {
         )
         let workspace = try #require(manager.selectedWorkspace)
         workspace.configureRemoteConnection(sshRemoteConfiguration(), autoConnect: false)
-        let paneId = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneId = try #require(workspace.activeBonsplitController.focusedPaneId)
         let localPanel = try #require(workspace.newTerminalSurface(
             inPane: paneId,
             focus: false,

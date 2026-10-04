@@ -357,7 +357,7 @@ struct LastSurfaceClosePreferenceTests {
 
             #expect(workspace.panels.count == 1)
             #expect(workspace.panels.values.first is BrowserPanel)
-            #expect(workspace.bonsplitController.allPaneIds.count == 1)
+            #expect(workspace.activeBonsplitController.allPaneIds.count == 1)
             #expect(workspace.focusedPanelId != nil)
         }
     }
@@ -402,7 +402,7 @@ struct LastSurfaceClosePreferenceTests {
             drainMainQueueForCloseTest(timeout: mainActorTestMainQueueSpin)
 
             #expect(workspace.panels.isEmpty)
-            #expect(workspace.bonsplitController.allPaneIds.count == 1)
+            #expect(workspace.activeBonsplitController.allPaneIds.count == 1)
             #expect(manager.reopenMostRecentlyClosedItem())
             drainMainQueueForCloseTest(timeout: mainActorTestMainQueueSpin)
 
@@ -412,7 +412,7 @@ struct LastSurfaceClosePreferenceTests {
             #expect(workspace.panels.count == 1)
             #expect(workspace.cloudVMBinding?.remoteWorkspaceID == "ws-display")
             #expect(workspace.panels.values.allSatisfy { !($0 is TerminalPanel) })
-            #expect(workspace.bonsplitController.allPaneIds.count == 1)
+            #expect(workspace.activeBonsplitController.allPaneIds.count == 1)
             let records = SurfaceCatalog.shared.projectionRecords(forWorkspace: workspace.id)
             let projection = try #require(records.first { $0.panelID == restoredPanelId })
             #expect(projection.resource == display)
@@ -435,7 +435,7 @@ struct LastSurfaceClosePreferenceTests {
             let browserPane = try #require(workspace.paneId(forPanelId: browserId))
             let terminalId = try #require(workspace.newTerminalSurface(inPane: browserPane, focus: true)?.id)
             let originalOrientation: String = {
-                guard case .split(let split) = workspace.bonsplitController.treeSnapshot() else { return "" }
+                guard case .split(let split) = workspace.activeBonsplitController.treeSnapshot() else { return "" }
                 return split.orientation
             }()
 
@@ -445,7 +445,7 @@ struct LastSurfaceClosePreferenceTests {
             #expect(manager.reopenMostRecentlyClosedItem())
             drainMainQueueForCloseTest(timeout: mainActorTestMainQueueSpin)
 
-            #expect(workspace.bonsplitController.allPaneIds.count == 2)
+            #expect(workspace.activeBonsplitController.allPaneIds.count == 2)
             #expect(workspace.panels.values.contains { $0 is BrowserPanel })
             #expect(workspace.panels.values.contains { $0 is TerminalPanel })
             let restoredTerminalId = try #require(workspace.panels.first { panelId, panel in
@@ -453,7 +453,7 @@ struct LastSurfaceClosePreferenceTests {
             }?.key)
             #expect(workspace.paneId(forPanelId: restoredTerminalId) == workspace.paneId(forPanelId: browserId))
             let restoredOrientation: String = {
-                guard case .split(let split) = workspace.bonsplitController.treeSnapshot() else { return "" }
+                guard case .split(let split) = workspace.activeBonsplitController.treeSnapshot() else { return "" }
                 return split.orientation
             }()
             #expect(restoredOrientation == originalOrientation)

@@ -20,7 +20,7 @@ struct SplitSpaceTests {
     @Test func fiveSplitsDownAtFullSizeKeepEveryPaneAboveTheMinimum() throws {
         let workspace = Workspace()
         defer { workspace.teardownAllPanels() }
-        workspace.bonsplitController.setContainerFrame(CGRect(x: 0, y: 0, width: 1200, height: 860))
+        workspace.activeBonsplitController.setContainerFrame(CGRect(x: 0, y: 0, width: 1200, height: 860))
 
         for _ in 0..<5 {
             let source = try #require(workspace.focusedPanelId)
@@ -31,7 +31,7 @@ struct SplitSpaceTests {
         // share it equally instead of halving the last one again.
         let minimumHeight = Double(workspace.splitMinimumPaneSize.height)
         #expect(minimumHeight >= Double(WindowChromeMetrics.bonsplitTabBarHeight) + 3 * 17)
-        let panes = workspace.bonsplitController.layoutSnapshot().panes
+        let panes = workspace.activeBonsplitController.layoutSnapshot().panes
         #expect(panes.count == 6)
         for pane in panes {
             #expect(pane.frame.height >= minimumHeight, "pane \(pane.paneId) is \(pane.frame.height) pt tall")
@@ -43,7 +43,7 @@ struct SplitSpaceTests {
     @Test func aSplitDownWithNoRoomIsRefused() throws {
         let workspace = Workspace()
         defer { workspace.teardownAllPanels() }
-        workspace.bonsplitController.setContainerFrame(CGRect(x: 0, y: 0, width: 1200, height: 300))
+        workspace.activeBonsplitController.setContainerFrame(CGRect(x: 0, y: 0, width: 1200, height: 300))
         let first = try #require(workspace.focusedPanelId)
         #expect(workspace.newTerminalSplitOutcome(from: first, orientation: .vertical).panel != nil)
         let panelCount = workspace.panels.count
@@ -57,7 +57,7 @@ struct SplitSpaceTests {
         }
         #expect(!outcome.isAccepted)
         #expect(workspace.panels.count == panelCount)
-        #expect(workspace.bonsplitController.allPaneIds.count == 2)
+        #expect(workspace.activeBonsplitController.allPaneIds.count == 2)
         #expect(workspace.focusedPanelId == source)
     }
 
@@ -66,7 +66,7 @@ struct SplitSpaceTests {
     @Test func aSplitRightUsesTheColumnMinimum() throws {
         let workspace = Workspace()
         defer { workspace.teardownAllPanels() }
-        workspace.bonsplitController.setContainerFrame(CGRect(x: 0, y: 0, width: 400, height: 860))
+        workspace.activeBonsplitController.setContainerFrame(CGRect(x: 0, y: 0, width: 400, height: 860))
         let first = try #require(workspace.focusedPanelId)
         #expect(workspace.newTerminalSplitOutcome(from: first, orientation: .horizontal).panel != nil)
         let source = try #require(workspace.focusedPanelId)
@@ -81,10 +81,10 @@ struct SplitSpaceTests {
     @Test func programmaticAndMovingTabHelpersUseTheCentralAdmissionGate() throws {
         let fileDropWorkspace = Workspace()
         defer { fileDropWorkspace.teardownAllPanels() }
-        fileDropWorkspace.bonsplitController.setContainerFrame(
+        fileDropWorkspace.activeBonsplitController.setContainerFrame(
             CGRect(x: 0, y: 0, width: 1200, height: 100)
         )
-        let fileDropPane = try #require(fileDropWorkspace.bonsplitController.focusedPaneId)
+        let fileDropPane = try #require(fileDropWorkspace.activeBonsplitController.focusedPaneId)
         let fileDropPanelCount = fileDropWorkspace.panels.count
 #if DEBUG
         var terminalConstructionRequests: [(command: String?, input: String?)] = []
@@ -107,7 +107,7 @@ struct SplitSpaceTests {
 
         let browserWorkspace = Workspace()
         defer { browserWorkspace.teardownAllPanels() }
-        browserWorkspace.bonsplitController.setContainerFrame(
+        browserWorkspace.activeBonsplitController.setContainerFrame(
             CGRect(x: 0, y: 0, width: 300, height: 860)
         )
         let browserSource = try #require(browserWorkspace.focusedPanelId)
@@ -131,10 +131,10 @@ struct SplitSpaceTests {
 
         let movingWorkspace = Workspace()
         defer { movingWorkspace.teardownAllPanels() }
-        movingWorkspace.bonsplitController.setContainerFrame(
+        movingWorkspace.activeBonsplitController.setContainerFrame(
             CGRect(x: 0, y: 0, width: 1200, height: 100)
         )
-        let movingPane = try #require(movingWorkspace.bonsplitController.focusedPaneId)
+        let movingPane = try #require(movingWorkspace.activeBonsplitController.focusedPaneId)
         let movedPanel = try #require(movingWorkspace.newTerminalSurface(inPane: movingPane, focus: false))
         let movedTab = try #require(movingWorkspace.surfaceIdFromPanelId(movedPanel.id))
         #expect(movingWorkspace.splitPaneMovingTab(
@@ -144,14 +144,14 @@ struct SplitSpaceTests {
             insertFirst: false,
             focusIntent: .preserveCurrent
         ) == nil)
-        #expect(movingWorkspace.bonsplitController.allPaneIds.count == 1)
-        #expect(movingWorkspace.bonsplitController.tabs(inPane: movingPane).contains { $0.id == movedTab })
+        #expect(movingWorkspace.activeBonsplitController.allPaneIds.count == 1)
+        #expect(movingWorkspace.activeBonsplitController.tabs(inPane: movingPane).contains { $0.id == movedTab })
     }
 
     @Test func explicitDividerRatioCannotCreateAnUndersizedChild() throws {
         let terminalWorkspace = Workspace()
         defer { terminalWorkspace.teardownAllPanels() }
-        terminalWorkspace.bonsplitController.setContainerFrame(
+        terminalWorkspace.activeBonsplitController.setContainerFrame(
             CGRect(x: 0, y: 0, width: 1000, height: 860)
         )
         let terminalSource = try #require(terminalWorkspace.focusedPanelId)
@@ -167,7 +167,7 @@ struct SplitSpaceTests {
 
         let borrowingWorkspace = Workspace()
         defer { borrowingWorkspace.teardownAllPanels() }
-        borrowingWorkspace.bonsplitController.setContainerFrame(
+        borrowingWorkspace.activeBonsplitController.setContainerFrame(
             CGRect(x: 0, y: 0, width: 600, height: 860)
         )
         let firstBorrowingSource = try #require(borrowingWorkspace.focusedPanelId)
@@ -182,13 +182,13 @@ struct SplitSpaceTests {
             initialDividerPosition: 0.1
         ))
         let minimumWidth = Double(borrowingWorkspace.splitMinimumPaneSize.width)
-        #expect(borrowingWorkspace.bonsplitController.layoutSnapshot().panes.allSatisfy {
+        #expect(borrowingWorkspace.activeBonsplitController.layoutSnapshot().panes.allSatisfy {
             $0.frame.width >= minimumWidth
         })
 
         let browserWorkspace = Workspace()
         defer { browserWorkspace.teardownAllPanels() }
-        browserWorkspace.bonsplitController.setContainerFrame(
+        browserWorkspace.activeBonsplitController.setContainerFrame(
             CGRect(x: 0, y: 0, width: 1000, height: 860)
         )
         let browserSource = try #require(browserWorkspace.focusedPanelId)
@@ -206,7 +206,7 @@ struct SplitSpaceTests {
         defer { flags.setOverride(previousSimulatorOverride, for: simulatorFlag) }
         let simulatorWorkspace = Workspace()
         defer { simulatorWorkspace.teardownAllPanels() }
-        simulatorWorkspace.bonsplitController.setContainerFrame(
+        simulatorWorkspace.activeBonsplitController.setContainerFrame(
             CGRect(x: 0, y: 0, width: 1000, height: 860)
         )
         let simulatorSource = try #require(simulatorWorkspace.focusedPanelId)

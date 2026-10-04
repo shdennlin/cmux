@@ -34,11 +34,11 @@ extension Workspace {
               let split = splitNodeJoiningPaneIds(
                 originalPane.id.uuidString,
                 newPane.id.uuidString,
-                in: bonsplitController.treeSnapshot()
+                in: activeBonsplitController.treeSnapshot()
               ),
               let transactionID = UUID(uuidString: split.id) else { return }
-        let originalTabs = bonsplitController.tabs(inPane: originalPane)
-        let newTabs = bonsplitController.tabs(inPane: newPane)
+        let originalTabs = activeBonsplitController.tabs(inPane: originalPane)
+        let newTabs = activeBonsplitController.tabs(inPane: newPane)
         let originalTerminals = presentedTerminalHostedViews(forTabs: originalTabs)
         let newTerminals = presentedTerminalHostedViews(forTabs: newTabs)
         // The base is a terminal that was presented in the original pane. When
@@ -49,7 +49,7 @@ extension Workspace {
               let baseFrame = TerminalWindowPortalRegistry.provisionalBaseFrameInWindow(for: base)
                 ?? Self.frameInWindow(of: base) else { return }
 
-        let configuration = bonsplitController.configuration
+        let configuration = activeBonsplitController.configuration
         // A non-programmatic split whose new pane already holds tabs moved
         // them there from the original pane.
         let movedTabCount = isProgrammaticSplit ? 0 : newTabs.count
@@ -98,7 +98,7 @@ extension Workspace {
     /// rendered it, or a layout replaced wholesale. Runs from bonsplit's
     /// structural delegate events, which follow the tree mutation.
     func releaseProvisionalSplitPaneGeometryForRemovedSplits() {
-        let liveSplitIDs = Self.splitNodeIDs(in: bonsplitController.treeSnapshot())
+        let liveSplitIDs = Self.splitNodeIDs(in: activeBonsplitController.treeSnapshot())
         TerminalWindowPortalRegistry.releaseProvisionalPaneGeometry(inWorkspace: id) { transactionID in
             !liveSplitIDs.contains(transactionID)
         }

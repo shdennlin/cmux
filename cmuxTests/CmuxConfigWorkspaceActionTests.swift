@@ -420,9 +420,9 @@ struct CmuxConfigWorkspaceActionTests {
             workspaceCommands: [:]
         )
 
-        let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+        let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
         workspace.splitTabBar(
-            workspace.bonsplitController,
+            workspace.activeBonsplitController,
             didRequestCustomAction: "review-setup",
             inPane: pane
         )

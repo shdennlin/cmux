@@ -43,10 +43,10 @@ struct PaneResizeShortcutTests {
             // The test exercises divider keyboard routing, so give Bonsplit a
             // usable geometry before creating the second pane. A newly-created
             // hidden test window can otherwise report `noSpace` on a cold runner.
-            workspace.bonsplitController.setContainerFrame(
+            workspace.activeBonsplitController.setContainerFrame(
                 CGRect(x: 0, y: 0, width: 1000, height: 1000)
             )
-            let controller = workspace.bonsplitController
+            let controller = workspace.activeBonsplitController
             let first = try #require(workspace.focusedPanelId)
             let horizontal = direction == "left" || direction == "right"
             let second = try #require(workspace.newTerminalSplit(
@@ -160,11 +160,11 @@ struct PaneResizeShortcutTests {
     private func expectCachedFramesMatch(_ workspace: Workspace) async throws {
         #expect(await AppKitTestEventPump().waitUntil(timeout: .seconds(3)) {
             guard let cached = workspace.tmuxLayoutSnapshot else { return false }
-            let live = workspace.bonsplitController.layoutSnapshot()
+            let live = workspace.activeBonsplitController.layoutSnapshot()
             return cached.panes == live.panes
         })
         let cached = try #require(workspace.tmuxLayoutSnapshot)
-        let live = workspace.bonsplitController.layoutSnapshot()
+        let live = workspace.activeBonsplitController.layoutSnapshot()
         #expect(cached.panes.count == live.panes.count)
         for pane in live.panes {
             let previous = try #require(cached.panes.first { $0.paneId == pane.paneId })

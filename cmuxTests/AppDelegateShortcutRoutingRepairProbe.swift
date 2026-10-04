@@ -21,7 +21,7 @@ extension AppDelegateShortcutRoutingTests {
     ) -> TerminalPanel? {
         window.setContentSize(NSSize(width: 1_000, height: 700))
         window.contentView?.layoutSubtreeIfNeeded()
-        workspace.bonsplitController.setContainerFrame(
+        workspace.activeBonsplitController.setContainerFrame(
             CGRect(x: 0, y: 0, width: 1_000, height: 1_000)
         )
         return workspace.newTerminalSplit(

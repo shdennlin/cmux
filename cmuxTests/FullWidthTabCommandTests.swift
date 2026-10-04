@@ -18,10 +18,10 @@ struct FullWidthTabCommandTests {
 
         #expect(manager.toggleFocusedFullWidthTab())
         #expect(workspace.focusedPanelId == panelId)
-        #expect(workspace.bonsplitController.isFullWidthTabMode(inPane: paneId))
+        #expect(workspace.activeBonsplitController.isFullWidthTabMode(inPane: paneId))
 
         #expect(manager.toggleFocusedFullWidthTab())
         #expect(workspace.focusedPanelId == panelId)
-        #expect(!workspace.bonsplitController.isFullWidthTabMode(inPane: paneId))
+        #expect(!workspace.activeBonsplitController.isFullWidthTabMode(inPane: paneId))
     }
 }
