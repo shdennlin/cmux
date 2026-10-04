@@ -33,7 +33,7 @@ struct GhosttySplitDividerColorTests {
         defer { workspace.teardownAllPanels() }
         workspace.applyGhosttyChrome(from: config, reason: "test-split-divider-color")
 
-        let chromeColors = workspace.bonsplitController.configuration.appearance.chromeColors
+        let chromeColors = workspace.activeBonsplitController.configuration.appearance.chromeColors
         #expect(chromeColors.dividerHex == "#78A9FF")
     }
 

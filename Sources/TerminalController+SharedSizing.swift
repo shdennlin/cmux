@@ -314,7 +314,7 @@ extension TerminalController {
     private func terminalSizePanelAnchor(surfaceID: UUID) -> (view: NSView, rect: NSRect?)? {
         if let workspace = AppDelegate.shared?.workspaceContainingPanel(panelId: surfaceID)?.workspace,
            let tabID = workspace.surfaceIdFromPanelId(surfaceID),
-           let view = workspace.bonsplitController.popoverAnchorView(for: tabID) {
+           let view = workspace.activeBonsplitController.popoverAnchorView(for: tabID) {
             return (view, nil)
         }
         guard let surface = GhosttyApp.terminalSurfaceRegistry.terminalSurface(id: surfaceID),

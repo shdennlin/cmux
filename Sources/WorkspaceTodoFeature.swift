@@ -164,7 +164,7 @@ enum WorkspaceTodoActions {
     /// socket verb. Also enables the feature (opening the pane is using it).
     @discardableResult
     static func openTodoPane(for workspace: Workspace, focus: Bool = true) -> WorkspaceTodoPanel? {
-        guard let paneId = workspace.bonsplitController.focusedPaneId else {
+        guard let paneId = workspace.activeBonsplitController.focusedPaneId else {
             return nil
         }
         guard let panel = workspace.openOrFocusWorkspaceTodoSurface(inPane: paneId, focus: focus) else {

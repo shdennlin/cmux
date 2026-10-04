@@ -29,7 +29,7 @@ struct WorkspaceRemoteDirectoryProvenanceTests {
         #expect(workspace.presentedCurrentDirectory == remoteDirectory)
         #expect(workspace.trustedRemoteCurrentDirectory == remoteDirectory)
 
-        let paneId = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneId = try #require(workspace.activeBonsplitController.focusedPaneId)
         let localPanel = try #require(workspace.newTerminalSurface(
             inPane: paneId,
             focus: true,
@@ -82,7 +82,7 @@ struct WorkspaceRemoteDirectoryProvenanceTests {
         let remotePanelId = try #require(workspace.focusedPanelId)
         workspace.configureRemoteConnection(sshRemoteConfiguration(command: sshCommand), autoConnect: false)
         workspace.updateRemotePanelDirectory(panelId: remotePanelId, directory: remoteDirectory)
-        let paneId = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneId = try #require(workspace.activeBonsplitController.focusedPaneId)
         let agentPanel = try #require(workspace.newAgentSessionSurface(
             inPane: paneId,
             rendererKind: .react,
@@ -115,7 +115,7 @@ struct WorkspaceRemoteDirectoryProvenanceTests {
         let remotePanelId = try #require(workspace.focusedPanelId)
         workspace.configureRemoteConnection(sshRemoteConfiguration(command: sshCommand), autoConnect: false)
         workspace.updateRemotePanelDirectory(panelId: remotePanelId, directory: remoteDirectory)
-        let paneId = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneId = try #require(workspace.activeBonsplitController.focusedPaneId)
         let agentPanel = try #require(workspace.newAgentSessionSurface(
             inPane: paneId,
             rendererKind: .react,
@@ -169,7 +169,7 @@ struct WorkspaceRemoteDirectoryProvenanceTests {
         let remotePanelId = try #require(workspace.focusedPanelId)
         workspace.configureRemoteConnection(sshRemoteConfiguration(command: sshCommand), autoConnect: false)
         workspace.updateRemotePanelDirectory(panelId: remotePanelId, directory: remoteDirectory)
-        let paneId = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneId = try #require(workspace.activeBonsplitController.focusedPaneId)
         let agentPanel = try #require(workspace.newAgentSessionSurface(
             inPane: paneId,
             rendererKind: .react,
@@ -247,7 +247,7 @@ struct WorkspaceRemoteDirectoryProvenanceTests {
         let remotePanelId = try #require(workspace.focusedPanelId)
         workspace.configureRemoteConnection(sshRemoteConfiguration(command: sshCommand), autoConnect: false)
         workspace.updateRemotePanelDirectory(panelId: remotePanelId, directory: remoteDirectory)
-        let paneId = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneId = try #require(workspace.activeBonsplitController.focusedPaneId)
         let localPanel = try #require(workspace.newTerminalSurface(
             inPane: paneId,
             focus: true,
@@ -280,7 +280,7 @@ struct WorkspaceRemoteDirectoryProvenanceTests {
         let remotePanelId = try #require(workspace.focusedPanelId)
         workspace.configureRemoteConnection(sshRemoteConfiguration(command: sshCommand), autoConnect: false)
         workspace.updateRemotePanelDirectory(panelId: remotePanelId, directory: remoteDirectory)
-        let paneId = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneId = try #require(workspace.activeBonsplitController.focusedPaneId)
         let agentPanel = try #require(workspace.newAgentSessionSurface(
             inPane: paneId,
             rendererKind: .react,
@@ -309,7 +309,7 @@ struct WorkspaceRemoteDirectoryProvenanceTests {
         let remotePanelId = try #require(workspace.focusedPanelId)
         workspace.configureRemoteConnection(sshRemoteConfiguration(command: sshCommand), autoConnect: false)
         workspace.updateRemotePanelDirectory(panelId: remotePanelId, directory: remoteDirectory)
-        let paneId = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneId = try #require(workspace.activeBonsplitController.focusedPaneId)
         let localPanel = try #require(workspace.newTerminalSurface(
             inPane: paneId,
             focus: false,
@@ -344,7 +344,7 @@ struct WorkspaceRemoteDirectoryProvenanceTests {
         let remotePanelId = try #require(workspace.focusedPanelId)
         workspace.configureRemoteConnection(sshRemoteConfiguration(command: sshCommand), autoConnect: false)
         workspace.updateRemotePanelDirectory(panelId: remotePanelId, directory: remoteProjectDirectory)
-        let paneId = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneId = try #require(workspace.activeBonsplitController.focusedPaneId)
         let localPanel = try #require(workspace.newTerminalSurface(
             inPane: paneId,
             focus: false,
@@ -377,7 +377,7 @@ struct WorkspaceRemoteDirectoryProvenanceTests {
         let remotePanelId = try #require(workspace.focusedPanelId)
         workspace.configureRemoteConnection(sshRemoteConfiguration(command: sshCommand), autoConnect: false)
         manager.updateReportedSurfaceDirectory(tabId: workspace.id, surfaceId: remotePanelId, directory: remoteDirectory)
-        let paneId = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneId = try #require(workspace.activeBonsplitController.focusedPaneId)
         let localPanel = try #require(workspace.newTerminalSurface(
             inPane: paneId,
             focus: true,
@@ -407,7 +407,7 @@ struct WorkspaceRemoteDirectoryProvenanceTests {
         let remotePanelId = try #require(workspace.focusedPanelId)
         workspace.configureRemoteConnection(sshRemoteConfiguration(command: sshCommand), autoConnect: false)
         manager.updateReportedSurfaceDirectory(tabId: workspace.id, surfaceId: remotePanelId, directory: remoteDirectory)
-        let paneId = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneId = try #require(workspace.activeBonsplitController.focusedPaneId)
         let agentPanel = try #require(workspace.newAgentSessionSurface(
             inPane: paneId,
             rendererKind: .react,
@@ -435,7 +435,7 @@ struct WorkspaceRemoteDirectoryProvenanceTests {
         )
         let workspace = try #require(manager.selectedWorkspace)
         workspace.configureRemoteConnection(sshRemoteConfiguration(command: sshCommand), autoConnect: false)
-        let paneId = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneId = try #require(workspace.activeBonsplitController.focusedPaneId)
         let agentPanel = try #require(workspace.newAgentSessionSurface(
             inPane: paneId,
             rendererKind: .react,
@@ -462,7 +462,7 @@ struct WorkspaceRemoteDirectoryProvenanceTests {
         let sshCommand = "ssh seepine@192.168.5.20"
         let workspace = Workspace(workingDirectory: localDirectory, initialTerminalCommand: sshCommand)
         workspace.configureRemoteConnection(sshRemoteConfiguration(command: sshCommand), autoConnect: false)
-        let paneId = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneId = try #require(workspace.activeBonsplitController.focusedPaneId)
         let agentPanel = try #require(workspace.newAgentSessionSurface(
             inPane: paneId,
             rendererKind: .react,

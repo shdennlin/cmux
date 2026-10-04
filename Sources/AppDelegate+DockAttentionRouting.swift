@@ -124,7 +124,7 @@ extension AppDelegate {
             workspace.focusPanel(target.surfaceID)
         }
         if requiresSplit,
-           workspace.bonsplitController.allPaneIds.count <= 1,
+           workspace.activeBonsplitController.allPaneIds.count <= 1,
            workspace.panels.count <= 1 {
             return true
         }

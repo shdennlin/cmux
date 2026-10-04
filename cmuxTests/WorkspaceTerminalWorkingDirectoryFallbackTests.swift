@@ -68,7 +68,7 @@ import Testing
     @Test func newTerminalSurfaceFallsBackToRequestedWorkingDirectoryWhenReportedDirectoryIsStale() throws {
         let workspace = Workspace()
         let sourcePaneId = try #require(
-            workspace.bonsplitController.focusedPaneId,
+            workspace.activeBonsplitController.focusedPaneId,
             "Expected focused pane in new workspace"
         )
 

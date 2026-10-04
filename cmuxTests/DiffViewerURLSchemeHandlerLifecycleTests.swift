@@ -326,7 +326,7 @@ struct DiffViewerURLSchemeHandlerLifecycleTests {
             }
 
             let workspace = try #require(manager.tabs.first)
-            let paneID = try #require(workspace.bonsplitController.allPaneIds.first)
+            let paneID = try #require(workspace.activeBonsplitController.allPaneIds.first)
             let browserPanel = try #require(workspace.newBrowserSurface(
                 inPane: paneID,
                 focus: true,

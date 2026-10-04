@@ -100,7 +100,7 @@ import Testing
     @Test func panelProvenanceMirrorsWorkspaceRules() throws {
         let manager = TabManager()
         let workspace = try #require(manager.selectedWorkspace)
-        let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+        let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let panelId = try #require(workspace.newTerminalSurface(inPane: pane, focus: true)?.id)
 
         #expect(workspace.setPanelCustomTitle(panelId: panelId, title: "Fix auth bug", source: .auto))
@@ -124,7 +124,7 @@ import Testing
     @Test func panelAutoWriteRejectedForCarriedTitleWithoutProvenance() throws {
         let manager = TabManager()
         let workspace = try #require(manager.selectedWorkspace)
-        let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+        let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let panelId = try #require(workspace.newTerminalSurface(inPane: pane, focus: true)?.id)
 
         // Simulate a carried title (move/respawn flows write the dictionary
@@ -137,7 +137,7 @@ import Testing
     @Test func cloudTerminalClearWithoutLocalOverrideIsAcceptedForWriteThrough() async throws {
         let manager = TabManager()
         let workspace = try #require(manager.selectedWorkspace)
-        let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+        let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let panelId = try #require(workspace.newTerminalSurface(inPane: pane, focus: true)?.id)
         let machine = SurfaceMachineID.cloud("title-clear-\(UUID().uuidString)")
         let remoteWorkspace = SurfaceRemoteWorkspace(

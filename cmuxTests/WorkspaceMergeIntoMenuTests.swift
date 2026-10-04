@@ -67,9 +67,9 @@ struct WorkspaceMergeIntoMenuTests {
         let firstPanel = try XCTUnwrap(target.focusedTerminalPanel?.id)
         let splitPanel = try XCTUnwrap(target.newTerminalSplit(from: firstPanel, orientation: .horizontal, focus: false))
         let focusedPane = try XCTUnwrap(target.paneId(forPanelId: splitPanel.id))
-        target.bonsplitController.focusPane(focusedPane)
+        target.activeBonsplitController.focusPane(focusedPane)
         let source = fixture.manager.addWorkspace(title: "Build", select: false)
-        let sourcePane = try XCTUnwrap(source.bonsplitController.allPaneIds.first)
+        let sourcePane = try XCTUnwrap(source.activeBonsplitController.allPaneIds.first)
         _ = try XCTUnwrap(source.newTerminalSurface(inPane: sourcePane, focus: false))
         let sourceOrder = source.sidebarOrderedPanelIds()
         #expect(sourceOrder.count == 2)
@@ -80,7 +80,7 @@ struct WorkspaceMergeIntoMenuTests {
         #expect(sourceOrder.allSatisfy { target.paneId(forPanelId: $0) == focusedPane }, "every tab lands in the focused pane")
         let order = ([splitPanel.id] + sourceOrder).map { target.indexInPane(forPanelId: $0) }
         #expect(order == [0, 1, 2], "after the pane's own tab, in the source's order")
-        #expect(target.bonsplitController.allPaneIds.count == 2, "no new split")
+        #expect(target.activeBonsplitController.allPaneIds.count == 2, "no new split")
     }
 
     @Test

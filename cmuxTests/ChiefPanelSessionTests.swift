@@ -46,7 +46,7 @@ import Testing
     @Test func droppingAChiefConversationCreatesOnePaneAndReusesIt() throws {
         let workspace = Workspace()
         defer { for panel in workspace.panels.values { panel.close() } }
-        let pane = try #require(workspace.bonsplitController.focusedPaneId)
+        let pane = try #require(workspace.activeBonsplitController.focusedPaneId)
         let conversation = ConversationID("conv_drop_test")
         #expect(workspace.performChiefConversationDrop(
             conversation,
@@ -64,7 +64,7 @@ import Testing
     @Test func chiefPaneRestoresItsConversation() throws {
         let workspace = Workspace()
         defer { for panel in workspace.panels.values { panel.close() } }
-        let paneId = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneId = try #require(workspace.activeBonsplitController.focusedPaneId)
         let chief = try #require(
             workspace.newChiefSurface(inPane: paneId, conversationID: ConversationID("conv_chief_test"), focus: false)
         )
@@ -82,18 +82,18 @@ import Testing
         #expect(restoredPanel.conversationID == ConversationID("conv_chief_test"))
         #expect(!restoredPanel.isHome)
         let restoredSurfaceId = try #require(restored.surfaceIdFromPanelId(restoredId))
-        #expect(restored.bonsplitController.tab(restoredSurfaceId)?.kind == SurfaceKind.chief.rawValue)
+        #expect(restored.activeBonsplitController.tab(restoredSurfaceId)?.kind == SurfaceKind.chief.rawValue)
     }
 
     @Test func canonicalHomeIsPinnedAndRestoresAsTheWorkspaceAnchor() throws {
         let workspace = Workspace()
         defer { for panel in workspace.panels.values { panel.close() } }
-        let paneId = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneId = try #require(workspace.activeBonsplitController.focusedPaneId)
         let home = try #require(workspace.newChiefSurface(inPane: paneId, isHome: true, focus: false))
         let tabId = try #require(workspace.surfaceIdFromPanelId(home.id))
         #expect(home.isHome)
         #expect(workspace.isChiefHome)
-        #expect(workspace.bonsplitController.tab(tabId)?.isPinned == true)
+        #expect(workspace.activeBonsplitController.tab(tabId)?.isPinned == true)
         #expect(!workspace.closePanel(home.id, force: true))
 
         let saved = try JSONDecoder().decode(
@@ -108,13 +108,13 @@ import Testing
         #expect(restoredHome.isHome)
         #expect(restored.isChiefHome)
         let restoredTab = try #require(restored.surfaceIdFromPanelId(restoredID))
-        #expect(restored.bonsplitController.tab(restoredTab)?.isPinned == true)
+        #expect(restored.activeBonsplitController.tab(restoredTab)?.isPinned == true)
     }
 
     @Test func movingCanonicalHomeWithinAWorkspaceCreatesAnOrdinaryCopy() throws {
         let workspace = Workspace()
         defer { for panel in workspace.panels.values { panel.close() } }
-        let paneId = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneId = try #require(workspace.activeBonsplitController.focusedPaneId)
         let home = try #require(workspace.newChiefSurface(inPane: paneId, isHome: true, focus: false))
         #expect(workspace.moveSurface(panelId: home.id, toPane: paneId, focus: false))
         let chiefs = workspace.panels.values.compactMap { $0 as? ChiefPanel }
@@ -126,7 +126,7 @@ import Testing
     @Test func openOrFocusReusesTheChiefPaneForTheSameConversation() throws {
         let workspace = Workspace()
         defer { for panel in workspace.panels.values { panel.close() } }
-        let paneId = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneId = try #require(workspace.activeBonsplitController.focusedPaneId)
         let first = try #require(workspace.openOrFocusChiefSurface(inPane: paneId, focus: false))
         let second = try #require(workspace.openOrFocusChiefSurface(inPane: paneId, focus: false))
         #expect(first === second)

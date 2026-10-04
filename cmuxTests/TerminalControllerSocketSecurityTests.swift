@@ -1903,7 +1903,7 @@ final class TerminalControllerSocketSecurityTests {
 
         let manager = TabManager()
         let workspace = try XCTUnwrap(manager.selectedWorkspace)
-        let pane = try XCTUnwrap(workspace.bonsplitController.allPaneIds.first)
+        let pane = try XCTUnwrap(workspace.activeBonsplitController.allPaneIds.first)
         let terminalPanel = try XCTUnwrap(workspace.newTerminalSurface(inPane: pane, focus: true))
         workspace.setPanelCustomTitle(panelId: terminalPanel.id, title: "Socket Terminal")
         let browserPanel = try XCTUnwrap(workspace.newBrowserSurface(
@@ -1976,7 +1976,7 @@ final class TerminalControllerSocketSecurityTests {
         }
 
         let workspace = try XCTUnwrap(manager.selectedWorkspace)
-        let pane = try XCTUnwrap(workspace.bonsplitController.allPaneIds.first)
+        let pane = try XCTUnwrap(workspace.activeBonsplitController.allPaneIds.first)
         let browserPanel = try XCTUnwrap(workspace.newBrowserSurface(
             inPane: pane,
             focus: true,
@@ -2039,7 +2039,7 @@ final class TerminalControllerSocketSecurityTests {
         }
 
         let workspace = try XCTUnwrap(manager.selectedWorkspace)
-        let pane = try XCTUnwrap(workspace.bonsplitController.allPaneIds.first)
+        let pane = try XCTUnwrap(workspace.activeBonsplitController.allPaneIds.first)
         let focusedBrowser = try XCTUnwrap(workspace.newBrowserSurface(
             inPane: pane,
             focus: true,
@@ -2089,7 +2089,7 @@ final class TerminalControllerSocketSecurityTests {
 
         let manager = TabManager()
         let workspace = try XCTUnwrap(manager.selectedWorkspace)
-        let pane = try XCTUnwrap(workspace.bonsplitController.allPaneIds.first)
+        let pane = try XCTUnwrap(workspace.activeBonsplitController.allPaneIds.first)
         let panel = try XCTUnwrap(workspace.newTerminalSurface(inPane: pane, focus: true))
         workspace.setPanelCustomTitle(panelId: panel.id, title: "Legacy Socket Terminal")
         TerminalController.shared.setActiveTabManager(manager)
@@ -2199,7 +2199,7 @@ final class TerminalControllerSocketSecurityTests {
         destination.configureRemoteConnection(config, autoConnect: false)
 
         let sourcePanelID = try XCTUnwrap(source.focusedTerminalPanel?.id)
-        let destinationPaneID = try XCTUnwrap(destination.bonsplitController.allPaneIds.first)
+        let destinationPaneID = try XCTUnwrap(destination.activeBonsplitController.allPaneIds.first)
         let sessionID = "moved-surface-session"
         let panel = try XCTUnwrap(
             source.newTerminalSplit(

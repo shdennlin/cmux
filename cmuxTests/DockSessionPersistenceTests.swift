@@ -932,7 +932,7 @@ struct DockSessionPersistenceTests {
             restorableAgentIndexProvider: { .empty }
         )
         defer { destination.teardownAllPanels() }
-        let destinationPaneID = try #require(destination.bonsplitController.allPaneIds.first)
+        let destinationPaneID = try #require(destination.activeBonsplitController.allPaneIds.first)
         #expect(
             destination.attachDetachedSurface(
                 detached,

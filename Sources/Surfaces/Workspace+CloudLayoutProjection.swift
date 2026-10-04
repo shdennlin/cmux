@@ -44,10 +44,10 @@ extension Workspace {
         guard expectedPlacements.isSubset(of: Set(layout.placements)) else { return }
         guard layout.placements.allSatisfy({ tabs[$0] != nil }) else { return }
         guard let sessionLayout = sessionLayout(for: layout, panelIDs: panelIDs) else { return }
-        if cloudLayoutMatches(layout, live: bonsplitController.treeSnapshot(), tabs: tabs) {
+        if cloudLayoutMatches(layout, live: activeBonsplitController.treeSnapshot(), tabs: tabs) {
             // External ratios suppress Bonsplit's geometry callback. Reconcile
             // AppKit and Ghostty even when the terminal membership is unchanged.
-            if applyCloudDividerRatios(layout, live: bonsplitController.treeSnapshot()) {
+            if applyCloudDividerRatios(layout, live: activeBonsplitController.treeSnapshot()) {
                 scheduleTerminalGeometryReconcile()
             }
             recordCloudLayoutBaseline(projections)
@@ -56,10 +56,10 @@ extension Workspace {
         // Selecting a tab also focuses its pane. Without a focused panel, the focused
         // pane's visible tab is what the user was looking at and must end focused.
         let focused = focusedPanelId.flatMap { surfaceIdFromPanelId($0) }
-            ?? bonsplitController.focusedPaneId.flatMap { bonsplitController.selectedTab(inPane: $0)?.id }
+            ?? activeBonsplitController.focusedPaneId.flatMap { activeBonsplitController.selectedTab(inPane: $0)?.id }
         // The codec regroups tabs by moving them, which changes each pane's selection.
         // Every pane keeps the tab the user was looking at, not only the focused one.
-        let selected = Set(bonsplitController.allPaneIds.compactMap { bonsplitController.selectedTab(inPane: $0)?.id })
+        let selected = Set(activeBonsplitController.allPaneIds.compactMap { activeBonsplitController.selectedTab(inPane: $0)?.id })
         // The existing remote-projection transaction preserves window/workspace
         // focus and suppresses activation while tabs move. It is shared with SSH.
         performRemoteTmuxMirrorMutation {
@@ -67,17 +67,17 @@ extension Workspace {
                 let wasProgrammatic = isProgrammaticSplit
                 isProgrammaticSplit = true
                 defer { isProgrammaticSplit = wasProgrammatic }
-                _ = SessionSplitContainerLayoutCodec(controller: bonsplitController).restoreExistingLayout(
+                _ = SessionSplitContainerLayoutCodec(controller: activeBonsplitController).restoreExistingLayout(
                     sessionLayout,
                     panelIDMap: [:],
                     tabIDForPanelID: surfaceIdFromPanelId
                 )
-                for pane in bonsplitController.allPaneIds {
-                    if let tab = bonsplitController.tabs(inPane: pane).first(where: { selected.contains($0.id) }) {
-                        bonsplitController.selectTab(tab.id)
+                for pane in activeBonsplitController.allPaneIds {
+                    if let tab = activeBonsplitController.tabs(inPane: pane).first(where: { selected.contains($0.id) }) {
+                        activeBonsplitController.selectTab(tab.id)
                     }
                 }
-                if let focused, bonsplitController.tab(focused) != nil { bonsplitController.selectTab(focused) }
+                if let focused, activeBonsplitController.tab(focused) != nil { activeBonsplitController.selectTab(focused) }
             }
         }
         recordCloudLayoutBaseline(projections)
@@ -103,7 +103,7 @@ extension Workspace {
             let fullWidth = placements.first
                 .flatMap { panelIDs[$0] }
                 .flatMap { paneId(forPanelId: $0) }
-                .map { bonsplitController.isFullWidthTabMode(inPane: $0) }
+                .map { activeBonsplitController.isFullWidthTabMode(inPane: $0) }
             return .pane(SessionPaneLayoutSnapshot(
                 panelIds: ids,
                 selectedPanelId: nil,
@@ -139,7 +139,7 @@ extension Workspace {
         guard case .split(_, let ratio, let first, let second) = layout, case .split(let split) = live else { return false }
         var changed = false
         if let id = UUID(uuidString: split.id), abs(split.dividerPosition - ratio) > 0.0001 {
-            changed = bonsplitController.setDividerPosition(CGFloat(ratio), forSplit: id, fromExternal: true)
+            changed = activeBonsplitController.setDividerPosition(CGFloat(ratio), forSplit: id, fromExternal: true)
         }
         let firstChanged = applyCloudDividerRatios(first, live: split.first)
         let secondChanged = applyCloudDividerRatios(second, live: split.second)

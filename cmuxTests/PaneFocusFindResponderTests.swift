@@ -427,7 +427,7 @@ struct FilePreviewTextFindRoutingTests {
         let manager = TabManager()
         let workspace = manager.addWorkspace(select: true, eagerLoadTerminal: false)
         defer { workspace.teardownAllPanels() }
-        let firstPane = try #require(workspace.bonsplitController.allPaneIds.first)
+        let firstPane = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let panel = try #require(workspace.newFilePreviewSurface(
             inPane: firstPane,
             filePath: fileURL.path,
@@ -481,7 +481,7 @@ struct FilePreviewTextFindRoutingTests {
         let manager = TabManager()
         let workspace = manager.addWorkspace(select: true, eagerLoadTerminal: false)
         defer { workspace.teardownAllPanels() }
-        let firstPane = try #require(workspace.bonsplitController.allPaneIds.first)
+        let firstPane = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let panel = try #require(workspace.newFilePreviewSurface(
             inPane: firstPane,
             filePath: fileURL.path,
@@ -522,7 +522,7 @@ struct FilePreviewTextFindRoutingTests {
         let manager = TabManager()
         let workspace = manager.addWorkspace(select: true, eagerLoadTerminal: false)
         defer { workspace.teardownAllPanels() }
-        let firstPane = try #require(workspace.bonsplitController.allPaneIds.first)
+        let firstPane = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let panel = try #require(workspace.newFilePreviewSurface(
             inPane: firstPane,
             filePath: fileURL.path,

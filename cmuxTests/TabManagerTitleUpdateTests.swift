@@ -259,7 +259,7 @@ struct TabManagerTitleUpdateTests {
         )
         let workspace = try #require(manager.selectedWorkspace)
         let removedPanelId = try #require(workspace.focusedPanelId)
-        let paneId = try #require(workspace.bonsplitController.allPaneIds.first)
+        let paneId = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let remainingPanel = try #require(workspace.newTerminalSurface(inPane: paneId, focus: true))
         let remainingTitle = try #require(workspace.panelTitles[remainingPanel.id])
 

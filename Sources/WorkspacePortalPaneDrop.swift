@@ -11,16 +11,16 @@ extension Workspace {
     ) -> DropZone {
         let sourcePane = PaneID(id: sourcePaneId)
         guard sourcePane != paneId,
-              bonsplitController.tab(TabID(uuid: tabId))?.kind == SurfaceKind.terminal.rawValue else {
+              activeBonsplitController.tab(TabID(uuid: tabId))?.kind == SurfaceKind.terminal.rawValue else {
             return proposedZone
         }
 
         if proposedZone == .left,
-           bonsplitController.adjacentPane(to: sourcePane, direction: .right) == paneId {
+           activeBonsplitController.adjacentPane(to: sourcePane, direction: .right) == paneId {
             return .center
         }
         if proposedZone == .right,
-           bonsplitController.adjacentPane(to: sourcePane, direction: .left) == paneId {
+           activeBonsplitController.adjacentPane(to: sourcePane, direction: .left) == paneId {
             return .center
         }
         return proposedZone

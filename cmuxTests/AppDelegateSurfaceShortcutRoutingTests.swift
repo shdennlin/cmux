@@ -391,7 +391,7 @@ struct AppDelegateSurfaceShortcutRoutingTests {
             let viewport = CanvasViewportSpy()
             workspace.canvasModel.viewport = viewport
             #expect(workspace.layoutMode == .canvas)
-            #expect(!workspace.bonsplitController.isSplitZoomed)
+            #expect(!workspace.activeBonsplitController.isSplitZoomed)
             #expect(KeyboardShortcutSettings.shortcut(for: .toggleSplitZoom).matches(event: event))
 
 #if DEBUG
@@ -400,7 +400,7 @@ struct AppDelegateSurfaceShortcutRoutingTests {
             Issue.record("debugHandleCustomShortcut is only available in DEBUG")
 #endif
             #expect(
-                !workspace.bonsplitController.isSplitZoomed,
+                !workspace.activeBonsplitController.isSplitZoomed,
                 "In canvas mode, the split-zoom shortcut should drive canvas overview instead of Bonsplit zoom"
             )
             #expect(viewport.overviewToggleCount == 1)
@@ -427,7 +427,7 @@ struct AppDelegateSurfaceShortcutRoutingTests {
 
             window.makeKeyAndOrderFront(nil)
             workspace.setLayoutMode(.canvas)
-            let originalBonsplitPaneCount = workspace.bonsplitController.allPaneIds.count
+            let originalBonsplitPaneCount = workspace.activeBonsplitController.allPaneIds.count
             let originalPanelIds = Set(workspace.panels.keys)
             let originalFrame = try #require(workspace.canvasModel.frame(of: focusedPanelId))
 
@@ -440,7 +440,7 @@ struct AppDelegateSurfaceShortcutRoutingTests {
             let newPanelIds = Set(workspace.panels.keys).subtracting(originalPanelIds)
             #expect(newPanelIds.count == 1)
             #expect(
-                workspace.bonsplitController.allPaneIds.count == originalBonsplitPaneCount,
+                workspace.activeBonsplitController.allPaneIds.count == originalBonsplitPaneCount,
                 "Canvas split shortcuts should create visible canvas panes without splitting the hidden Bonsplit tree"
             )
             #expect(workspace.canvasModel.persistablePanes.count == 2)
@@ -571,7 +571,7 @@ struct AppDelegateSurfaceShortcutRoutingTests {
             window.makeKeyAndOrderFront(nil)
             workspace.setLayoutMode(.canvas)
             let secondPanelId = try #require(workspace.openNewCanvasPane(type: .terminal, focus: true))
-            let originalBonsplitPaneCount = workspace.bonsplitController.allPaneIds.count
+            let originalBonsplitPaneCount = workspace.activeBonsplitController.allPaneIds.count
             workspace.canvasModel.setFrame(CGRect(x: 0, y: 0, width: 640, height: 420), for: firstPanelId)
             workspace.canvasModel.setFrame(CGRect(x: 720, y: 0, width: 320, height: 260), for: secondPanelId)
 
@@ -585,7 +585,7 @@ struct AppDelegateSurfaceShortcutRoutingTests {
             let secondFrame = try #require(workspace.canvasModel.frame(of: secondPanelId))
             #expect(firstFrame.width == secondFrame.width)
             #expect(firstFrame.height == secondFrame.height)
-            #expect(workspace.bonsplitController.allPaneIds.count == originalBonsplitPaneCount)
+            #expect(workspace.activeBonsplitController.allPaneIds.count == originalBonsplitPaneCount)
         }
     }
 

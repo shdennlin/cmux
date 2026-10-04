@@ -171,9 +171,9 @@ import Testing
         defer { harness.tearDown() }
 
         let anchorPanelId = try harness.makeAdditionalTerminalPanel()
-        var configuration = harness.workspace.bonsplitController.configuration
+        var configuration = harness.workspace.activeBonsplitController.configuration
         configuration.newTabPosition = .end
-        harness.workspace.bonsplitController.configuration = configuration
+        harness.workspace.activeBonsplitController.configuration = configuration
 
         #expect(
             harness.workspace.remoteTmuxNewTabPlacement(
@@ -187,9 +187,9 @@ import Testing
         let harness = try Harness()
         defer { harness.tearDown() }
 
-        var configuration = harness.workspace.bonsplitController.configuration
+        var configuration = harness.workspace.activeBonsplitController.configuration
         configuration.newTabPosition = .current
-        harness.workspace.bonsplitController.configuration = configuration
+        harness.workspace.activeBonsplitController.configuration = configuration
 
         #expect(
             harness.workspace.remoteTmuxNewTabPlacement(
@@ -203,9 +203,9 @@ import Testing
         let harness = try Harness()
         defer { harness.tearDown() }
 
-        var configuration = harness.workspace.bonsplitController.configuration
+        var configuration = harness.workspace.activeBonsplitController.configuration
         configuration.newTabPosition = .end
-        harness.workspace.bonsplitController.configuration = configuration
+        harness.workspace.activeBonsplitController.configuration = configuration
 
         #expect(
             harness.workspace.remoteTmuxNewTabPlacement(

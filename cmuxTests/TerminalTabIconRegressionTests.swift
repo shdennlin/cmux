@@ -76,7 +76,7 @@ struct TerminalTabIconRegressionTests {
         #expect(workspace.restoredAgentResumeStatesByPanelId[panel.id] == .autoResumeCommandRunning)
         // The resumed agent marks the tab, so the check below cannot pass
         // just because no mark was ever applied.
-        let runningTab = try #require(workspace.bonsplitController.tab(tabId))
+        let runningTab = try #require(workspace.activeBonsplitController.tab(tabId))
         #expect(runningTab.iconAsset == "AgentIcons/Codex")
 
         // The agent quits and the shell prompt returns.
@@ -114,7 +114,7 @@ struct TerminalTabIconRegressionTests {
         panel: TerminalPanel,
         tabId: TabID
     ) throws {
-        let tab = try #require(workspace.bonsplitController.tab(tabId))
+        let tab = try #require(workspace.activeBonsplitController.tab(tabId))
         #expect(tab.iconAsset == nil)
         #expect(tab.iconImageData == nil)
         #expect(tab.icon == panel.displayIcon)

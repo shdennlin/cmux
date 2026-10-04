@@ -105,7 +105,7 @@ extension Workspace {
         if shouldFocus {
             focusPanel(panelId)
         }
-        let isSplit = bonsplitController.allPaneIds.count > 1 || panels.count > 1
+        let isSplit = activeBonsplitController.allPaneIds.count > 1 || panels.count > 1
         if requiresSplit && !isSplit {
             return
         }

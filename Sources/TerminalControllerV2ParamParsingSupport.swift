@@ -124,7 +124,7 @@ extension TerminalController {
         for item in windows {
             guard let tm = app.tabManagerFor(windowId: item.windowId) else { continue }
             for ws in tm.tabs {
-                if let paneId = ws.bonsplitController.allPaneIds.first(where: { $0.id == paneUUID }) {
+                if let paneId = ws.activeBonsplitController.allPaneIds.first(where: { $0.id == paneUUID }) {
                     return (item.windowId, tm, ws, paneId)
                 }
             }

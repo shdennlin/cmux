@@ -446,7 +446,7 @@ struct DockPaneDropUnfocusedRoutingTests {
             }
 
             let workspace = try #require(manager.tabs.first)
-            let sourcePane = try #require(workspace.bonsplitController.focusedPaneId ?? workspace.bonsplitController.allPaneIds.first)
+            let sourcePane = try #require(workspace.activeBonsplitController.focusedPaneId ?? workspace.activeBonsplitController.allPaneIds.first)
             let sourcePanel = try #require(workspace.newTerminalSurface(inPane: sourcePane, focus: true))
             let sourceTabId = try #require(workspace.surfaceIdFromPanelId(sourcePanel.id))
             let dock = workspace.requiredDockSplitForTesting

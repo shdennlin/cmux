@@ -39,7 +39,7 @@ struct CloudTerminalDragSplitRoutingTests {
             #expect(workspace.focusedPanelId == source)
             #expect(workspace.paneId(forPanelId: source) != sourcePane)
             #expect(workspace.paneId(forPanelId: replacement) == sourcePane)
-            #expect(workspace.bonsplitController.tabs(inPane: sourcePane).count == 1)
+            #expect(workspace.activeBonsplitController.tabs(inPane: sourcePane).count == 1)
             #expect(workspace.cloudPendingCreations[replacement]?.machine == provider.machine)
             #expect(workspace.cloudPendingCreations[replacement]?.remoteWorkspaceID == provider.remote.id)
             #expect(workspace.machineOwningSurface(replacement) == provider.machine)
@@ -88,7 +88,7 @@ struct CloudTerminalDragSplitRoutingTests {
             let before = Set(workspace.panels.keys)
             try drag(source, in: workspace, direction: "down")
             #expect(Set(workspace.panels.keys) == before)
-            #expect(workspace.bonsplitController.allPaneIds.count == 1)
+            #expect(workspace.activeBonsplitController.allPaneIds.count == 1)
             #expect(workspace.cloudPaneCreationFailureStore.failure?.machine == machine)
             #expect(workspace.cloudPaneCreationFailureStore.failure?.sourcePanelID == source)
             #expect(workspace.focusedPanelId == source)
@@ -169,7 +169,7 @@ struct CloudTerminalDragSplitRoutingTests {
         try await AppContextSerialGate.withExclusiveAppContext {
             let app = try VaultPaneAppFixture()
             let workspace = app.workspace
-            let pane = try #require(workspace.bonsplitController.focusedPaneId)
+            let pane = try #require(workspace.activeBonsplitController.focusedPaneId)
             _ = try #require(workspace.newTerminalSurface(inPane: pane, focus: false))
             let provider = CloudTerminalPlacementTestProvider()
             let source = try installSource(in: workspace, provider: provider)
@@ -177,7 +177,7 @@ struct CloudTerminalDragSplitRoutingTests {
             let before = Set(workspace.panels.keys)
             try drag(source, in: workspace, direction: "left")
             #expect(Set(workspace.panels.keys) == before)
-            #expect(workspace.bonsplitController.allPaneIds.count == 2)
+            #expect(workspace.activeBonsplitController.allPaneIds.count == 2)
             #expect(workspace.cloudPendingCreations.isEmpty)
             #expect(provider.requestedWorkspaces.isEmpty)
         }
@@ -230,7 +230,7 @@ struct CloudTerminalDragSplitRoutingTests {
             let zone: DropZone = horizontal ? (first ? .left : .right) : (first ? .top : .bottom)
             #expect(workspace.performPortalSurfaceDrop(tabId: tab.uuid, sourcePaneId: pane.id, targetPane: pane, zone: zone))
         } else {
-            _ = try #require(workspace.bonsplitController.splitPane(
+            _ = try #require(workspace.activeBonsplitController.splitPane(
                 pane, orientation: horizontal ? .horizontal : .vertical, movingTab: tab, insertFirst: first
             ))
         }

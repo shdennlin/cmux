@@ -70,7 +70,7 @@ final class CloudNameAuthorityFixture {
     func expectParity(_ name: String, workspaceName: String? = nil,
                       sidebarName: String? = nil, sidebarWorkspaceName: String? = nil) throws {
         let native = try #require(workspace.surfaceIdFromPanelId(panelID))
-        #expect(workspace.bonsplitController.tab(native)?.title == name)
+        #expect(workspace.activeBonsplitController.tab(native)?.title == name)
         let nodes = CloudTreeNodeBuilder.flattened(CloudTreeNodeBuilder.nodes(
             machines: [], snapshot: catalog.snapshot, localWorkspaces: [], includeLocalMachine: false
         ))

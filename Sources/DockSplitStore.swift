@@ -1272,6 +1272,10 @@ final class DockSplitStore: BonsplitDelegate, FilePreviewTabMetadataHost {
         surfaceId(forPanelId: panelId)
     }
 
+    func filePreviewTabController(forPanelId panelId: UUID) -> BonsplitController? {
+        bonsplitController
+    }
+
     /// Preserves a Dock custom title while accepting panel-owned metadata.
     func filePreviewTabTitlePresentation(
         for metadata: FilePreviewTabMetadata,

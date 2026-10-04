@@ -169,7 +169,7 @@ struct ChiefHomeNavigation {
             initialTerminalStartsOnFirstVisit: true,
             autoWelcomeIfNeeded: false,
             autoRefreshMetadata: false
-        ), let pane = workspace.bonsplitController.focusedPaneId else { return nil }
+        ), let pane = workspace.activeBonsplitController.focusedPaneId else { return nil }
         let scaffold = Array(workspace.panels.keys)
         guard workspace.newChiefSurface(
             inPane: pane, conversationID: conversationID, isHome: isHome, focus: false

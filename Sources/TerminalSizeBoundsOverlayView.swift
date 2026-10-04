@@ -20,7 +20,7 @@ enum TerminalSizingChromeColor {
     /// and the split divider color of the workspace that shows `surface`,
     /// resolved in `appearance`.
     static func panePalette(for surface: TerminalSurface?, appearance: NSAppearance) -> BonsplitSizingChromePalette {
-        let divider = surface?.owningWorkspace()?.bonsplitController.configuration.appearance.splitDividerColor
+        let divider = surface?.owningWorkspace()?.activeBonsplitController.configuration.appearance.splitDividerColor
             ?? NSColor.separatorColor
         var palette: BonsplitSizingChromePalette?
         appearance.performAsCurrentDrawingAppearance {

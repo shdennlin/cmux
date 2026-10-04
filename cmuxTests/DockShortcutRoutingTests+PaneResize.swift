@@ -33,7 +33,7 @@ extension DockShortcutRoutingTests {
                 ))
                 let controller = harness.dock.bonsplitController
                 controller.setContainerFrame(CGRect(x: 0, y: 0, width: 1000, height: 500))
-                let mainBefore = harness.mainWorkspace.bonsplitController.treeSnapshot()
+                let mainBefore = harness.mainWorkspace.activeBonsplitController.treeSnapshot()
                 let split = try #require(Self.splitNodes(in: controller.treeSnapshot()).first)
                 let splitId = try #require(UUID(uuidString: split.id))
                 #expect(controller.setDividerPosition(0.5, forSplit: splitId))
@@ -42,7 +42,7 @@ extension DockShortcutRoutingTests {
                     #expect(Self.dispatch(action.defaultShortcut, in: harness, isARepeat: index > 1))
                     let updated = try #require(Self.splitNodes(in: controller.treeSnapshot()).first)
                     #expect(abs(updated.dividerPosition - (0.5 - 0.02 * Double(index))) < 0.000_001)
-                    #expect(harness.mainWorkspace.bonsplitController.treeSnapshot() == mainBefore)
+                    #expect(harness.mainWorkspace.activeBonsplitController.treeSnapshot() == mainBefore)
                     #expect(harness.dock.focusedPanelId == focused)
                 }
             }

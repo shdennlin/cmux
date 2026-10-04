@@ -167,7 +167,7 @@ struct KeyboardShortcutModifierHoldHintsSettingsFileTests {
 
             let manager = TabManager(autoWelcomeIfNeeded: false)
             let workspace = manager.addWorkspace(select: true)
-            workspace.bonsplitController.tabShortcutHintsEnabled = true
+            workspace.activeBonsplitController.tabShortcutHintsEnabled = true
 
             _ = MainWindowFocusController(
                 windowId: UUID(),
@@ -176,7 +176,7 @@ struct KeyboardShortcutModifierHoldHintsSettingsFileTests {
                 fileExplorerState: FileExplorerState()
             )
 
-            #expect(!workspace.bonsplitController.tabShortcutHintsEnabled)
+            #expect(!workspace.activeBonsplitController.tabShortcutHintsEnabled)
         }
     }
 

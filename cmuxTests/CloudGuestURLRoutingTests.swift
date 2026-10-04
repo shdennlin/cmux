@@ -47,7 +47,7 @@ struct CloudGuestURLRoutingTests {
         let owner = manager.addWorkspace(select: false, autoWelcomeIfNeeded: false, autoRefreshMetadata: false)
         let panel = try #require(owner.focusedPanelId)
         let selectedPanel = selected.focusedPanelId
-        let sourcePane = owner.bonsplitController.focusedPaneId
+        let sourcePane = owner.activeBonsplitController.focusedPaneId
         let suite = "guest-url-background-\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
@@ -63,7 +63,7 @@ struct CloudGuestURLRoutingTests {
         #expect(manager.selectedTabId == selected.id)
         #expect(selected.focusedPanelId == selectedPanel)
         #expect(owner.focusedPanelId == panel)
-        #expect(owner.bonsplitController.focusedPaneId == sourcePane)
+        #expect(owner.activeBonsplitController.focusedPaneId == sourcePane)
     }
 
     @Test func guestOpenerUsesTerminalPolicyAndPreservesFocus() throws {

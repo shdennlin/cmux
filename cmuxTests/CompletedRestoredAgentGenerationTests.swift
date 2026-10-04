@@ -213,7 +213,7 @@ struct CompletedRestoredAgentGenerationTests {
         #expect(detached.restoredAgentCompletedGeneration?.completedAt == sourceGeneration.completedAt)
 
         let destination = Workspace()
-        let destinationPaneId = try #require(destination.bonsplitController.focusedPaneId)
+        let destinationPaneId = try #require(destination.activeBonsplitController.focusedPaneId)
         #expect(
             destination.attachDetachedSurface(
                 detached,

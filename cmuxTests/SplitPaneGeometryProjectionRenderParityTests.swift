@@ -44,10 +44,10 @@ struct SplitPaneGeometryProjectionRenderParityTests {
             )),
             baseCwd: NSTemporaryDirectory()
         )
-        let split = try #require(Self.firstSplit(in: workspace.bonsplitController.treeSnapshot()))
+        let split = try #require(Self.firstSplit(in: workspace.activeBonsplitController.treeSnapshot()))
 
         let hostingView = NSHostingView(
-            rootView: BonsplitView(controller: workspace.bonsplitController) { _, _ in
+            rootView: BonsplitView(controller: workspace.activeBonsplitController) { _, _ in
                 Color.clear
             } emptyPane: { _ in
                 Color.clear
@@ -76,7 +76,7 @@ struct SplitPaneGeometryProjectionRenderParityTests {
         // Feed the projection a pane whose container is exactly the split
         // view's extent: the tab strip above the content counts toward the
         // container, and the horizontal axis has no strip at all.
-        let configuration = workspace.bonsplitController.configuration
+        let configuration = workspace.activeBonsplitController.configuration
         let tabBarHeight = configuration.appearance.tabBarHeight
         let content = CGRect(
             x: 0, y: 0,

@@ -29,7 +29,7 @@ extension Workspace {
         activeMovingTabSplitFocusIntent = focusIntent
         defer { activeMovingTabSplitFocusIntent = previousIntent }
 
-        guard let newPaneId = bonsplitController.splitPane(
+        guard let newPaneId = activeBonsplitController.splitPane(
             paneId,
             orientation: orientation,
             movingTab: tabId,
@@ -42,11 +42,11 @@ extension Workspace {
            let previousFocusedPanelId,
            let previousPaneId = self.paneId(forPanelId: previousFocusedPanelId),
            let previousTabId = surfaceIdFromPanelId(previousFocusedPanelId) {
-            if bonsplitController.selectedTab(inPane: previousPaneId)?.id != previousTabId {
-                bonsplitController.selectTab(previousTabId)
+            if activeBonsplitController.selectedTab(inPane: previousPaneId)?.id != previousTabId {
+                activeBonsplitController.selectTab(previousTabId)
             }
-            if bonsplitController.focusedPaneId != previousPaneId {
-                bonsplitController.focusPane(previousPaneId)
+            if activeBonsplitController.focusedPaneId != previousPaneId {
+                activeBonsplitController.focusPane(previousPaneId)
             }
             if let previousOwnedFocusIntent {
                 focusPanel(

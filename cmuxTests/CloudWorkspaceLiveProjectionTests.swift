@@ -94,7 +94,7 @@ struct CloudWorkspaceLiveProjectionTests {
         catalog.record(SurfaceProjection(
             resource: desktop.id, workspaceID: workspace.id, panelID: browser.id, remoteWorkspaceID: "a"
         ))
-        let tree = workspace.bonsplitController.treeSnapshot()
+        let tree = workspace.activeBonsplitController.treeSnapshot()
         let focused = workspace.focusedPanelId
         let desktopPane = workspace.paneId(forPanelId: browser.id)
         let panels = Set(workspace.panels.keys)
@@ -105,7 +105,7 @@ struct CloudWorkspaceLiveProjectionTests {
         ] {
             install(state, catalog: catalog, extraResources: [desktop])
             await coordinator.waitForIdle()
-            #expect(workspace.bonsplitController.treeSnapshot() == tree)
+            #expect(workspace.activeBonsplitController.treeSnapshot() == tree)
             #expect(workspace.paneId(forPanelId: browser.id) == desktopPane)
             #expect(workspace.focusedPanelId == focused)
             #expect(Set(workspace.panels.keys) == panels)
@@ -241,7 +241,7 @@ struct CloudWorkspaceLiveProjectionTests {
         let live = LiveWorkspaceFixture()
         defer { live.tearDown() }
         let workspace = live.add()
-        let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+        let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let firstPanel = try #require(workspace.focusedPanelId)
         let missingPanel = try #require(workspace.newTerminalSurface(inPane: pane, focus: false)?.id)
         let binding = WorkspaceCloudVMBinding(vmID: machine.rawValue, isBase: false, remoteWorkspaceID: "a")

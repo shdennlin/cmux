@@ -278,7 +278,7 @@ struct CloudSidebarConsistencyTests {
         #expect(workspace.title == "Current workspace")
         #expect(workspace.panelTitles[panelID] == "Process a r2")
         let nativeTab = try #require(workspace.surfaceIdFromPanelId(panelID))
-        let displayed = try #require(workspace.bonsplitController.tab(nativeTab))
+        let displayed = try #require(workspace.activeBonsplitController.tab(nativeTab))
         #expect(displayed.title == (named ? "Explicit a" : "Process a r2"))
     }
 }

@@ -40,7 +40,7 @@ struct VaultPaneTransferLifecycleTests {
             let panelID = try #require(fixture.workspace.focusedPanelId)
             let paneID = try #require(fixture.workspace.paneId(forPanelId: panelID))
             let tabID = try #require(fixture.workspace.surfaceIdFromPanelId(panelID))
-            let controller = fixture.workspace.bonsplitController
+            let controller = fixture.workspace.activeBonsplitController
             let sourceTab = try #require(
                 controller.internalController
                     .paneState(for: paneID)?
@@ -407,7 +407,7 @@ struct VaultPaneTransferLifecycleTests {
                     targetPane: targetPane
                 )
                 let dropHandler = try #require(
-                    fixture.workspace.bonsplitController.onExternalTabDrop
+                    fixture.workspace.activeBonsplitController.onExternalTabDrop
                 )
                 #expect(dropHandler(request))
                 #expect(

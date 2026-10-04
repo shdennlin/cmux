@@ -19,7 +19,7 @@ extension Workspace {
     /// divider-drag minimum, so a fresh split never starts smaller than a
     /// drag could make it.
     var splitMinimumPaneSize: CGSize {
-        let appearance = bonsplitController.configuration.appearance
+        let appearance = activeBonsplitController.configuration.appearance
         let contentHeight = appearance.tabBarHeight
             + Self.splitMinimumTerminalRows * Self.splitNominalTerminalRowHeight
         return CGSize(
@@ -38,11 +38,11 @@ extension Workspace {
     ) -> SplitSpaceVerdict {
         guard layoutMode != .canvas else { return .fits }
         let minimum = splitMinimumPaneSize
-        return bonsplitController.treeSnapshot().splitSpaceVerdict(
+        return activeBonsplitController.treeSnapshot().splitSpaceVerdict(
             splittingPaneId: paneId.id.uuidString,
             orientation: orientation.rawValue,
             minimumExtent: Double(orientation == .horizontal ? minimum.width : minimum.height),
-            dividerThickness: Double(bonsplitController.configuration.appearance.dividerThickness),
+            dividerThickness: Double(activeBonsplitController.configuration.appearance.dividerThickness),
             dividerPosition: dividerPosition.map(Double.init)
         )
     }
@@ -115,7 +115,7 @@ extension Workspace {
     ) {
         guard layoutMode != .canvas else { return }
         let paneKeys = Set([originalPaneId.id.uuidString, newPaneId.id.uuidString])
-        let splitFrames = bonsplitController.layoutSnapshot().panes.filter { paneKeys.contains($0.paneId) }
+        let splitFrames = activeBonsplitController.layoutSnapshot().panes.filter { paneKeys.contains($0.paneId) }
         guard splitFrames.count == paneKeys.count else { return }
         let minimum = splitMinimumPaneSize
         let required = Double(orientation == .horizontal ? minimum.width : minimum.height)

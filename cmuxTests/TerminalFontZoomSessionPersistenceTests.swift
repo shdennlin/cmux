@@ -90,7 +90,7 @@ struct TerminalFontZoomSessionPersistenceTests {
         let workspace = Workspace()
         let firstPanelID = try #require(workspace.focusedPanelId)
         let firstPanel = try #require(workspace.panels[firstPanelID] as? TerminalPanel)
-        let paneID = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
         let secondPanel = try #require(
             workspace.newTerminalSurface(
                 inPane: paneID,
@@ -276,7 +276,7 @@ struct TerminalFontZoomSessionPersistenceTests {
         let workspace = Workspace()
         let firstPanelID = try #require(workspace.focusedPanelId)
         let firstPanel = try #require(workspace.panels[firstPanelID] as? TerminalPanel)
-        let paneID = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
         let secondPanel = try #require(
             workspace.newTerminalSurface(
                 inPane: paneID,
@@ -331,7 +331,7 @@ struct TerminalFontZoomSessionPersistenceTests {
     func windowDockOnlyWorkspaceFontSizeAdjustmentSeedsFirstMainTerminal() throws {
         let workspace = Workspace()
         let firstPanelID = try #require(workspace.focusedPanelId)
-        let paneID = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
         _ = try #require(
             workspace.newBrowserSurface(
                 inPane: paneID,
@@ -379,7 +379,7 @@ struct TerminalFontZoomSessionPersistenceTests {
         let manager = TabManager()
         let workspace = try #require(manager.selectedWorkspace)
         let firstPanelID = try #require(workspace.focusedPanelId)
-        let paneID = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
         _ = try #require(
             workspace.newBrowserSurface(
                 inPane: paneID,
@@ -454,7 +454,7 @@ struct TerminalFontZoomSessionPersistenceTests {
         let firstWorkspace = try #require(manager.selectedWorkspace)
         let firstPanelID = try #require(firstWorkspace.focusedPanelId)
         let firstPaneID = try #require(
-            firstWorkspace.bonsplitController.focusedPaneId
+            firstWorkspace.activeBonsplitController.focusedPaneId
         )
         _ = try #require(
             firstWorkspace.newBrowserSurface(
@@ -469,7 +469,7 @@ struct TerminalFontZoomSessionPersistenceTests {
         let secondWorkspace = try #require(manager.addTab(select: false))
         let secondPanelID = try #require(secondWorkspace.focusedPanelId)
         let secondPaneID = try #require(
-            secondWorkspace.bonsplitController.focusedPaneId
+            secondWorkspace.activeBonsplitController.focusedPaneId
         )
         _ = try #require(
             secondWorkspace.newBrowserSurface(
@@ -559,7 +559,7 @@ struct TerminalFontZoomSessionPersistenceTests {
         let firstWorkspace = try #require(manager.selectedWorkspace)
         let firstPanelID = try #require(firstWorkspace.focusedPanelId)
         let firstPaneID = try #require(
-            firstWorkspace.bonsplitController.focusedPaneId
+            firstWorkspace.activeBonsplitController.focusedPaneId
         )
         _ = try #require(
             firstWorkspace.newBrowserSurface(
@@ -580,7 +580,7 @@ struct TerminalFontZoomSessionPersistenceTests {
         let secondWorkspace = try #require(manager.addTab(select: false))
         let secondPanelID = try #require(secondWorkspace.focusedPanelId)
         let secondPaneID = try #require(
-            secondWorkspace.bonsplitController.focusedPaneId
+            secondWorkspace.activeBonsplitController.focusedPaneId
         )
         _ = try #require(
             secondWorkspace.newBrowserSurface(
@@ -651,7 +651,7 @@ struct TerminalFontZoomSessionPersistenceTests {
         let workspace = Workspace()
         let terminalPanelID = try #require(workspace.focusedPanelId)
         let paneID = try #require(
-            workspace.bonsplitController.focusedPaneId
+            workspace.activeBonsplitController.focusedPaneId
         )
         _ = try #require(
             workspace.newBrowserSurface(
@@ -710,7 +710,7 @@ struct TerminalFontZoomSessionPersistenceTests {
     func boundedWindowDockFontSizeAdjustmentSeedsFirstMainTerminal() throws {
         let workspace = Workspace()
         let firstPanelID = try #require(workspace.focusedPanelId)
-        let paneID = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
         _ = try #require(
             workspace.newBrowserSurface(
                 inPane: paneID,
@@ -766,7 +766,7 @@ struct TerminalFontZoomSessionPersistenceTests {
     func terminalFreeResetReplacesStaleDockOnlyLineage() throws {
         let workspace = Workspace()
         let firstPanelID = try #require(workspace.focusedPanelId)
-        let paneID = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
         _ = try #require(
             workspace.newBrowserSurface(
                 inPane: paneID,
@@ -1087,7 +1087,7 @@ struct TerminalFontZoomSessionPersistenceTests {
         let workspace = Workspace()
         let panelID = try #require(workspace.focusedPanelId)
         let sourcePanel = try #require(workspace.panels[panelID] as? TerminalPanel)
-        let paneID = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
         _ = try #require(
             workspace.newBrowserSurface(
                 inPane: paneID,
@@ -1206,7 +1206,7 @@ struct TerminalFontZoomSessionPersistenceTests {
         sourcePanel.surface.recordCurrentFontSizeLineage(
             TerminalFontSizeLineage(basePoints: 5.5, isExplicitOverride: true)
         )
-        let paneID = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
 
         let restoredPanel = try #require(
             workspace.newTerminalSurface(
@@ -1240,7 +1240,7 @@ struct TerminalFontZoomSessionPersistenceTests {
         let restoredWorkspace = Workspace()
         let restoredPanelIDs = restoredWorkspace.restoreSessionSnapshot(snapshot)
         let restoredPanelID = restoredPanelIDs[panelID] ?? panelID
-        let paneID = try #require(restoredWorkspace.bonsplitController.focusedPaneId)
+        let paneID = try #require(restoredWorkspace.activeBonsplitController.focusedPaneId)
         _ = try #require(
             restoredWorkspace.newBrowserSurface(
                 inPane: paneID,

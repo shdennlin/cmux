@@ -9,12 +9,12 @@ extension Workspace {
         newPanelID: UUID
     ) {
         guard let layout,
-              let restoredLayout = SessionSplitContainerLayoutCodec(controller: bonsplitController)
+              let restoredLayout = SessionSplitContainerLayoutCodec(controller: activeBonsplitController)
                 .pruned(layout, keeping: Set(panels.keys).subtracting([newPanelID]).union([oldPanelID])) else {
             return
         }
         withSplitSpaceAdmissionBypass {
-            _ = SessionSplitContainerLayoutCodec(controller: bonsplitController).restoreExistingLayout(
+            _ = SessionSplitContainerLayoutCodec(controller: activeBonsplitController).restoreExistingLayout(
                 restoredLayout,
                 panelIDMap: [oldPanelID: newPanelID],
                 tabIDForPanelID: surfaceIdFromPanelId

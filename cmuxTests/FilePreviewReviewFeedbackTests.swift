@@ -31,6 +31,10 @@ private final class FilePreviewTabMetadataTestHost: FilePreviewTabMetadataHost {
         panelId == self.panelId ? tabId : nil
     }
 
+    func filePreviewTabController(forPanelId panelId: UUID) -> BonsplitController? {
+        bonsplitController
+    }
+
     func filePreviewTabTitlePresentation(
         for metadata: FilePreviewTabMetadata,
         panelId _: UUID,
@@ -391,7 +395,7 @@ struct FilePreviewReviewFeedbackTests {
         let manager = TabManager()
         let workspace = manager.addWorkspace(select: true, eagerLoadTerminal: false)
         defer { workspace.teardownAllPanels() }
-        let firstPane = try #require(workspace.bonsplitController.allPaneIds.first)
+        let firstPane = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let existingPanel = try #require(workspace.newFilePreviewSurface(
             inPane: firstPane,
             filePath: originalURL.path,
@@ -404,7 +408,7 @@ struct FilePreviewReviewFeedbackTests {
             filePath: placeholderURL.path
         ))
         let targetPane = try #require(workspace.paneId(forPanelId: placeholderPanel.id))
-        let startingTargetTabs = workspace.bonsplitController.tabs(inPane: targetPane).count
+        let startingTargetTabs = workspace.activeBonsplitController.tabs(inPane: targetPane).count
         TerminalController.shared.setActiveTabManager(manager)
 
         let result = TerminalController.shared.v2FileOpen(params: [
@@ -426,7 +430,7 @@ struct FilePreviewReviewFeedbackTests {
         #expect(payload["pane_id"] as? String == targetPane.id.uuidString)
         #expect(workspace.paneId(forPanelId: openedPanelId)?.id == targetPane.id)
         #expect(
-            workspace.bonsplitController.tabs(inPane: targetPane).count
+            workspace.activeBonsplitController.tabs(inPane: targetPane).count
                 == startingTargetTabs + 1
         )
     }

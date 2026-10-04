@@ -179,7 +179,7 @@ struct BrowserCLIDialogTests {
             TerminalController.shared.setActiveTabManager(nil)
         }
         let workspace = try #require(manager.selectedWorkspace)
-        let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+        let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let source = try #require(workspace.newBrowserSurface(inPane: pane, focus: false))
         let focused = workspace.focusedPanelId
         TerminalController.shared.setActiveTabManager(manager)
@@ -220,7 +220,7 @@ struct BrowserCLIDialogTests {
             TerminalController.shared.setActiveTabManager(nil)
         }
         let workspace = try #require(manager.selectedWorkspace)
-        let pane = try #require(workspace.bonsplitController.allPaneIds.first)
+        let pane = try #require(workspace.activeBonsplitController.allPaneIds.first)
         let panel = try #require(workspace.newBrowserSurface(inPane: pane, focus: false, creationPolicy: .restoration))
         TerminalController.shared.setActiveTabManager(manager)
         _ = panel.webViewForAutomationCommand()

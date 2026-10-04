@@ -55,7 +55,7 @@ struct FileExplorerOpenedTabDragSourceTests {
             defer { try? FileManager.default.removeItem(at: fileURL) }
 
             let paneId = try #require(
-                workspace.bonsplitController.focusedPaneId ?? workspace.bonsplitController.allPaneIds.first
+                workspace.activeBonsplitController.focusedPaneId ?? workspace.activeBonsplitController.allPaneIds.first
             )
             let openedPanels = workspace.openFileSurfaces(
                 inPane: paneId,
@@ -66,7 +66,7 @@ struct FileExplorerOpenedTabDragSourceTests {
             )
             let panel = try #require(openedPanels.first as? FilePreviewPanel)
             let tabId = try #require(workspace.surfaceIdFromPanelId(panel.id))
-            let pane = try #require(workspace.bonsplitController.internalController.paneState(for: paneId))
+            let pane = try #require(workspace.activeBonsplitController.internalController.paneState(for: paneId))
             let tab = try #require(pane.tabs.first { $0.id == tabId.uuid })
             #expect(pane.selectedTabId == tabId.uuid)
             #expect(tab.kind == SurfaceKind.filePreview.rawValue)
@@ -112,7 +112,7 @@ struct FileExplorerOpenedTabDragSourceTests {
             let fixture = try VaultPaneAppFixture()
             defer { fixture.tearDown() }
             let workspace = fixture.workspace
-            let controller = workspace.bonsplitController
+            let controller = workspace.activeBonsplitController
             controller.tabShortcutHintsEnabled = false
             let fileURL = FileManager.default.temporaryDirectory
                 .appendingPathComponent("cmux-explorer-open-\(UUID().uuidString)")
@@ -189,7 +189,7 @@ struct FileExplorerOpenedTabDragSourceTests {
             let fixture = try VaultPaneAppFixture()
             defer { fixture.tearDown() }
             let workspace = fixture.workspace
-            let controller = workspace.bonsplitController
+            let controller = workspace.activeBonsplitController
             controller.tabShortcutHintsEnabled = false
             let fileURL = FileManager.default.temporaryDirectory
                 .appendingPathComponent("cmux-explorer-open-\(UUID().uuidString)")

@@ -21,7 +21,7 @@ struct WorkspaceClosePanelFallbackTests {
         let paneId = try #require(workspace.paneId(forPanelId: firstPanelId))
         let otherPanel = try #require(workspace.newTerminalSurface(inPane: paneId, focus: true))
         let otherTabId = try #require(workspace.surfaceIdFromPanelId(otherPanel.id))
-        workspace.bonsplitController.selectTab(otherTabId)
+        workspace.bonsplitController(owningTab: otherTabId).selectTab(otherTabId)
 
         // Closing a background surface must use its own tab mapping, even when
         // Bonsplit's selected tab belongs to another surface.
@@ -39,8 +39,8 @@ struct WorkspaceClosePanelFallbackTests {
         let paneId = try #require(workspace.paneId(forPanelId: firstPanelId))
         let otherPanel = try #require(workspace.newTerminalSurface(inPane: paneId, focus: true))
         let otherTabId = try #require(workspace.surfaceIdFromPanelId(otherPanel.id))
-        workspace.bonsplitController.selectTab(otherTabId)
-        #expect(workspace.bonsplitController.selectedTab(inPane: paneId)?.id == otherTabId)
+        workspace.activeBonsplitController.selectTab(otherTabId)
+        #expect(workspace.activeBonsplitController.selectedTab(inPane: paneId)?.id == otherTabId)
 
         // A target with no tab mapping that still owns first responder.
         let unmappedPanelId = UUID()
@@ -52,7 +52,7 @@ struct WorkspaceClosePanelFallbackTests {
             force: true
         ))
 
-        #expect(workspace.bonsplitController.tabs(inPane: paneId).count == 2)
+        #expect(workspace.activeBonsplitController.tabs(inPane: paneId).count == 2)
         #expect(workspace.panels[otherPanel.id] != nil)
         #expect(workspace.panels[firstPanelId] != nil)
         #expect(workspace.surfaceIdFromPanelId(otherPanel.id) == otherTabId)
@@ -65,7 +65,7 @@ struct WorkspaceClosePanelFallbackTests {
         let paneId = try #require(workspace.paneId(forPanelId: firstPanelId))
         let targetPanel = try #require(workspace.newTerminalSurface(inPane: paneId, focus: true))
         let targetTabId = try #require(workspace.surfaceIdFromPanelId(targetPanel.id))
-        workspace.bonsplitController.selectTab(targetTabId)
+        workspace.activeBonsplitController.selectTab(targetTabId)
 
         // The target lost its mapping but its tab is still selected.
         workspace.removeSurfaceMapping(forSurfaceId: targetTabId)
@@ -78,7 +78,7 @@ struct WorkspaceClosePanelFallbackTests {
             force: true
         ))
 
-        let remainingTabIds = workspace.bonsplitController.tabs(inPane: paneId).map(\.id)
+        let remainingTabIds = workspace.activeBonsplitController.tabs(inPane: paneId).map(\.id)
         #expect(!remainingTabIds.contains(targetTabId))
         #expect(remainingTabIds.count == 1)
         #expect(workspace.surfaceIdFromPanelId(firstPanelId) != nil)

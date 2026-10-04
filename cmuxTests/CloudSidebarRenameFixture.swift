@@ -85,7 +85,7 @@ final class CloudSidebarRenameFixture {
 
     func assertParity(_ title: String, workspaceName: String = "Fixture workspace") throws {
         let native = try #require(workspace.surfaceIdFromPanelId(panelID))
-        #expect(workspace.bonsplitController.tab(native)?.title == title)
+        #expect(workspace.activeBonsplitController.tab(native)?.title == title)
         #expect(workspace.panelTitle(panelId: panelID) == title)
         let rows = CloudTreeNodeBuilder.flattened(catalog.sidebarNodes(on: machine))
         let terminals = rows.compactMap { node -> CloudTreeTerminalRow? in

@@ -52,11 +52,11 @@ struct WorkspaceForkConversationContextMenuTests {
         #expect(didForkFromClickedPanel)
 
         #expect(
-            workspace.bonsplitController.tabs(inPane: sourcePaneId).count == 3,
+            workspace.activeBonsplitController.tabs(inPane: sourcePaneId).count == 3,
             "Fork Conversation from the terminal context menu should fork the clicked panel"
         )
         #expect(
-            workspace.bonsplitController.allPaneIds.count == 1,
+            workspace.activeBonsplitController.allPaneIds.count == 1,
             "New Tab destination should stay in the clicked panel's pane"
         )
     }

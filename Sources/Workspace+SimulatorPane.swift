@@ -50,7 +50,7 @@ extension Workspace {
         guard !isRetiredFromOwningTabManager,
               (CmuxFeatureFlags.shared.isSimulatorEnabled || restoringSession),
               !isRemoteTmuxMirror else { return nil }
-        let shouldFocus = focus ?? (bonsplitController.focusedPaneId == paneId)
+        let shouldFocus = focus ?? (activeBonsplitController.focusedPaneId == paneId)
         let previousFocusedPanelId = focusedPanelId
         let previousHostedView = focusedTerminalInputTarget()?.panel.hostedView
         let panel = SimulatorPanel(
@@ -62,7 +62,7 @@ extension Workspace {
         panels[panel.id] = panel
         panelTitles[panel.id] = panel.displayTitle
 
-        guard let tabId = bonsplitController.createTab(
+        guard let tabId = activeBonsplitController.createTab(
             title: panel.displayTitle,
             icon: panel.displayIcon,
             kind: SurfaceKind.simulator.rawValue,
@@ -79,7 +79,7 @@ extension Workspace {
 
         bindSurface(tabId, toPanelId: panel.id)
         if let targetIndex {
-            _ = bonsplitController.reorderTab(tabId, toIndex: targetIndex)
+            _ = activeBonsplitController.reorderTab(tabId, toIndex: targetIndex)
         }
         publishCmuxSurfaceCreated(
             panel.id,
@@ -90,8 +90,8 @@ extension Workspace {
         )
 
         if shouldFocus {
-            bonsplitController.focusPane(paneId)
-            bonsplitController.selectTab(tabId)
+            activeBonsplitController.focusPane(paneId)
+            activeBonsplitController.selectTab(tabId)
             applyTabSelection(tabId: tabId, inPane: paneId)
         } else if let previousFocusedPanelId {
             preserveFocusAfterNonFocusSplit(
@@ -119,8 +119,8 @@ extension Workspace {
               CmuxFeatureFlags.shared.isSimulatorEnabled,
               !isRemoteTmuxMirror,
               let sourceTabId = surfaceIdFromPanelId(panelId),
-              let sourcePaneId = bonsplitController.allPaneIds.first(where: { paneId in
-                  bonsplitController.tabs(inPane: paneId).contains(where: { $0.id == sourceTabId })
+              let sourcePaneId = activeBonsplitController.allPaneIds.first(where: { paneId in
+                  activeBonsplitController.tabs(inPane: paneId).contains(where: { $0.id == sourceTabId })
               }),
               admitsSplitSpacePreflight(
                   splitting: sourcePaneId,
@@ -152,7 +152,7 @@ extension Workspace {
         isProgrammaticSplit = true
         defer { isProgrammaticSplit = false }
         guard let newPaneId = withSplitSpaceDividerPosition(initialDividerPosition, {
-            bonsplitController.splitPane(
+            activeBonsplitController.splitPane(
                 sourcePaneId,
                 orientation: orientation,
                 withTab: tab,

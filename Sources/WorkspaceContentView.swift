@@ -111,7 +111,7 @@ private struct WorkspacePanelContentHostView: View {
                 // selectedTabId, not selectedTab: building a Tab reads every
                 // TabItem property, which subscribes this update to the tab's
                 // title. Portal ownership only needs identity.
-                return workspace.bonsplitController.selectedTabId(inPane: paneId) == tabId
+                return workspace.activeBonsplitController.selectedTabId(inPane: paneId) == tabId
             },
             onFocus: onFocus,
             onRequestPanelFocus: onRequestPanelFocus,
@@ -245,9 +245,9 @@ struct WorkspaceContentView: View {
         let workspaceManualUnreadPanelId = workspace.representativePanelIdForWorkspaceManualUnread()
         let bonsplitPaneRenderSnapshots: [UUID: BonsplitPaneRenderSnapshot] = isCanvas
             ? [:]
-            : Self.bonsplitPaneRenderSnapshots(for: workspace.bonsplitController)
+            : Self.bonsplitPaneRenderSnapshots(for: workspace.activeBonsplitController)
 
-        let bonsplitView = BonsplitView(controller: workspace.bonsplitController) { tab, paneId in
+        let bonsplitView = BonsplitView(controller: workspace.activeBonsplitController) { tab, paneId in
             // Content for each tab in bonsplit
             let _ = Self.debugPanelLookup(tab: tab, workspace: workspace)
             if let panel = workspace.panel(for: tab.id) {
@@ -363,7 +363,7 @@ struct WorkspaceContentView: View {
                         onTriggerFlash: { workspace.triggerDebugFlash(panelId: panel.id) }
                     )
                     .onTapGesture {
-                        workspace.bonsplitController.focusPane(paneId)
+                        workspace.activeBonsplitController.focusPane(paneId)
                     }
                 }
             } else if workspace.cloudVMID != nil {
@@ -375,7 +375,7 @@ struct WorkspaceContentView: View {
             // Empty pane content
             EmptyPanelView(workspace: workspace, paneId: paneId)
                 .onTapGesture {
-                    workspace.bonsplitController.focusPane(paneId)
+                    workspace.activeBonsplitController.focusPane(paneId)
                 }
         }
         .internalOnlyTabDrag()
@@ -515,7 +515,7 @@ struct WorkspaceContentView: View {
     /// Bonsplit's observable state while SwiftUI is evaluating `body`.
     private func syncBonsplitInteractivity() {
         Self.syncBonsplitInteractivity(
-            workspace.bonsplitController,
+            workspace.activeBonsplitController,
             isInputActive: isWorkspaceInputActive
         )
     }
@@ -532,10 +532,10 @@ struct WorkspaceContentView: View {
     /// Routes Finder drops to the focused terminal without rebuilding the
     /// closure during every Bonsplit body evaluation.
     private func installBonsplitFileDropHandler() {
-        workspace.bonsplitController.onFileDrop = { [weak workspace] urls, paneId in
+        workspace.activeBonsplitController.onFileDrop = { [weak workspace] urls, paneId in
             guard let workspace else { return false }
             // Find the focused panel in this pane and drop the files into it.
-            guard let tabId = workspace.bonsplitController.selectedTab(inPane: paneId)?.id,
+            guard let tabId = workspace.activeBonsplitController.selectedTab(inPane: paneId)?.id,
                   let panelId = workspace.panelIdFromSurfaceId(tabId),
                   let panel = workspace.terminalInputTarget(forPanelID: panelId)?.panel else { return false }
             return panel.hostedView.handleDroppedURLs(urls)
@@ -548,8 +548,8 @@ struct WorkspaceContentView: View {
         let isWorkspaceManuallyUnread = notificationStore.hasManualUnread(forTabId: workspace.id)
         let workspaceManualUnreadPanelId = workspace.representativePanelIdForWorkspaceManualUnread()
 
-        for paneId in workspace.bonsplitController.allPaneIds {
-            for tab in workspace.bonsplitController.tabs(inPane: paneId) {
+        for paneId in workspace.activeBonsplitController.allPaneIds {
+            for tab in workspace.activeBonsplitController.tabs(inPane: paneId) {
                 let panelId = workspace.panelIdFromSurfaceId(tab.id)
                 let expectedKind = panelId.flatMap { workspace.panelKind(panelId: $0) }
                 let expectedPinned = panelId.map { workspace.isPanelPinned($0) } ?? false
@@ -569,7 +569,7 @@ struct WorkspaceContentView: View {
                 if tab.showsNotificationBadge != shouldShow ||
                     tab.isPinned != expectedPinned ||
                     (expectedKind != nil && tab.kind != expectedKind) {
-                    workspace.bonsplitController.updateTab(
+                    workspace.activeBonsplitController.updateTab(
                         tab.id,
                         kind: kindUpdate,
                         showsNotificationBadge: shouldShow,
@@ -581,7 +581,7 @@ struct WorkspaceContentView: View {
     }
 
     private var splitZoomRenderIdentity: String {
-        workspace.bonsplitController.zoomedPaneId.map { "zoom:\($0.id.uuidString)" } ?? "unzoomed"
+        workspace.activeBonsplitController.zoomedPaneId.map { "zoom:\($0.id.uuidString)" } ?? "unzoomed"
     }
 
     static let tmuxPaneOverlayGeometry = TmuxPaneOverlayGeometry(
@@ -781,7 +781,7 @@ struct WorkspaceContentView: View {
             }
         }
         logTheme(
-            "theme refresh end workspace=\(workspace.id.uuidString) reason=\(reason) event=\(eventLabel) chromeBg=\(workspace.bonsplitController.configuration.appearance.chromeColors.backgroundHex ?? "nil")"
+            "theme refresh end workspace=\(workspace.id.uuidString) reason=\(reason) event=\(eventLabel) chromeBg=\(workspace.activeBonsplitController.configuration.appearance.chromeColors.backgroundHex ?? "nil")"
         )
     }
 
@@ -891,7 +891,7 @@ struct EmptyPanelView: View {
     }
 
     private func focusPane() {
-        workspace.bonsplitController.focusPane(paneId)
+        workspace.activeBonsplitController.focusPane(paneId)
     }
 
     private func createTerminal() {

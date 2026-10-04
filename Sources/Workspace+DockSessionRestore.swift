@@ -11,7 +11,7 @@ extension Workspace {
         restorableAgentIndex: RestorableAgentSessionIndex?,
         claudeBackgroundRestores: [UUID: ClaudeBackgroundAttachRestore]? = nil
     ) -> DetachedSurfaceTransfer? {
-        guard let paneId = bonsplitController.allPaneIds.first else { return nil }
+        guard let paneId = activeBonsplitController.allPaneIds.first else { return nil }
         sessionRestoreIdentityExclusions.beginRestore(excluding: excludingStableIdentities)
         defer { sessionRestoreIdentityExclusions.endRestore() }
         // A Dock restore pass already chose one pane per Claude background

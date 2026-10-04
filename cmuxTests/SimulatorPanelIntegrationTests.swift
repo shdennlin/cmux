@@ -27,7 +27,7 @@ struct SimulatorPanelIntegrationTests {
     @Test("Creating a Simulator surface focuses it and publishes its kind")
     func surfaceCreationAndFocus() throws {
         let workspace = Workspace()
-        let paneID = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
 
         let panel = try #require(workspace.newSimulatorSurface(inPane: paneID, focus: true))
         defer { panel.close() }
@@ -35,8 +35,8 @@ struct SimulatorPanelIntegrationTests {
         #expect(panel.panelType == .simulator)
         #expect(workspace.focusedPanelId == panel.id)
         let surfaceID = try #require(workspace.surfaceIdFromPanelId(panel.id))
-        #expect(workspace.bonsplitController.selectedTab(inPane: paneID)?.id == surfaceID)
-        #expect(workspace.bonsplitController.tab(surfaceID)?.kind == SurfaceKind.simulator.rawValue)
+        #expect(workspace.activeBonsplitController.selectedTab(inPane: paneID)?.id == surfaceID)
+        #expect(workspace.activeBonsplitController.tab(surfaceID)?.kind == SurfaceKind.simulator.rawValue)
     }
 
     @Test("Creating an unfocused Simulator split preserves the source focus")
@@ -57,7 +57,7 @@ struct SimulatorPanelIntegrationTests {
         let simulatorPaneID = try #require(workspace.paneId(forPanelId: panel.id))
         #expect(simulatorPaneID != sourcePaneID)
         #expect(workspace.focusedPanelId == sourcePanelID)
-        #expect(workspace.bonsplitController.focusedPaneId == sourcePaneID)
+        #expect(workspace.activeBonsplitController.focusedPaneId == sourcePaneID)
     }
 
     @Test("Canvas creates a Simulator as its own focused pane")
@@ -87,7 +87,7 @@ struct SimulatorPanelIntegrationTests {
         let preferredRuntimeID = "com.apple.CoreSimulator.SimRuntime.iOS-26-5"
         let preferredDeviceTypeID = "com.apple.CoreSimulator.SimDeviceType.iPad-Pro-13-inch-M5"
         let workspace = Workspace()
-        let paneID = try #require(workspace.bonsplitController.focusedPaneId)
+        let paneID = try #require(workspace.activeBonsplitController.focusedPaneId)
         let panel = try #require(
             workspace.newSimulatorSurface(
                 inPane: paneID,
@@ -118,7 +118,7 @@ struct SimulatorPanelIntegrationTests {
         #expect(restoredPanel.selectedRuntimeIdentifier == preferredRuntimeID)
         #expect(restoredPanel.selectedDeviceTypeIdentifier == preferredDeviceTypeID)
         let restoredSurfaceID = try #require(restoredWorkspace.surfaceIdFromPanelId(restoredPanel.id))
-        #expect(restoredWorkspace.bonsplitController.tab(restoredSurfaceID)?.kind == SurfaceKind.simulator.rawValue)
+        #expect(restoredWorkspace.activeBonsplitController.tab(restoredSurfaceID)?.kind == SurfaceKind.simulator.rawValue)
         flags.setOverride(true, for: simulatorFlag)
     }
 

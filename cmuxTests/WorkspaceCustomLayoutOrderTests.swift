@@ -56,7 +56,7 @@ import Testing
     @Test(arguments: [NewTabPosition.current, .end])
     func layoutApplicationRestoresInteractiveNewTabPlacement(initialPlacement: NewTabPosition) throws {
         let workspace = Workspace()
-        workspace.bonsplitController.configuration.newTabPosition = initialPlacement
+        workspace.activeBonsplitController.configuration.newTabPosition = initialPlacement
         workspace.applyCustomLayout(
             .pane(CmuxPaneDefinition(surfaces: [
                 CmuxSurfaceDefinition(type: .terminal, name: "AAA"),
@@ -66,11 +66,11 @@ import Testing
             baseCwd: NSTemporaryDirectory()
         )
 
-        let paneId = try #require(workspace.bonsplitController.allPaneIds.first)
-        let layoutTabIds = workspace.bonsplitController.tabs(inPane: paneId).map(\.id)
+        let paneId = try #require(workspace.activeBonsplitController.allPaneIds.first)
+        let layoutTabIds = workspace.activeBonsplitController.tabs(inPane: paneId).map(\.id)
         try #require(layoutTabIds.count == 3)
 
-        switch (initialPlacement, workspace.bonsplitController.configuration.newTabPosition) {
+        switch (initialPlacement, workspace.activeBonsplitController.configuration.newTabPosition) {
         case (.current, .current), (.end, .end):
             break
         default:
@@ -87,14 +87,14 @@ import Testing
             expectedTabIds = [layoutTabIds[0], layoutTabIds[1], layoutTabIds[2], newTabId]
         }
 
-        #expect(workspace.bonsplitController.tabs(inPane: paneId).map(\.id) == expectedTabIds)
-        #expect(workspace.bonsplitController.selectedTab(inPane: paneId)?.id == layoutTabIds[1])
+        #expect(workspace.activeBonsplitController.tabs(inPane: paneId).map(\.id) == expectedTabIds)
+        #expect(workspace.activeBonsplitController.selectedTab(inPane: paneId)?.id == layoutTabIds[1])
     }
 
     private static func surfaceSnapshot(in workspace: Workspace) throws -> (titles: [String], selectedTitle: String?) {
-        let paneId = try #require(workspace.bonsplitController.allPaneIds.first)
-        let titles = workspace.bonsplitController.tabs(inPane: paneId).map(\.title)
-        let selectedTitle = workspace.bonsplitController.selectedTab(inPane: paneId)?.title
+        let paneId = try #require(workspace.activeBonsplitController.allPaneIds.first)
+        let titles = workspace.activeBonsplitController.tabs(inPane: paneId).map(\.title)
+        let selectedTitle = workspace.activeBonsplitController.selectedTab(inPane: paneId)?.title
         return (titles, selectedTitle)
     }
 }

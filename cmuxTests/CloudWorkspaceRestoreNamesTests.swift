@@ -101,7 +101,7 @@ struct CloudWorkspaceRestoreNamesTests {
         let machine = SurfaceMachineID.cloud("restore-\(UUID().uuidString)")
         let manager = TabManager(autoWelcomeIfNeeded: false, createInitialWorkspace: false)
         let source = Workspace()
-        let pane = try #require(source.bonsplitController.allPaneIds.first)
+        let pane = try #require(source.activeBonsplitController.allPaneIds.first)
         let first = try #require(source.focusedPanelId)
         let second = try #require(source.newTerminalSurface(inPane: pane, focus: false)).id
         source.cloudVMBinding = WorkspaceCloudVMBinding(

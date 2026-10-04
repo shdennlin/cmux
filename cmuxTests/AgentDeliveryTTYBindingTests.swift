@@ -125,7 +125,7 @@ extension AgentNotificationRegressionTests {
         fixture.source.remoteConfiguration = deliveryTargetRemoteConfiguration(relayPort: 64_007)
         fixture.source.trackRemoteTerminalSurface(fixture.panelId)
         fixture.source.registerReportedSurfaceTTYName("pts/7", panelId: fixture.panelId)
-        let paneID = try #require(fixture.source.bonsplitController.allPaneIds.first)
+        let paneID = try #require(fixture.source.activeBonsplitController.allPaneIds.first)
         _ = try #require(fixture.source.newTerminalSurface(inPane: paneID, focus: false))
 
         let move = try #require(fixture.appDelegate.moveSurfaceToNewWorkspace(
