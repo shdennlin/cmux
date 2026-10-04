@@ -191,6 +191,10 @@ enum AppSettingsFileMapping {
         .init(jsonKey: "equalizeSplitsOnCreate", defaultsKey: app.equalizeSplitsOnCreate.userDefaultsKey),
         .init(jsonKey: "equalizeSplitsOnDividerDoubleClick", defaultsKey: app.equalizeSplitsOnDividerDoubleClick.userDefaultsKey),
         .init(
+            jsonKey: "workspaceTopTabs",
+            defaultsKey: app.workspaceTopTabs.userDefaultsKey
+        ),
+        .init(
             jsonKey: "openSupportedFilesInCmux",
             defaultsKey: app.openSupportedFilesInCmux.userDefaultsKey
         ),

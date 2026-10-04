@@ -2,8 +2,8 @@ import Bonsplit
 import Foundation
 
 extension Workspace {
-    func configureForkAgentConversationContextMenuAvailability() {
-        activeBonsplitController.tabContextForkConversationAvailabilityProvider = { [weak self] tabId, _ in
+    func configureForkAgentConversationContextMenuAvailability(for controller: BonsplitController) {
+        controller.tabContextForkConversationAvailabilityProvider = { [weak self] tabId, _ in
             guard let self,
                   let panelId = self.panelIdFromSurfaceId(tabId) else { return .hidden }
             switch self.forkAgentConversationContextMenuPresentationAvailability(forPanelId: panelId) {
@@ -18,7 +18,7 @@ extension Workspace {
                 return .hidden
             }
         }
-        activeBonsplitController.tabContextForkConversationAvailabilityRefreshHandler = { [weak self] tabId, _ in
+        controller.tabContextForkConversationAvailabilityRefreshHandler = { [weak self] tabId, _ in
             guard let self,
                   let panelId = self.panelIdFromSurfaceId(tabId) else { return }
             await self.resolveForkAgentConversationContextMenuAvailability(forPanelId: panelId)

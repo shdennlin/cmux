@@ -9,7 +9,7 @@ extension Workspace {
     /// without reactivating an already-selected container's hidden surface.
     func focusRemoteTmuxContainerPaneIfNeeded(_ paneId: PaneID) {
         guard activeBonsplitController.focusedPaneId != paneId else { return }
-        activeBonsplitController.focusPane(paneId)
+        bonsplitController(owningPane: paneId).focusPane(paneId)
     }
 
     /// Moves keyboard focus through the rendered pane hierarchy. A selected
@@ -40,7 +40,7 @@ extension Workspace {
 
         activeBonsplitController.navigateFocus(direction: direction)
         if let paneId = activeBonsplitController.focusedPaneId,
-           let tabId = activeBonsplitController.selectedTab(inPane: paneId)?.id {
+           let tabId = bonsplitController(owningPane: paneId).selectedTab(inPane: paneId)?.id {
             applyTabSelection(tabId: tabId, inPane: paneId)
         }
         return previousFocusedPanelId != focusedPanelId ||
@@ -54,6 +54,7 @@ extension Workspace {
         to movement: SurfacePaneMovement,
         allowMissingDestinationSplit: Bool = true
     ) -> Bool {
+        guard canMoveSurfaceBetweenPanes else { return false }
         guard let panelId = focusedPanelId else { return false }
         return moveSurface(
             panelId: panelId,
@@ -110,8 +111,8 @@ extension Workspace {
                       insertFirst: directionalSplit.insertFirst,
                       focusIntent: .activateMovedTab
                   ) {
-            activeBonsplitController.focusPane(newPaneId)
-            activeBonsplitController.selectTab(tabId)
+            bonsplitController(owningPane: newPaneId).focusPane(newPaneId)
+            bonsplitController(owningTab: tabId).selectTab(tabId)
             focusPanel(panelId)
             didMove = true
         } else {
@@ -119,7 +120,7 @@ extension Workspace {
         }
 
         if !didMove, let zoomedPaneId {
-            _ = activeBonsplitController.togglePaneZoom(inPane: zoomedPaneId)
+            _ = bonsplitController(owningPane: zoomedPaneId).togglePaneZoom(inPane: zoomedPaneId)
         }
         return didMove
     }
@@ -165,8 +166,8 @@ extension Workspace {
     }
 
     private func insertionIndexAfterSelectedSurface(in paneId: PaneID) -> Int {
-        let destinationTabs = activeBonsplitController.tabs(inPane: paneId)
-        guard let selectedTabId = activeBonsplitController.selectedTab(inPane: paneId)?.id,
+        let destinationTabs = bonsplitController(owningPane: paneId).tabs(inPane: paneId)
+        guard let selectedTabId = bonsplitController(owningPane: paneId).selectedTab(inPane: paneId)?.id,
               let selectedIndex = destinationTabs.firstIndex(where: {
                   $0.id == selectedTabId
               }) else {
@@ -230,6 +231,10 @@ extension Workspace {
     /// Select the next surface in the currently focused split pane, or in
     /// workspace Canvas order when Canvas layout is active.
     func selectNextSurface() {
+        if isTopTabsEnabled {
+            selectNextTopTab()
+            return
+        }
         if layoutMode == .canvas {
             _ = selectAdjacentCanvasTab(offset: 1)
             return
@@ -237,7 +242,7 @@ extension Workspace {
         activeBonsplitController.selectNextTab()
 
         if let paneId = activeBonsplitController.focusedPaneId,
-           let tabId = activeBonsplitController.selectedTab(inPane: paneId)?.id {
+           let tabId = bonsplitController(owningPane: paneId).selectedTab(inPane: paneId)?.id {
             applyTabSelection(tabId: tabId, inPane: paneId)
         }
     }
@@ -245,6 +250,10 @@ extension Workspace {
     /// Select the previous surface in the currently focused split pane, or in
     /// workspace Canvas order when Canvas layout is active.
     func selectPreviousSurface() {
+        if isTopTabsEnabled {
+            selectPreviousTopTab()
+            return
+        }
         if layoutMode == .canvas {
             _ = selectAdjacentCanvasTab(offset: -1)
             return
@@ -252,7 +261,7 @@ extension Workspace {
         activeBonsplitController.selectPreviousTab()
 
         if let paneId = activeBonsplitController.focusedPaneId,
-           let tabId = activeBonsplitController.selectedTab(inPane: paneId)?.id {
+           let tabId = bonsplitController(owningPane: paneId).selectedTab(inPane: paneId)?.id {
             applyTabSelection(tabId: tabId, inPane: paneId)
         }
     }
@@ -295,10 +304,10 @@ extension Workspace {
             previousPanel.unfocus()
         }
 
-        activeBonsplitController.focusPane(targetPaneId)
+        bonsplitController(owningPane: targetPaneId).focusPane(targetPaneId)
 
         if let paneId = activeBonsplitController.focusedPaneId,
-           let tabId = activeBonsplitController.selectedTab(inPane: paneId)?.id {
+           let tabId = bonsplitController(owningPane: paneId).selectedTab(inPane: paneId)?.id {
             applyTabSelection(tabId: tabId, inPane: paneId)
         }
     }
@@ -307,12 +316,15 @@ extension Workspace {
     /// without wrapping.
     @discardableResult
     func moveSelectedSurface(by offset: Int) -> Bool {
+        if isTopTabsEnabled {
+            return moveSelectedTopTab(by: offset)
+        }
         if layoutMode == .canvas {
             guard let focusedPanelId else { return false }
             return reorderSurface(panelId: focusedPanelId, by: offset)
         }
         guard let paneId = activeBonsplitController.focusedPaneId,
-              let selectedTab = activeBonsplitController.selectedTab(inPane: paneId),
+              let selectedTab = bonsplitController(owningPane: paneId).selectedTab(inPane: paneId),
               let panelId = panelIdFromSurfaceId(selectedTab.id) else { return false }
         return reorderSurface(panelId: panelId, by: offset)
     }
@@ -331,7 +343,7 @@ extension Workspace {
         }
         guard let paneId = paneId(forPanelId: panelId),
               let tabId = surfaceIdFromPanelId(panelId) else { return false }
-        let tabs = activeBonsplitController.tabs(inPane: paneId)
+        let tabs = bonsplitController(owningPane: paneId).tabs(inPane: paneId)
         guard let currentIndex = tabs.firstIndex(where: { $0.id == tabId }), !tabs.isEmpty else { return false }
         let finalIndex = min(max(currentIndex + offset, tabs.startIndex), tabs.index(before: tabs.endIndex))
         guard finalIndex != currentIndex else { return true }
@@ -342,16 +354,20 @@ extension Workspace {
     /// Select a surface by index in the currently focused split pane, or in
     /// workspace Canvas order when Canvas layout is active.
     func selectSurface(at index: Int) {
+        if isTopTabsEnabled {
+            selectTopTab(at: index)
+            return
+        }
         if layoutMode == .canvas {
             _ = selectCanvasTab(at: index)
             return
         }
         guard let focusedPaneId = activeBonsplitController.focusedPaneId else { return }
-        let tabs = activeBonsplitController.tabs(inPane: focusedPaneId)
+        let tabs = bonsplitController(owningPane: focusedPaneId).tabs(inPane: focusedPaneId)
         guard tabs.indices.contains(index) else { return }
         activeBonsplitController.selectTab(tabs[index].id)
 
-        if let tabId = activeBonsplitController.selectedTab(inPane: focusedPaneId)?.id {
+        if let tabId = bonsplitController(owningPane: focusedPaneId).selectedTab(inPane: focusedPaneId)?.id {
             applyTabSelection(tabId: tabId, inPane: focusedPaneId)
         }
     }
@@ -359,16 +375,20 @@ extension Workspace {
     /// Select the last surface in the currently focused split pane, or in
     /// workspace Canvas order when Canvas layout is active.
     func selectLastSurface() {
+        if isTopTabsEnabled {
+            selectLastTopTab()
+            return
+        }
         if layoutMode == .canvas {
             _ = selectLastCanvasTab()
             return
         }
         guard let focusedPaneId = activeBonsplitController.focusedPaneId else { return }
-        let tabs = activeBonsplitController.tabs(inPane: focusedPaneId)
+        let tabs = bonsplitController(owningPane: focusedPaneId).tabs(inPane: focusedPaneId)
         guard let last = tabs.last else { return }
-        activeBonsplitController.selectTab(last.id)
+        bonsplitController(owningTab: last.id).selectTab(last.id)
 
-        if let tabId = activeBonsplitController.selectedTab(inPane: focusedPaneId)?.id {
+        if let tabId = bonsplitController(owningPane: focusedPaneId).selectedTab(inPane: focusedPaneId)?.id {
             applyTabSelection(tabId: tabId, inPane: focusedPaneId)
         }
     }

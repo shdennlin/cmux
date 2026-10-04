@@ -24,7 +24,7 @@ extension Workspace {
         panels[todoPanel.id] = todoPanel
         panelTitles[todoPanel.id] = todoPanel.displayTitle
 
-        guard let newTabId = activeBonsplitController.createTab(
+        guard let newTabId = bonsplitController(owningPane: paneId).createTab(
             title: todoPanel.displayTitle,
             icon: todoPanel.displayIcon,
             kind: SurfaceKind.todo.rawValue,
@@ -40,7 +40,7 @@ extension Workspace {
 
         bindSurface(newTabId, toPanelId: todoPanel.id)
         if let targetIndex {
-            _ = activeBonsplitController.reorderTab(newTabId, toIndex: targetIndex)
+            _ = bonsplitController(owningTab: newTabId).reorderTab(newTabId, toIndex: targetIndex)
         }
         publishCmuxSurfaceCreated(
             todoPanel.id,
@@ -50,8 +50,8 @@ extension Workspace {
             focused: shouldFocusNewTab
         )
         if shouldFocusNewTab {
-            activeBonsplitController.focusPane(paneId)
-            activeBonsplitController.selectTab(newTabId)
+            bonsplitController(owningPane: paneId).focusPane(paneId)
+            bonsplitController(owningTab: newTabId).selectTab(newTabId)
             applyTabSelection(tabId: newTabId, inPane: paneId)
         } else {
             preserveFocusAfterNonFocusSplit(

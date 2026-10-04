@@ -174,7 +174,7 @@ extension AppDelegate {
         guard destinationWorkspace.surfaceOwnershipPolicy.rejection(for: sourceDock.machineOwningSurface(panelId),
                                                                     kind: AppDelegate.shared?.surfaceResourceKind(for: sourceDock.panels[panelId])) == nil else { return false }
         let resolvedPane = targetPane.flatMap { pane in
-            destinationWorkspace.activeBonsplitController.allPaneIds.first(where: { $0 == pane })
+            destinationWorkspace.allTopTabPaneIds.first(where: { $0 == pane })
         } ?? destinationWorkspace.activeBonsplitController.focusedPaneId
             ?? destinationWorkspace.activeBonsplitController.allPaneIds.first
         guard let resolvedPane else { return false }

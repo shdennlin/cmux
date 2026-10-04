@@ -35,8 +35,7 @@ extension Workspace {
         panels[loading.id] = terminal
         let title = String(localized: "cloudTree.terminal.untitled", defaultValue: "terminal")
         panelTitles[loading.id] = title
-        activeBonsplitController.updateTab(
-            tab, title: title, icon: .some(terminal.displayIcon),
+        bonsplitController(owningTab: tab).updateTab(tab, title: title, icon: .some(terminal.displayIcon),
             iconImageData: .some(nil), iconAsset: .some(nil),
             kind: .some(SurfaceKind.terminal.rawValue),
             hasCustomTitle: false, isDirty: false,
@@ -67,8 +66,7 @@ extension Workspace {
         terminal.close()
         panels[panelID] = loading
         panelTitles[panelID] = loading.displayTitle
-        activeBonsplitController.updateTab(
-            tab, title: loading.displayTitle, icon: .some(loading.displayIcon),
+        bonsplitController(owningTab: tab).updateTab(tab, title: loading.displayTitle, icon: .some(loading.displayIcon),
             iconImageData: .some(nil), iconAsset: .some(nil),
             kind: .some(SurfaceKind.cloudVMLoading.rawValue),
             hasCustomTitle: false, isDirty: false,

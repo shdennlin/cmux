@@ -77,6 +77,7 @@ extension CmuxSettingsFileStore {
                     "focusHistoryIncludesPanesAndTabs": SettingCatalog().app.focusHistoryIncludesPanesAndTabs.defaultValue,
                     "equalizeSplitsOnCreate": SettingCatalog().app.equalizeSplitsOnCreate.defaultValue,
                     "equalizeSplitsOnDividerDoubleClick": SettingCatalog().app.equalizeSplitsOnDividerDoubleClick.defaultValue,
+                    "workspaceTopTabs": SettingCatalog().app.workspaceTopTabs.defaultValue,
                     "preferredEditor": "",
                     "defaultWorkspacePath": AppCatalogSection().defaultWorkspacePath.defaultValue,
                     "openSupportedFilesInCmux": AppCatalogSection().openSupportedFilesInCmux.defaultValue,

@@ -779,7 +779,7 @@ struct PaneSwapSelectionController {
         return workspace.activeBonsplitController.allPaneIds.contains { paneID in
             guard paneID.id != sourcePaneID,
                   workspace.remoteTmuxControlPane(paneID: paneID.id) == nil,
-                  let selectedTab = workspace.activeBonsplitController.selectedTab(inPane: paneID),
+                  let selectedTab = workspace.bonsplitController(owningPane: paneID).selectedTab(inPane: paneID),
                   let panelID = workspace.panelIdFromSurfaceId(selectedTab.id) else {
                 return false
             }

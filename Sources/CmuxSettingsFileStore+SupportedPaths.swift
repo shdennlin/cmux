@@ -25,6 +25,7 @@ extension CmuxSettingsFileStore {
         "app.focusHistoryIncludesPanesAndTabs",
         "app.equalizeSplitsOnCreate",
         "app.equalizeSplitsOnDividerDoubleClick",
+        "app.workspaceTopTabs",
         "app.preferredEditor",
         "app.defaultWorkspacePath",
         "app.openSupportedFilesInCmux",

@@ -61,8 +61,7 @@ extension Workspace {
 
         guard let panel = panels[panelId], let tabId = surfaceIdFromPanelId(panelId) else { return true }
         let baseTitle = panelTitles[panelId] ?? panel.displayTitle
-        activeBonsplitController.updateTab(
-            tabId,
+        bonsplitController(owningTab: tabId).updateTab(tabId,
             title: resolvedPanelTitle(panelId: panelId, fallback: baseTitle),
             hasCustomTitle: panelCustomTitles[panelId] != nil
         )

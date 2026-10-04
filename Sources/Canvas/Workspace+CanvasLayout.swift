@@ -22,6 +22,8 @@ extension Workspace {
     /// split tree itself is left untouched, so switching back restores it.
     func setLayoutMode(_ mode: WorkspaceLayoutMode) {
         guard mode != layoutMode else { return }
+        // Canvas has one pane layout; a workspace with several top tabs keeps splits.
+        if mode == .canvas && topTabs.count > 1 { return }
         if mode == .canvas {
             canvasModel.seedFromSplitFrames(splitPaneFramesByPanelId())
         }
@@ -74,7 +76,7 @@ extension Workspace {
     func bonsplitPaneId(forPanelId panelId: UUID) -> PaneID? {
         guard let tabId = surfaceIdFromPanelId(panelId) else { return nil }
         for paneId in activeBonsplitController.allPaneIds {
-            if activeBonsplitController.tabs(inPane: paneId).contains(where: { $0.id == tabId }) {
+            if bonsplitController(owningPane: paneId).tabs(inPane: paneId).contains(where: { $0.id == tabId }) {
                 return paneId
             }
         }

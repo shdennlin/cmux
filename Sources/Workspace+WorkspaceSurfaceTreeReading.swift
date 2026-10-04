@@ -28,29 +28,31 @@ extension Workspace: WorkspaceSurfaceTreeReading {
     /// surfaces. `DockSplitStore.paneId(forPanelId:)` already did it this way.
     func paneId(forPanelId panelId: UUID) -> PaneID? {
         guard let tabId = surfaceIdFromPanelId(panelId) else { return nil }
-        return activeBonsplitController.paneId(containing: tabId)
+        return bonsplitController(owningTab: tabId).paneId(containing: tabId)
     }
 
     func indexInPane(forPanelId panelId: UUID) -> Int? {
         guard let tabId = surfaceIdFromPanelId(panelId),
               let paneId = paneId(forPanelId: panelId) else { return nil }
-        return activeBonsplitController.tabs(inPane: paneId).firstIndex(where: { $0.id == tabId })
+        return bonsplitController(owningPane: paneId).tabs(inPane: paneId).firstIndex(where: { $0.id == tabId })
     }
 
+    /// Every surface in every top tab, the visible tab's first.
     var surfaceIdsInTabOrderAcrossAllPanes: [UUID] {
-        activeBonsplitController.allTabIds.map(\.uuid)
+        let others = topTabs.filter { $0.id != selectedTopTab.id }
+        return (activeBonsplitController.allTabIds + others.flatMap { $0.controller.allTabIds }).map(\.uuid)
     }
 
     var focusedPaneSelectedSurfaceId: UUID? {
         guard let paneId = activeBonsplitController.focusedPaneId,
-              let tab = activeBonsplitController.selectedTab(inPane: paneId) else {
+              let tab = bonsplitController(owningPane: paneId).selectedTab(inPane: paneId) else {
             return nil
         }
         return tab.id.uuid
     }
 
     var allPaneIds: [UUID] {
-        activeBonsplitController.allPaneIds.map(\.id)
+        allTopTabPaneIds.map(\.id)
     }
 
     var spatiallyOrderedPaneIds: [UUID] {
@@ -58,11 +60,11 @@ extension Workspace: WorkspaceSurfaceTreeReading {
     }
 
     func selectedSurfaceId(inPaneId paneId: UUID) -> UUID? {
-        activeBonsplitController.selectedTab(inPane: PaneID(id: paneId))?.id.uuid
+        bonsplitController(owningPane: PaneID(id: paneId)).selectedTab(inPane: PaneID(id: paneId))?.id.uuid
     }
 
     func surfaceIdsInTabOrder(inPaneId paneId: UUID) -> [UUID] {
-        activeBonsplitController.tabs(inPane: PaneID(id: paneId)).map(\.id.uuid)
+        bonsplitController(owningPane: PaneID(id: paneId)).tabs(inPane: PaneID(id: paneId)).map(\.id.uuid)
     }
 
     func panelId(forSurfaceId surfaceId: UUID) -> UUID? {
