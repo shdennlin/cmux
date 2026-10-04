@@ -825,6 +825,11 @@
           "description": "When true, double-clicking a split divider makes the panes in its row or column equal in size. Other rows and columns keep their sizes.",
           "descriptionKey": "schemaDescriptions.app.equalizeSplitsOnDividerDoubleClick"
         },
+        "workspaceTopTabs": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true, each workspace shows tabs above its split area and every tab owns its own split layout, so Split divides only the current tab. When false, a workspace has one split layout with tabs inside each pane."
+        },
         "preferredEditor": {
           "type": "string",
           "default": "",

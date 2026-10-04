@@ -177,7 +177,7 @@ extension Workspace {
         let previousTab = previousPane.flatMap { activeBonsplitController.selectedTab(inPane: $0)?.id }
         panels[panel.id] = panel
         panelTitles[panel.id] = Self.cloudManualMirrorTabTitle
-        guard let tab = activeBonsplitController.createTab(
+        guard let tab = bonsplitController(owningPane: pane).createTab(
             title: Self.cloudManualMirrorTabTitle,
             icon: panel.displayIcon,
             iconAsset: iconAssetName,
@@ -193,11 +193,11 @@ extension Workspace {
         }
         bindSurface(tab, toPanelId: panel.id)
         if let index {
-            let tabs = activeBonsplitController.tabs(inPane: pane)
+            let tabs = bonsplitController(owningPane: pane).tabs(inPane: pane)
             if let current = tabs.firstIndex(where: { $0.id == tab }) {
                 let target = min(max(index, 0), tabs.count - 1)
                 // Bonsplit accepts an insertion gap, not the final tab index.
-                _ = activeBonsplitController.reorderTab(tab, toIndex: target + (current < target ? 1 : 0))
+                _ = bonsplitController(owningTab: tab).reorderTab(tab, toIndex: target + (current < target ? 1 : 0))
             }
         }
         rememberTerminalConfigInheritanceSource(panel)
@@ -208,8 +208,8 @@ extension Workspace {
             // Creating a tab can select its target pane as a Bonsplit side
             // effect. A non-focused projection must preserve the caller's
             // active pane/tab so layout admission cannot steal keyboard focus.
-            activeBonsplitController.focusPane(previousPane)
-            if let previousTab { activeBonsplitController.selectTab(previousTab) }
+            bonsplitController(owningPane: previousPane).focusPane(previousPane)
+            if let previousTab { bonsplitController(owningTab: previousTab).selectTab(previousTab) }
             panel.unfocus()
         }
         return panel.id
@@ -245,8 +245,7 @@ extension Workspace {
         let orientation: SplitOrientation = (direction == .left || direction == .right) ? .horizontal : .vertical
         let insertFirst = direction == .left || direction == .up
         guard withSplitSpaceAdmissionBypass({
-            activeBonsplitController.splitPane(
-                target,
+            bonsplitController(owningPane: target).splitPane(target,
                 orientation: orientation,
                 withTab: tab,
                 insertFirst: insertFirst
@@ -262,8 +261,8 @@ extension Workspace {
         if focus {
             focusNewSplitPanel(panel.id, previousHostedView: previousHostedView, reason: "workspace.cloudSplitReparent")
         } else if let previousPane {
-            activeBonsplitController.focusPane(previousPane)
-            if let previousTab { activeBonsplitController.selectTab(previousTab) }
+            bonsplitController(owningPane: previousPane).focusPane(previousPane)
+            if let previousTab { bonsplitController(owningTab: previousTab).selectTab(previousTab) }
             panel.unfocus()
         }
         return panel.id
@@ -272,14 +271,14 @@ extension Workspace {
     /// Flags or clears the tab-strip spinner of a pane whose terminal is still arriving.
     func setCloudManualMirrorTabLoading(panelID: UUID, _ isLoading: Bool) {
         guard let tabID = surfaceIdFromPanelId(panelID) else { return }
-        activeBonsplitController.updateTab(tabID, isLoading: isLoading)
+        bonsplitController(owningTab: tabID).updateTab(tabID, isLoading: isLoading)
     }
 
     /// Updates a Cloud terminal tab after the daemon reports a provider identity change.
     func updateCloudTerminalTabIcon(panelID: UUID, assetName: String?) {
         guard let tabID = surfaceIdFromPanelId(panelID),
-              let tab = activeBonsplitController.tab(tabID), tab.iconAsset != assetName else { return }
-        activeBonsplitController.updateTab(tabID, iconAsset: .some(assetName))
+              let tab = bonsplitController(owningTab: tabID).tab(tabID), tab.iconAsset != assetName else { return }
+        bonsplitController(owningTab: tabID).updateTab(tabID, iconAsset: .some(assetName))
     }
 
     /// The live workspace with `id` in any window, or nil once it was retired.

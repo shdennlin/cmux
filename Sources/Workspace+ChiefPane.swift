@@ -39,7 +39,7 @@ extension Workspace {
         targetIndex: Int? = nil
     ) -> ChiefPanel? {
         guard !isRetiredFromOwningTabManager else { return nil }
-        let shouldFocusNewTab = focus ?? (activeBonsplitController.focusedPaneId == paneId)
+        let shouldFocusNewTab = focus ?? (bonsplitController(owningPane: paneId).focusedPaneId == paneId)
         let previousFocusedPanelId = focusedPanelId
         let previousHostedView = focusedTerminalInputTarget()?.panel.hostedView
 
@@ -48,7 +48,7 @@ extension Workspace {
         panelTitles[chiefPanel.id] = chiefPanel.displayTitle
         if isHome { pinnedPanelIds.insert(chiefPanel.id) }
 
-        guard let newTabId = activeBonsplitController.createTab(
+        guard let newTabId = bonsplitController(owningPane: paneId).createTab(
             title: chiefPanel.displayTitle,
             icon: chiefPanel.displayIcon,
             iconAsset: ChiefPanel.iconAssetName,
@@ -68,7 +68,7 @@ extension Workspace {
 
         bindSurface(newTabId, toPanelId: chiefPanel.id)
         if let targetIndex {
-            _ = activeBonsplitController.reorderTab(newTabId, toIndex: targetIndex)
+            _ = bonsplitController(owningTab: newTabId).reorderTab(newTabId, toIndex: targetIndex)
         }
         publishCmuxSurfaceCreated(
             chiefPanel.id,
@@ -79,8 +79,8 @@ extension Workspace {
         )
         if shouldFocusNewTab {
             leaveChiefHomeToShowChiefPane()
-            activeBonsplitController.focusPane(paneId)
-            activeBonsplitController.selectTab(newTabId)
+            bonsplitController(owningPane: paneId).focusPane(paneId)
+            bonsplitController(owningTab: newTabId).selectTab(newTabId)
             applyTabSelection(tabId: newTabId, inPane: paneId)
         } else {
             preserveFocusAfterNonFocusSplit(
@@ -134,8 +134,8 @@ extension Workspace {
     ) -> ChiefPanel? {
         guard !isRetiredFromOwningTabManager,
               let sourceTabId = surfaceIdFromPanelId(panelId),
-              let sourcePaneId = activeBonsplitController.allPaneIds.first(where: { paneId in
-                  activeBonsplitController.tabs(inPane: paneId).contains(where: { $0.id == sourceTabId })
+              let sourcePaneId = bonsplitController(owningTab: sourceTabId).allPaneIds.first(where: { paneId in
+                  bonsplitController(owningTab: sourceTabId).tabs(inPane: paneId).contains(where: { $0.id == sourceTabId })
               }),
               admitsSplitSpacePreflight(
                   splitting: sourcePaneId,
@@ -164,7 +164,7 @@ extension Workspace {
         isProgrammaticSplit = true
         defer { isProgrammaticSplit = false }
         guard let newPaneId = withSplitSpaceDividerPosition(initialDividerPosition, {
-            activeBonsplitController.splitPane(
+            bonsplitController(owningPane: sourcePaneId).splitPane(
                 sourcePaneId,
                 orientation: orientation,
                 withTab: tab,

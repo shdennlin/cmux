@@ -64,6 +64,7 @@ struct SettingsRowAnchorResolutionTests {
         "app.warnBeforeClosingWorkspace",
         "app.alwaysConfirmWorkspaceClose",
         "app.workspaceInheritWorkingDirectory",
+        "app.workspaceTopTabs",
         "agentMessages.enabled",
         "chief.dangerouslySkipPermissions",
         "chief.effort",

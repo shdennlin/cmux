@@ -31,7 +31,7 @@ extension TerminalController {
 
     func v2RefreshRemoteTmuxAwarePaneAndSurfaceRefs(workspace: Workspace) {
         for paneID in workspace.activeBonsplitController.allPaneIds {
-            let panelIDs = workspace.activeBonsplitController.tabs(inPane: paneID).compactMap {
+            let panelIDs = workspace.bonsplitController(owningPane: paneID).tabs(inPane: paneID).compactMap {
                 workspace.panelIdFromSurfaceId($0.id)
             }
             var hasOrdinarySurface = false

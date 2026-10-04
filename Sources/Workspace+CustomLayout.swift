@@ -40,7 +40,7 @@ extension Workspace {
     func sendConfigSetupCommand(_ command: String) {
         let firstTerminal: TerminalPanel? = focusedTerminalInputTarget()?.panel ?? {
             for paneId in activeBonsplitController.allPaneIds {
-                for tab in activeBonsplitController.tabs(inPane: paneId) {
+                for tab in bonsplitController(owningPane: paneId).tabs(inPane: paneId) {
                     if let panelId = panelIdFromSurfaceId(tab.id),
                        let terminal = terminalPanel(for: panelId) {
                         return terminal
