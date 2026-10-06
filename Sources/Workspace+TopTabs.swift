@@ -138,15 +138,71 @@ extension Workspace {
         notificationStore: TerminalNotificationStore? = nil
     ) -> Bool {
         guard let tab = topTabs.first(where: { $0.id == topTabId }) else { return false }
-        let notificationStore = notificationStore ?? AppDelegate.shared?.notificationStore
         return tab.controller.allTabIds.contains { tabId in
             guard let panelId = panelIdFromSurfaceId(tabId) else { return false }
-            return manualUnreadPanelIds.contains(panelId)
-                || (notificationStore?.hasVisibleNotificationIndicator(
-                    forTabId: id,
-                    surfaceId: panelId
-                ) ?? false)
+            return panelHasUnread(panelId, notificationStore: notificationStore)
         }
+    }
+
+    /// Whether one panel shows an unread indicator.
+    func panelHasUnread(
+        _ panelId: UUID,
+        notificationStore: TerminalNotificationStore? = nil
+    ) -> Bool {
+        let notificationStore = notificationStore ?? AppDelegate.shared?.notificationStore
+        return manualUnreadPanelIds.contains(panelId)
+            || (notificationStore?.hasVisibleNotificationIndicator(
+                forTabId: id,
+                surfaceId: panelId
+            ) ?? false)
+    }
+
+    /// What one panel's agent is doing, for its top tab's activity bar: the
+    /// sidebar's own verdict for that pane alone, so the two never disagree on
+    /// priority. Only pane-scoped status entries count. Entries are keyed per
+    /// workspace, and borrowing the workspace copy would paint another pane's
+    /// failure onto this one.
+    func panelActivityState(
+        _ panelId: UUID,
+        notificationStore: TerminalNotificationStore? = nil
+    ) -> TopTabActivityState? {
+        let lifecycle = (agentLifecycleStatesByPanelId[panelId] ?? [:])
+            .filter { !AgentHibernationLifecycleStatusKeys.isManualKey($0.key) }
+        let entries = (agentStatusEntriesByPanelId[panelId] ?? [:])
+            .filter { AgentHibernationLifecycleStatusKeys.isAllowed($0.key) }
+            .sorted { $0.key < $1.key }
+            .map(\.value)
+        let input = SidebarCompactStatusGlyph.Input(
+            agentEntries: entries,
+            lifecycleStates: Array(lifecycle.values),
+            hasActiveAgent: SidebarAgentActivitySummary.visibleActiveCodingAgentCount(
+                showsAgentActivity: true,
+                statesByPanelId: [panelId: lifecycle]
+            ) > 0
+        )
+        let kind = SidebarCompactStatusGlyph.resolve(input).kind
+        if let state = TopTabActivityState(glyphKind: kind) { return state }
+        // Only an agent that settled to idle can be "done". A terminal that
+        // never ran one, or an agent still waiting on a wakeup, is not.
+        if kind == .idle, panelHasUnread(panelId, notificationStore: notificationStore) {
+            return .done
+        }
+        return nil
+    }
+
+    /// The activity bar a top tab shows: the loudest state among its panels.
+    func topTabActivityState(
+        _ topTabId: UUID,
+        notificationStore: TerminalNotificationStore? = nil
+    ) -> TopTabActivityState? {
+        guard let tab = topTabs.first(where: { $0.id == topTabId }) else { return nil }
+        return tab.controller.allTabIds
+            .compactMap { tabId in
+                panelIdFromSurfaceId(tabId).flatMap {
+                    panelActivityState($0, notificationStore: notificationStore)
+                }
+            }
+            .max { $0.urgency < $1.urgency }
     }
 
     /// Every pane in every top tab, the visible tab's first.
