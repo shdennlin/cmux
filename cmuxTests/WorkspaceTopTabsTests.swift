@@ -154,6 +154,153 @@ struct WorkspaceTopTabsTests {
         #expect(workspace.spatiallyOrderedPaneIds.count == 1)
     }
 
+    // MARK: a top tab's activity bar follows the agents in its panels
+
+    @Test func topTabActivityStateFollowsItsPanelLifecycle() throws {
+        let workspace = Workspace()
+        let panel = try #require(workspace.focusedTerminalPanel)
+        let tab = workspace.topTabs[0]
+        #expect(workspace.topTabActivityState(tab.id) == nil)
+
+        workspace.setAgentLifecycle(key: "claude_code", panelId: panel.id, lifecycle: .running)
+        #expect(workspace.topTabActivityState(tab.id) == .running)
+
+        workspace.setAgentLifecycle(key: "claude_code", panelId: panel.id, lifecycle: .needsInput)
+        #expect(workspace.topTabActivityState(tab.id) == .needsInput)
+
+        // Done and waiting for nothing: no bar.
+        workspace.setAgentLifecycle(key: "claude_code", panelId: panel.id, lifecycle: .idle)
+        #expect(workspace.topTabActivityState(tab.id) == nil)
+
+        workspace.setAgentLifecycle(key: "claude_code", panelId: panel.id, lifecycle: .running)
+        #expect(workspace.clearAgentLifecycle(key: "claude_code", panelId: panel.id))
+        #expect(workspace.topTabActivityState(tab.id) == nil)
+    }
+
+    /// A tab hiding a pane that needs the person still asks for them.
+    @Test func topTabActivityStateTakesTheLoudestPanel() throws {
+        let workspace = Workspace()
+        let first = try #require(workspace.focusedTerminalPanel)
+        let second = try #require(workspace.newTerminalSplit(from: first.id, orientation: .horizontal, focus: false))
+        let tab = workspace.topTabs[0]
+
+        workspace.setAgentLifecycle(key: "claude_code", panelId: first.id, lifecycle: .running)
+        workspace.setAgentLifecycle(key: "codex", panelId: second.id, lifecycle: .needsInput)
+        #expect(workspace.topTabActivityState(tab.id) == .needsInput)
+
+        workspace.setAgentLifecycle(key: "codex", panelId: second.id, lifecycle: .idle)
+        #expect(workspace.topTabActivityState(tab.id) == .running)
+    }
+
+    @Test func backgroundTopTabShowsItsOwnPanelsActivity() throws {
+        let workspace = Workspace()
+        let backgroundPanel = try #require(workspace.focusedTerminalPanel)
+        let backgroundTab = workspace.topTabs[0]
+        let visibleTab = try #require(workspace.addTopTab(select: true, inheritingDirectoryFrom: backgroundPanel.id))
+
+        workspace.setAgentLifecycle(key: "claude_code", panelId: backgroundPanel.id, lifecycle: .running)
+
+        #expect(workspace.topTabActivityState(backgroundTab.id) == .running)
+        #expect(workspace.topTabActivityState(visibleTab.id) == nil)
+    }
+
+    // MARK: done, an agent that finished and has not been looked at yet
+
+    @Test func finishedAgentThatIsUnreadShowsDone() throws {
+        let workspace = Workspace()
+        let panel = try #require(workspace.focusedTerminalPanel)
+        let tab = workspace.topTabs[0]
+        workspace.setAgentLifecycle(key: "claude_code", panelId: panel.id, lifecycle: .idle)
+        #expect(workspace.topTabActivityState(tab.id) == nil)
+
+        workspace.markPanelUnread(panel.id)
+
+        #expect(workspace.topTabActivityState(tab.id) == .done)
+    }
+
+    @Test func doneGoesAwayOnceThePanelIsRead() throws {
+        let workspace = Workspace()
+        let panel = try #require(workspace.focusedTerminalPanel)
+        let tab = workspace.topTabs[0]
+        workspace.setAgentLifecycle(key: "claude_code", panelId: panel.id, lifecycle: .idle)
+        workspace.markPanelUnread(panel.id)
+        #expect(workspace.topTabActivityState(tab.id) == .done)
+
+        workspace.markPanelRead(panel.id)
+
+        #expect(workspace.topTabActivityState(tab.id) == nil)
+    }
+
+    /// A bell or a finished command in a plain terminal is unread too, but it
+    /// is not an agent finishing, so it gets no bar.
+    @Test func unreadTerminalWithoutAnAgentIsNotDone() throws {
+        let workspace = Workspace()
+        let panel = try #require(workspace.focusedTerminalPanel)
+        let tab = workspace.topTabs[0]
+
+        workspace.markPanelUnread(panel.id)
+
+        #expect(workspace.topTabActivityState(tab.id) == nil)
+    }
+
+    @Test func busyAgentShowsItsStateEvenWhenUnread() throws {
+        let workspace = Workspace()
+        let panel = try #require(workspace.focusedTerminalPanel)
+        let tab = workspace.topTabs[0]
+        workspace.markPanelUnread(panel.id)
+
+        workspace.setAgentLifecycle(key: "claude_code", panelId: panel.id, lifecycle: .running)
+        #expect(workspace.topTabActivityState(tab.id) == .running)
+
+        workspace.setAgentLifecycle(key: "claude_code", panelId: panel.id, lifecycle: .needsInput)
+        #expect(workspace.topTabActivityState(tab.id) == .needsInput)
+    }
+
+    @Test func doneShowsOnABackgroundTab() throws {
+        let workspace = Workspace()
+        let backgroundPanel = try #require(workspace.focusedTerminalPanel)
+        let backgroundTab = workspace.topTabs[0]
+        let visibleTab = try #require(workspace.addTopTab(select: true, inheritingDirectoryFrom: backgroundPanel.id))
+        workspace.setAgentLifecycle(key: "claude_code", panelId: backgroundPanel.id, lifecycle: .idle)
+
+        workspace.markPanelUnread(backgroundPanel.id)
+
+        #expect(workspace.topTabActivityState(backgroundTab.id) == .done)
+        #expect(workspace.topTabActivityState(visibleTab.id) == nil)
+    }
+
+    /// Done is the quietest bar: a tab with a finished pane and a working one
+    /// still reads as working.
+    @Test func runningPanelOutranksADonePanelInTheSameTab() throws {
+        let workspace = Workspace()
+        let first = try #require(workspace.focusedTerminalPanel)
+        let second = try #require(workspace.newTerminalSplit(from: first.id, orientation: .horizontal, focus: false))
+        let tab = workspace.topTabs[0]
+        workspace.setAgentLifecycle(key: "claude_code", panelId: first.id, lifecycle: .idle)
+        workspace.markPanelUnread(first.id)
+        #expect(workspace.topTabActivityState(tab.id) == .done)
+
+        workspace.setAgentLifecycle(key: "codex", panelId: second.id, lifecycle: .running)
+
+        #expect(workspace.topTabActivityState(tab.id) == .running)
+    }
+
+    /// The sidebar rows are painted from these same hexes by the agent-status
+    /// daemon, so one state is one colour on both. A value changes in both
+    /// places or in neither.
+    @Test func activityBarColorsAreTheSharedPalette() {
+        let palette: [(state: TopTabActivityState, light: String, dark: String)] = [
+            (.done, "#34C759", "#3FCF6E"),
+            (.running, "#2F7BF5", "#4C8DFF"),
+            (.needsInput, "#E8920A", "#F5A524"),
+            (.error, "#E5342B", "#FF453A"),
+        ]
+        for entry in palette {
+            #expect(entry.state.hex(isDark: false) == entry.light, "\(entry.state) in light")
+            #expect(entry.state.hex(isDark: true) == entry.dark, "\(entry.state) in dark")
+        }
+    }
+
     // MARK: a top tab shows the agent running in its panel
 
     @Test func topTabShowsTheAgentMarkOfItsOwnPanel() throws {

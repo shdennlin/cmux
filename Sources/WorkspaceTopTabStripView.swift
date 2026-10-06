@@ -167,6 +167,11 @@ struct WorkspaceTopTabStripView: View {
                     .matchedGeometryEffect(id: "activeIndicator", in: activeIndicatorNamespace)
             }
         }
+        .overlay(alignment: .bottom) {
+            if let activity = workspace.topTabActivityState(tab.id, notificationStore: notificationStore) {
+                WorkspaceTopTabActivityBar(state: activity)
+            }
+        }
         .background(
             GeometryReader { proxy in
                 Color.clear.preference(
