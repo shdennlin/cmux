@@ -647802,6 +647802,183 @@
           }
         }
       }
+    },
+    "cli.help.clearTabState": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usage: cmux clear-tab-state [flags]\n\nClear the state set with set-tab-state, so the tab's activity bar\nfollows cmux's own agent state again.\n\nFlags:\n  --surface <id|ref|index>     Target surface (default: $CMUX_SURFACE_ID)\n  --workspace <id|ref|index>   Workspace of the surface\n  --window <id|ref|index>      Window context for workspace/surface refs\n\nExample:\n  cmux clear-tab-state --surface surface:3"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الاستخدام: cmux clear-tab-state [flags]\n\nيمسح الحالة المعيّنة باستخدام set-tab-state، بحيث يعود شريط نشاط علامة التبويب\nإلى اتباع حالة الوكيل الخاصة بـ cmux.\n\nالخيارات:\n  --surface <id|ref|index>     السطح المستهدف (الافتراضي: $CMUX_SURFACE_ID)\n  --workspace <id|ref|index>   مساحة العمل التي تحتوي السطح\n  --window <id|ref|index>      سياق النافذة لمراجع مساحة العمل/السطح\n\nمثال:\n  cmux clear-tab-state --surface surface:3"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verwendung: cmux clear-tab-state [flags]\n\nLöscht den mit set-tab-state gesetzten Zustand, sodass die Aktivitätsleiste des Tabs\nwieder dem eigenen Agentenzustand von cmux folgt.\n\nFlags:\n  --surface <id|ref|index>     Ziel-Surface (Standard: $CMUX_SURFACE_ID)\n  --workspace <id|ref|index>   Arbeitsbereich der Surface\n  --window <id|ref|index>      Fensterkontext für Arbeitsbereichs-/Surface-Referenzen\n\nBeispiel:\n  cmux clear-tab-state --surface surface:3"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uso: cmux clear-tab-state [flags]\n\nBorra el estado definido con set-tab-state para que la barra de actividad de la pestaña\nvuelva a seguir el estado de agente propio de cmux.\n\nOpciones:\n  --surface <id|ref|index>     Superficie objetivo (por defecto: $CMUX_SURFACE_ID)\n  --workspace <id|ref|index>   Espacio de trabajo de la superficie\n  --window <id|ref|index>      Contexto de ventana para referencias de espacio de trabajo/superficie\n\nEjemplo:\n  cmux clear-tab-state --surface surface:3"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utilisation : cmux clear-tab-state [flags]\n\nEfface l'état défini avec set-tab-state, afin que la barre d'activité de l'onglet\nsuive à nouveau l'état d'agent propre à cmux.\n\nOptions :\n  --surface <id|ref|index>     Surface cible (par défaut : $CMUX_SURFACE_ID)\n  --workspace <id|ref|index>   Espace de travail de la surface\n  --window <id|ref|index>      Contexte de fenêtre pour les références d'espace de travail/de surface\n\nExemple :\n  cmux clear-tab-state --surface surface:3"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usage: cmux clear-tab-state [flags]\n\nset-tab-state で設定した状態をクリアし、\nタブのアクティビティバーが再び cmux 自身のエージェント状態に従うようにします。\n\nFlags:\n  --surface <id|ref|index>     対象サーフェス（デフォルト: $CMUX_SURFACE_ID）\n  --workspace <id|ref|index>   サーフェスのワークスペース\n  --window <id|ref|index>      ワークスペース/サーフェス参照のウィンドウコンテキスト\n\nExample:\n  cmux clear-tab-state --surface surface:3"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "사용법: cmux clear-tab-state [flags]\n\nset-tab-state로 설정한 상태를 지워서\n탭의 활동 표시줄이 다시 cmux 자체의 에이전트 상태를 따르도록 합니다.\n\n플래그:\n  --surface <id|ref|index>     대상 서피스 (기본값: $CMUX_SURFACE_ID)\n  --workspace <id|ref|index>   서피스가 속한 작업 공간\n  --window <id|ref|index>      작업 공간/서피스 참조의 창 컨텍스트\n\n예시:\n  cmux clear-tab-state --surface surface:3"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用法：cmux clear-tab-state [flags]\n\n清除用 set-tab-state 设置的状态，\n让标签页的活动栏重新跟随 cmux 自身的 agent 状态。\n\n标志:\n  --surface <id|ref|index>     目标 surface（默认：$CMUX_SURFACE_ID）\n  --workspace <id|ref|index>   surface 所在的工作区\n  --window <id|ref|index>      工作区/surface 引用所用的窗口\n\n示例:\n  cmux clear-tab-state --surface surface:3"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用法：cmux clear-tab-state [flags]\n\n清除以 set-tab-state 設定的狀態，\n讓分頁的活動列重新依照 cmux 自己的 agent 狀態顯示。\n\n旗標：\n  --surface <id|ref|index>     目標 surface（預設值：$CMUX_SURFACE_ID）\n  --workspace <id|ref|index>   surface 所在的工作區\n  --window <id|ref|index>      工作區/surface 參照所用的視窗\n\n範例：\n  cmux clear-tab-state --surface surface:3"
+          }
+        }
+      }
+    },
+    "cli.help.listTabState": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usage: cmux list-tab-state [flags]\n\nList the tabs in a workspace that have a state set with set-tab-state.\n\nFlags:\n  --workspace <id|ref|index>   Target workspace (default: $CMUX_WORKSPACE_ID)\n  --window <id|ref|index>      Window context for workspace refs and indexes\n  --json                       Print the full payload as JSON\n\nExample:\n  cmux list-tab-state --json"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الاستخدام: cmux list-tab-state [flags]\n\nيسرد علامات التبويب في مساحة العمل التي لها حالة معيّنة باستخدام set-tab-state.\n\nالخيارات:\n  --workspace <id|ref|index>   مساحة العمل المستهدفة (الافتراضي: $CMUX_WORKSPACE_ID)\n  --window <id|ref|index>      سياق النافذة لمراجع مساحات العمل وفهارسها\n  --json                       طباعة الحمولة الكاملة بتنسيق JSON\n\nمثال:\n  cmux list-tab-state --json"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verwendung: cmux list-tab-state [flags]\n\nListet die Tabs eines Arbeitsbereichs auf, für die mit set-tab-state ein Zustand gesetzt ist.\n\nFlags:\n  --workspace <id|ref|index>   Ziel-Arbeitsbereich (Standard: $CMUX_WORKSPACE_ID)\n  --window <id|ref|index>      Fensterkontext für Arbeitsbereichsreferenzen und -indizes\n  --json                       Vollständige Nutzdaten als JSON ausgeben\n\nBeispiel:\n  cmux list-tab-state --json"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uso: cmux list-tab-state [flags]\n\nEnumera las pestañas de un espacio de trabajo que tienen un estado definido con set-tab-state.\n\nOpciones:\n  --workspace <id|ref|index>   Espacio de trabajo objetivo (por defecto: $CMUX_WORKSPACE_ID)\n  --window <id|ref|index>      Contexto de ventana para referencias e índices de espacio de trabajo\n  --json                       Imprimir la carga completa como JSON\n\nEjemplo:\n  cmux list-tab-state --json"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utilisation : cmux list-tab-state [flags]\n\nListe les onglets d'un espace de travail dont l'état a été défini avec set-tab-state.\n\nOptions :\n  --workspace <id|ref|index>   Espace de travail cible (par défaut : $CMUX_WORKSPACE_ID)\n  --window <id|ref|index>      Contexte de fenêtre pour les références et index d'espace de travail\n  --json                       Afficher la charge utile complète en JSON\n\nExemple :\n  cmux list-tab-state --json"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usage: cmux list-tab-state [flags]\n\nset-tab-state で状態が設定されているワークスペース内のタブを一覧表示します。\n\nFlags:\n  --workspace <id|ref|index>   対象ワークスペース（デフォルト: $CMUX_WORKSPACE_ID）\n  --window <id|ref|index>      ワークスペース参照とインデックスのウィンドウコンテキスト\n  --json                       完全なペイロードを JSON で出力\n\nExample:\n  cmux list-tab-state --json"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "사용법: cmux list-tab-state [flags]\n\n작업 공간에서 set-tab-state로 상태가 설정된 탭을 나열합니다.\n\n플래그:\n  --workspace <id|ref|index>   대상 작업 공간 (기본값: $CMUX_WORKSPACE_ID)\n  --window <id|ref|index>      작업 공간 참조 및 인덱스의 창 컨텍스트\n  --json                       전체 페이로드를 JSON으로 출력\n\n예시:\n  cmux list-tab-state --json"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用法：cmux list-tab-state [flags]\n\n列出工作区中用 set-tab-state 设置了状态的标签页。\n\n标志:\n  --workspace <id|ref|index>   目标工作区（默认：$CMUX_WORKSPACE_ID）\n  --window <id|ref|index>      工作区引用和索引所用的窗口\n  --json                       以 JSON 输出完整内容\n\n示例:\n  cmux list-tab-state --json"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用法：cmux list-tab-state [flags]\n\n列出工作區中以 set-tab-state 設定了狀態的分頁。\n\n旗標：\n  --workspace <id|ref|index>   目標工作區（預設值：$CMUX_WORKSPACE_ID）\n  --window <id|ref|index>      工作區參照與索引所用的視窗\n  --json                       以 JSON 輸出完整內容\n\n範例：\n  cmux list-tab-state --json"
+          }
+        }
+      }
+    },
+    "cli.help.setTabState": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usage: cmux set-tab-state <running|needs-input|error|idle> [flags]\n\nSet what the activity bar under a tab shows. The bar uses this state\ninstead of cmux's own agent state until you clear it, so a tool that\nknows better (from its own hooks) can correct it. idle hides the bar.\nThe state is display-only, lasts as long as the tab, and the last\nwriter wins.\n\nFlags:\n  --surface <id|ref|index>     Target surface (default: $CMUX_SURFACE_ID)\n  --workspace <id|ref|index>   Workspace of the surface\n  --window <id|ref|index>      Window context for workspace/surface refs\n\nExample:\n  cmux set-tab-state running\n  cmux set-tab-state needs-input --surface surface:3"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الاستخدام: cmux set-tab-state <running|needs-input|error|idle> [flags]\n\nيحدد ما يعرضه شريط النشاط أسفل علامة التبويب. يستخدم الشريط\nهذه الحالة بدلًا من حالة الوكيل الخاصة بـ cmux حتى\nتمسحها، بحيث تتمكن أداة تعرف الحالة بدقة أكبر (من خلال\nخطافاتها الخاصة) من تصحيحها. القيمة idle تخفي الشريط. الحالة للعرض\nفقط، وتبقى طوال وجود علامة التبويب، ويُعتمد آخر ما يُكتب.\n\nالخيارات:\n  --surface <id|ref|index>     السطح المستهدف (الافتراضي: $CMUX_SURFACE_ID)\n  --workspace <id|ref|index>   مساحة العمل التي تحتوي السطح\n  --window <id|ref|index>      سياق النافذة لمراجع مساحة العمل/السطح\n\nمثال:\n  cmux set-tab-state running\n  cmux set-tab-state needs-input --surface surface:3"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verwendung: cmux set-tab-state <running|needs-input|error|idle> [flags]\n\nLegt fest, was die Aktivitätsleiste unter einem Tab anzeigt. Die Leiste verwendet\ndiesen Zustand anstelle des eigenen Agentenzustands von cmux, bis Sie ihn löschen,\ndamit ein Werkzeug, das es (über eigene Hooks) besser weiß, die Anzeige\nkorrigieren kann. idle blendet die Leiste aus. Der Zustand dient nur der\nAnzeige, gilt so lange wie der Tab, und der letzte Schreibvorgang gewinnt.\n\nFlags:\n  --surface <id|ref|index>     Ziel-Surface (Standard: $CMUX_SURFACE_ID)\n  --workspace <id|ref|index>   Arbeitsbereich der Surface\n  --window <id|ref|index>      Fensterkontext für Arbeitsbereichs-/Surface-Referenzen\n\nBeispiel:\n  cmux set-tab-state running\n  cmux set-tab-state needs-input --surface surface:3"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uso: cmux set-tab-state <running|needs-input|error|idle> [flags]\n\nDefine lo que muestra la barra de actividad bajo una pestaña. La\nbarra usa este estado en lugar del estado de agente propio de cmux\nhasta que lo borres, para que una herramienta mejor informada (por sus\npropios hooks) pueda corregirlo. idle oculta la barra. El estado es solo de\nvisualización, dura lo mismo que la pestaña y prevalece la última escritura.\n\nOpciones:\n  --surface <id|ref|index>     Superficie objetivo (por defecto: $CMUX_SURFACE_ID)\n  --workspace <id|ref|index>   Espacio de trabajo de la superficie\n  --window <id|ref|index>      Contexto de ventana para referencias de espacio de trabajo/superficie\n\nEjemplo:\n  cmux set-tab-state running\n  cmux set-tab-state needs-input --surface surface:3"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utilisation : cmux set-tab-state <running|needs-input|error|idle> [flags]\n\nDéfinit ce qu'affiche la barre d'activité sous un onglet. La barre utilise\ncet état au lieu de l'état d'agent propre à cmux jusqu'à ce\nque vous l'effaciez, afin qu'un outil mieux informé (grâce à ses\npropres hooks) puisse le corriger. idle masque la barre. L'état sert uniquement\nà l'affichage, dure aussi longtemps que l'onglet, et la dernière écriture l'emporte.\n\nOptions :\n  --surface <id|ref|index>     Surface cible (par défaut : $CMUX_SURFACE_ID)\n  --workspace <id|ref|index>   Espace de travail de la surface\n  --window <id|ref|index>      Contexte de fenêtre pour les références d'espace de travail/de surface\n\nExemple :\n  cmux set-tab-state running\n  cmux set-tab-state needs-input --surface surface:3"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usage: cmux set-tab-state <running|needs-input|error|idle> [flags]\n\nタブの下にあるアクティビティバーの表示を設定します。\nクリアするまで、バーは cmux 自身のエージェント状態ではなくこの状態を使用します。\nそのため、（独自のフックで）状況をより正確に把握しているツールが表示を補正できます。\nidle を指定するとバーは非表示になります。\nこの状態は表示専用で、タブが存在する間だけ保持され、最後に設定した値が優先されます。\n\nFlags:\n  --surface <id|ref|index>     対象サーフェス（デフォルト: $CMUX_SURFACE_ID）\n  --workspace <id|ref|index>   サーフェスのワークスペース\n  --window <id|ref|index>      ワークスペース/サーフェス参照のウィンドウコンテキスト\n\nExample:\n  cmux set-tab-state running\n  cmux set-tab-state needs-input --surface surface:3"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "사용법: cmux set-tab-state <running|needs-input|error|idle> [flags]\n\n탭 아래 활동 표시줄에 표시할 내용을 설정합니다. 지우기 전까지\n표시줄은 cmux 자체의 에이전트 상태 대신 이 상태를 사용하므로,\n(자체 훅을 통해) 상태를 더 정확히 아는 도구가 이를\n바로잡을 수 있습니다. idle은 표시줄을 숨깁니다. 이 상태는 표시\n전용이며 탭이 있는 동안 유지되고, 마지막으로 쓴 값이 우선합니다.\n\n플래그:\n  --surface <id|ref|index>     대상 서피스 (기본값: $CMUX_SURFACE_ID)\n  --workspace <id|ref|index>   서피스가 속한 작업 공간\n  --window <id|ref|index>      작업 공간/서피스 참조의 창 컨텍스트\n\n예시:\n  cmux set-tab-state running\n  cmux set-tab-state needs-input --surface surface:3"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用法：cmux set-tab-state <running|needs-input|error|idle> [flags]\n\n设置标签页下方活动栏显示的内容。\n在你清除之前，活动栏会使用此状态，而不是 cmux 自身的 agent 状态，\n以便（通过自身 hook）更了解情况的工具能够修正它。\nidle 会隐藏活动栏。\n此状态仅用于显示，与标签页同时存在，以最后写入的值为准。\n\n标志:\n  --surface <id|ref|index>     目标 surface（默认：$CMUX_SURFACE_ID）\n  --workspace <id|ref|index>   surface 所在的工作区\n  --window <id|ref|index>      工作区/surface 引用所用的窗口\n\n示例:\n  cmux set-tab-state running\n  cmux set-tab-state needs-input --surface surface:3"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用法：cmux set-tab-state <running|needs-input|error|idle> [flags]\n\n設定分頁下方活動列要顯示的內容。\n在你清除之前，活動列會使用這個狀態，而不是 cmux 自己的 agent 狀態，\n讓（透過自身 hook）更清楚狀況的工具能修正它。\nidle 會隱藏活動列。\n這個狀態只影響顯示，存續期間與分頁相同，以最後寫入的值為準。\n\n旗標：\n  --surface <id|ref|index>     目標 surface（預設值：$CMUX_SURFACE_ID）\n  --workspace <id|ref|index>   surface 所在的工作區\n  --window <id|ref|index>      工作區/surface 參照所用的視窗\n\n範例：\n  cmux set-tab-state running\n  cmux set-tab-state needs-input --surface surface:3"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

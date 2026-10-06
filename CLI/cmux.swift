@@ -8199,6 +8199,12 @@ struct CMUXCLI {
             }
             let response = try sendV1Command(socketCmd, client: client)
             print(response)
+        case "set-tab-state":
+            try runSetTabState(commandArgs: commandArgs, client: client, jsonOutput: jsonOutput, idFormat: idFormat, windowOverride: windowId)
+        case "clear-tab-state":
+            try runClearTabState(commandArgs: commandArgs, client: client, jsonOutput: jsonOutput, idFormat: idFormat, windowOverride: windowId)
+        case "list-tab-state":
+            try runListTabState(commandArgs: commandArgs, client: client, jsonOutput: jsonOutput, idFormat: idFormat, windowOverride: windowId)
         case "set-status":
             let response = try forwardSidebarMetadataCommand(
                 "set_status",
@@ -21448,6 +21454,54 @@ struct CMUXCLI {
             Example:
               cmux set-status build "compiling" --icon hammer --color "#ff9500" --priority 80
               cmux set-status deploy "v1.2.3" --workspace workspace:2
+            """)
+        case "set-tab-state":
+            return String(localized: "cli.help.setTabState", defaultValue: """
+            Usage: cmux set-tab-state <running|needs-input|error|idle> [flags]
+
+            Set what the activity bar under a tab shows. The bar uses this state
+            instead of cmux's own agent state until you clear it, so a tool that
+            knows better (from its own hooks) can correct it. idle hides the bar.
+            The state is display-only, lasts as long as the tab, and the last
+            writer wins.
+
+            Flags:
+              --surface <id|ref|index>     Target surface (default: $CMUX_SURFACE_ID)
+              --workspace <id|ref|index>   Workspace of the surface
+              --window <id|ref|index>      Window context for workspace/surface refs
+
+            Example:
+              cmux set-tab-state running
+              cmux set-tab-state needs-input --surface surface:3
+            """)
+        case "clear-tab-state":
+            return String(localized: "cli.help.clearTabState", defaultValue: """
+            Usage: cmux clear-tab-state [flags]
+
+            Clear the state set with set-tab-state, so the tab's activity bar
+            follows cmux's own agent state again.
+
+            Flags:
+              --surface <id|ref|index>     Target surface (default: $CMUX_SURFACE_ID)
+              --workspace <id|ref|index>   Workspace of the surface
+              --window <id|ref|index>      Window context for workspace/surface refs
+
+            Example:
+              cmux clear-tab-state --surface surface:3
+            """)
+        case "list-tab-state":
+            return String(localized: "cli.help.listTabState", defaultValue: """
+            Usage: cmux list-tab-state [flags]
+
+            List the tabs in a workspace that have a state set with set-tab-state.
+
+            Flags:
+              --workspace <id|ref|index>   Target workspace (default: $CMUX_WORKSPACE_ID)
+              --window <id|ref|index>      Window context for workspace refs and indexes
+              --json                       Print the full payload as JSON
+
+            Example:
+              cmux list-tab-state --json
             """)
         case "clear-status":
             return """

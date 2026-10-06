@@ -1345,6 +1345,7 @@
 		D96970000000000000000006 /* CMUXCLI+Sudo.swift in Sources */ = {isa = PBXBuildFile; fileRef = D96971000000000000000001 /* CMUXCLI+Sudo.swift */; };
 		A10020000000000000000007 /* CMUXCLI+SurfaceSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10020000000000000000008 /* CMUXCLI+SurfaceSelection.swift */; };
 		A1329C0B0000000000000101 /* CMUXCLI+SurfaceSizing.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1329C0B0000000000000001 /* CMUXCLI+SurfaceSizing.swift */; };
+		B0104AE00B634B13C90A9382 /* CMUXCLI+TabState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EB5DB2E2B0F0195DE69CD1D /* CMUXCLI+TabState.swift */; };
 		B6E774493F579BDC8C8BD8C1 /* CMUXCLI+TaskHelp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 330D98B52CC6A159D363DA42 /* CMUXCLI+TaskHelp.swift */; };
 		C2538001A1B2C3D4E5F60719 /* CMUXCLI+TerminalCreation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2538002A1B2C3D4E5F60719 /* CMUXCLI+TerminalCreation.swift */; };
 		B900002EA1B2C3D4E5F60719 /* CMUXCLI+Themes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B900002CA1B2C3D4E5F60719 /* CMUXCLI+Themes.swift */; };
@@ -3801,6 +3802,7 @@
 		C51A73000000000000000301 /* TerminalController+ControlSurfacePanelType.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51A73000000000000000302 /* TerminalController+ControlSurfacePanelType.swift */; };
 		C0DE00000000000000000C7A /* TerminalController+ControlSystemContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE00000000000000000C79 /* TerminalController+ControlSystemContext.swift */; };
 		C0DE00000000000000000C7C /* TerminalController+ControlSystemContext2.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE00000000000000000C7B /* TerminalController+ControlSystemContext2.swift */; };
+		5766DA4526FE7FE8F9C43D52 /* TerminalController+ControlTabStateContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8834D0AC5CBB55D69E5111C6 /* TerminalController+ControlTabStateContext.swift */; };
 		93300003A1B2C3D4E5F60718 /* TerminalController+ControlTerminalBinding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93300004A1B2C3D4E5F60718 /* TerminalController+ControlTerminalBinding.swift */; };
 		C0DE00000000000000000C62 /* TerminalController+ControlWorkspaceContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE00000000000000000C61 /* TerminalController+ControlWorkspaceContext.swift */; };
 		C0DE00000000000000000C54 /* TerminalController+ControlWorkspaceGroupContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE00000000000000000C53 /* TerminalController+ControlWorkspaceGroupContext.swift */; };
@@ -4156,6 +4158,8 @@
 		E30760000000000000000002 /* TmuxWorkspacePaneOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30760000000000000000001 /* TmuxWorkspacePaneOverlayView.swift */; };
 		C01E00020000000000000001 /* TokenTheme+AppKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = C01E00020000000000000002 /* TokenTheme+AppKit.swift */; };
 		068FDF0269B95D0787A65AE6 /* TopTabActivityState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A2BE2CC4E18940779F1091 /* TopTabActivityState.swift */; };
+		F9A94B34F0E5074C8FF88B6E /* TopTabExternalState.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCA743F3A9F1396FCDA816F5 /* TopTabExternalState.swift */; };
+		8172EBBAF93933E5AD53921D /* TopTabExternalStateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BFBA4ADA2C0B6D5A27540C9 /* TopTabExternalStateStore.swift */; };
 		D3284001A1B2C3D4E5F60718 /* TraditionalChineseIMENumpadRegressionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3284002A1B2C3D4E5F60718 /* TraditionalChineseIMENumpadRegressionTests.swift */; };
 		468100000000000000000003 /* TypingHotPathRegressionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 468100000000000000000004 /* TypingHotPathRegressionTests.swift */; };
 		D9A1B2C3D4E5000000000001 /* UITestDiagnosticsWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9A1B2C3D4E5000000000002 /* UITestDiagnosticsWriter.swift */; };
@@ -5949,6 +5953,7 @@
 		D96971000000000000000001 /* CMUXCLI+Sudo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CMUXCLI+Sudo.swift"; sourceTree = "<group>"; };
 		A10020000000000000000008 /* CMUXCLI+SurfaceSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CMUXCLI+SurfaceSelection.swift"; sourceTree = "<group>"; };
 		A1329C0B0000000000000001 /* CMUXCLI+SurfaceSizing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CMUXCLI+SurfaceSizing.swift"; sourceTree = "<group>"; };
+		9EB5DB2E2B0F0195DE69CD1D /* CMUXCLI+TabState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CMUXCLI+TabState.swift"; sourceTree = "<group>"; };
 		330D98B52CC6A159D363DA42 /* CMUXCLI+TaskHelp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CMUXCLI+TaskHelp.swift"; sourceTree = "<group>"; };
 		C2538002A1B2C3D4E5F60719 /* CMUXCLI+TerminalCreation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CMUXCLI+TerminalCreation.swift"; sourceTree = "<group>"; };
 		B900002CA1B2C3D4E5F60719 /* CMUXCLI+Themes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CMUXCLI+Themes.swift"; sourceTree = "<group>"; };
@@ -8266,6 +8271,7 @@
 		C51A73000000000000000302 /* TerminalController+ControlSurfacePanelType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TerminalController+ControlSurfacePanelType.swift"; sourceTree = "<group>"; };
 		C0DE00000000000000000C79 /* TerminalController+ControlSystemContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TerminalController+ControlSystemContext.swift"; sourceTree = "<group>"; };
 		C0DE00000000000000000C7B /* TerminalController+ControlSystemContext2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TerminalController+ControlSystemContext2.swift"; sourceTree = "<group>"; };
+		8834D0AC5CBB55D69E5111C6 /* TerminalController+ControlTabStateContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TerminalController+ControlTabStateContext.swift"; sourceTree = "<group>"; };
 		93300004A1B2C3D4E5F60718 /* TerminalController+ControlTerminalBinding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TerminalController+ControlTerminalBinding.swift"; sourceTree = "<group>"; };
 		C0DE00000000000000000C61 /* TerminalController+ControlWorkspaceContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TerminalController+ControlWorkspaceContext.swift"; sourceTree = "<group>"; };
 		C0DE00000000000000000C53 /* TerminalController+ControlWorkspaceGroupContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TerminalController+ControlWorkspaceGroupContext.swift"; sourceTree = "<group>"; };
@@ -8621,6 +8627,8 @@
 		E30760000000000000000001 /* TmuxWorkspacePaneOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TmuxWorkspacePaneOverlayView.swift; sourceTree = "<group>"; };
 		C01E00020000000000000002 /* TokenTheme+AppKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Panels/TokenTheme+AppKit.swift"; sourceTree = "<group>"; };
 		A1A2BE2CC4E18940779F1091 /* TopTabActivityState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopTabActivityState.swift; sourceTree = "<group>"; };
+		FCA743F3A9F1396FCDA816F5 /* TopTabExternalState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopTabExternalState.swift; sourceTree = "<group>"; };
+		0BFBA4ADA2C0B6D5A27540C9 /* TopTabExternalStateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopTabExternalStateStore.swift; sourceTree = "<group>"; };
 		D3284002A1B2C3D4E5F60718 /* TraditionalChineseIMENumpadRegressionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraditionalChineseIMENumpadRegressionTests.swift; sourceTree = "<group>"; };
 		468100000000000000000004 /* TypingHotPathRegressionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypingHotPathRegressionTests.swift; sourceTree = "<group>"; };
 		D9A1B2C3D4E5000000000002 /* UITestDiagnosticsWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Debug/UITests/UITestDiagnosticsWriter.swift"; sourceTree = "<group>"; };
@@ -12124,6 +12132,9 @@
 				A1A2BE2CC4E18940779F1091 /* TopTabActivityState.swift */,
 				7281251E48C8A3971C450E9B /* WorkspaceTopTabActivityBar.swift */,
 				2CA2BF52B09E3B1A1F7D49BE /* WorkspaceTopTabActivityBarLayerView.swift */,
+				8834D0AC5CBB55D69E5111C6 /* TerminalController+ControlTabStateContext.swift */,
+				FCA743F3A9F1396FCDA816F5 /* TopTabExternalState.swift */,
+				0BFBA4ADA2C0B6D5A27540C9 /* TopTabExternalStateStore.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -12405,6 +12416,7 @@
 				5B85EF1F8C40AF5C89F442A8 /* CMUXCLI+AgentMessageSettings.swift */,
 				6EA23FD5F4147585610132E4 /* CMUXCLI+BrowserRepl.swift */,
 				F0226FF4BE571A2BA5B5AB16 /* CMUXCLI+VPN.swift */,
+				9EB5DB2E2B0F0195DE69CD1D /* CMUXCLI+TabState.swift */,
 			);
 			path = CLI;
 			sourceTree = "<group>";
@@ -16605,6 +16617,7 @@
 				C51A73000000000000000301 /* TerminalController+ControlSurfacePanelType.swift in Sources */,
 				C0DE00000000000000000C7A /* TerminalController+ControlSystemContext.swift in Sources */,
 				C0DE00000000000000000C7C /* TerminalController+ControlSystemContext2.swift in Sources */,
+				5766DA4526FE7FE8F9C43D52 /* TerminalController+ControlTabStateContext.swift in Sources */,
 				93300003A1B2C3D4E5F60718 /* TerminalController+ControlTerminalBinding.swift in Sources */,
 				C0DE00000000000000000C62 /* TerminalController+ControlWorkspaceContext.swift in Sources */,
 				C0DE00000000000000000C54 /* TerminalController+ControlWorkspaceGroupContext.swift in Sources */,
@@ -16886,6 +16899,8 @@
 				E30760000000000000000002 /* TmuxWorkspacePaneOverlayView.swift in Sources */,
 					C01E00020000000000000001 /* TokenTheme+AppKit.swift in Sources */,
 				068FDF0269B95D0787A65AE6 /* TopTabActivityState.swift in Sources */,
+				F9A94B34F0E5074C8FF88B6E /* TopTabExternalState.swift in Sources */,
+				8172EBBAF93933E5AD53921D /* TopTabExternalStateStore.swift in Sources */,
 				D9A1B2C3D4E5000000000001 /* UITestDiagnosticsWriter.swift in Sources */,
 				234457BD526EDFF5A1AA558C /* UITestFixtureTeamsAuthClient.swift in Sources */,
 				A5001501 /* UITestRecorder.swift in Sources */,
@@ -17345,6 +17360,7 @@
 				D96970000000000000000006 /* CMUXCLI+Sudo.swift in Sources */,
 				A10020000000000000000007 /* CMUXCLI+SurfaceSelection.swift in Sources */,
 				A1329C0B0000000000000101 /* CMUXCLI+SurfaceSizing.swift in Sources */,
+				B0104AE00B634B13C90A9382 /* CMUXCLI+TabState.swift in Sources */,
 				B6E774493F579BDC8C8BD8C1 /* CMUXCLI+TaskHelp.swift in Sources */,
 				C2538001A1B2C3D4E5F60719 /* CMUXCLI+TerminalCreation.swift in Sources */,
 				B900002EA1B2C3D4E5F60719 /* CMUXCLI+Themes.swift in Sources */,

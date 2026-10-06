@@ -335,6 +335,9 @@ extension CMUXCLI {
         set-status <key> <value> [--workspace <id|ref|index>] [--window <id|ref|index>] [--icon <name>] [--color <#hex>] [--priority <n>]
         clear-status <key> [--workspace <id|ref|index>] [--window <id|ref|index>]
         list-status [--workspace <id|ref|index>] [--window <id|ref|index>]
+        set-tab-state <running|needs-input|error|idle> [--surface <id|ref|index>] [--workspace <id|ref|index>] [--window <id|ref|index>]
+        clear-tab-state [--surface <id|ref|index>] [--workspace <id|ref|index>] [--window <id|ref|index>]
+        list-tab-state [--workspace <id|ref|index>] [--window <id|ref|index>]
         set-progress <0.0-1.0> [--label <text>] [--workspace <id|ref|index>] [--window <id|ref|index>]
         clear-progress [--workspace <id|ref|index>] [--window <id|ref|index>]
         log [--level <level>] [--source <name>] [--workspace <id|ref|index>] [--window <id|ref|index>] <message>
