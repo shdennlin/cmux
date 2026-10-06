@@ -4155,6 +4155,7 @@
 		2266CBB107FE4621370B99A4 /* TmuxWorkspacePaneOverlayStateBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5F9E6E0EA230D9166AB417 /* TmuxWorkspacePaneOverlayStateBuilder.swift */; };
 		E30760000000000000000002 /* TmuxWorkspacePaneOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30760000000000000000001 /* TmuxWorkspacePaneOverlayView.swift */; };
 		C01E00020000000000000001 /* TokenTheme+AppKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = C01E00020000000000000002 /* TokenTheme+AppKit.swift */; };
+		068FDF0269B95D0787A65AE6 /* TopTabActivityState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A2BE2CC4E18940779F1091 /* TopTabActivityState.swift */; };
 		D3284001A1B2C3D4E5F60718 /* TraditionalChineseIMENumpadRegressionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3284002A1B2C3D4E5F60718 /* TraditionalChineseIMENumpadRegressionTests.swift */; };
 		468100000000000000000003 /* TypingHotPathRegressionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 468100000000000000000004 /* TypingHotPathRegressionTests.swift */; };
 		D9A1B2C3D4E5000000000001 /* UITestDiagnosticsWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9A1B2C3D4E5000000000002 /* UITestDiagnosticsWriter.swift */; };
@@ -4542,6 +4543,8 @@
 		5B38DFE53BE108F4DA2BDBB7 /* WorkspaceTodoSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C5C9824B98FFC44A2C44F47 /* WorkspaceTodoSnapshotTests.swift */; };
 		39EF42EF23A2F751429718CE /* WorkspaceTodoState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A243534CEB9E9A49B44453 /* WorkspaceTodoState.swift */; };
 		C8A5C9024AF2B3D4E8858CE5 /* WorkspaceTopTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6850665B3893AEA85DDCF06 /* WorkspaceTopTab.swift */; };
+		30369877575395A8288099F6 /* WorkspaceTopTabActivityBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7281251E48C8A3971C450E9B /* WorkspaceTopTabActivityBar.swift */; };
+		608373591FF5BE27EFACD29C /* WorkspaceTopTabActivityBarLayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CA2BF52B09E3B1A1F7D49BE /* WorkspaceTopTabActivityBarLayerView.swift */; };
 		7DD10F14B5F815EB5BE38B2D /* WorkspaceTopTabsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3004DC21D3AB016EE08B0E9F /* WorkspaceTopTabsTests.swift */; };
 		E29390D68AD8E06C5070CC52 /* WorkspaceTopTabStripView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70D94A649E7B4922B4337F4F /* WorkspaceTopTabStripView.swift */; };
 		6B524A0BA34FD46A771335AB /* WorkspaceUnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71F8ED91A4B55D34BE6A0668 /* WorkspaceUnitTests.swift */; };
@@ -8617,6 +8620,7 @@
 		DA5F9E6E0EA230D9166AB417 /* TmuxWorkspacePaneOverlayStateBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TmuxWorkspacePaneOverlayStateBuilder.swift; sourceTree = "<group>"; };
 		E30760000000000000000001 /* TmuxWorkspacePaneOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TmuxWorkspacePaneOverlayView.swift; sourceTree = "<group>"; };
 		C01E00020000000000000002 /* TokenTheme+AppKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Panels/TokenTheme+AppKit.swift"; sourceTree = "<group>"; };
+		A1A2BE2CC4E18940779F1091 /* TopTabActivityState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopTabActivityState.swift; sourceTree = "<group>"; };
 		D3284002A1B2C3D4E5F60718 /* TraditionalChineseIMENumpadRegressionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraditionalChineseIMENumpadRegressionTests.swift; sourceTree = "<group>"; };
 		468100000000000000000004 /* TypingHotPathRegressionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypingHotPathRegressionTests.swift; sourceTree = "<group>"; };
 		D9A1B2C3D4E5000000000002 /* UITestDiagnosticsWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Debug/UITests/UITestDiagnosticsWriter.swift"; sourceTree = "<group>"; };
@@ -9000,6 +9004,8 @@
 		9C5C9824B98FFC44A2C44F47 /* WorkspaceTodoSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceTodoSnapshotTests.swift; sourceTree = "<group>"; };
 		E9A243534CEB9E9A49B44453 /* WorkspaceTodoState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceTodoState.swift; sourceTree = "<group>"; };
 		A6850665B3893AEA85DDCF06 /* WorkspaceTopTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceTopTab.swift; sourceTree = "<group>"; };
+		7281251E48C8A3971C450E9B /* WorkspaceTopTabActivityBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceTopTabActivityBar.swift; sourceTree = "<group>"; };
+		2CA2BF52B09E3B1A1F7D49BE /* WorkspaceTopTabActivityBarLayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceTopTabActivityBarLayerView.swift; sourceTree = "<group>"; };
 		3004DC21D3AB016EE08B0E9F /* WorkspaceTopTabsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WorkspaceTopTabsTests.swift"; sourceTree = "<group>"; };
 		70D94A649E7B4922B4337F4F /* WorkspaceTopTabStripView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceTopTabStripView.swift; sourceTree = "<group>"; };
 		71F8ED91A4B55D34BE6A0668 /* WorkspaceUnitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceUnitTests.swift; sourceTree = "<group>"; };
@@ -12115,6 +12121,9 @@
 				4329802440F08BAEF5BBD5AA /* Workspace+TopTabs.swift */,
 				A6850665B3893AEA85DDCF06 /* WorkspaceTopTab.swift */,
 				70D94A649E7B4922B4337F4F /* WorkspaceTopTabStripView.swift */,
+				A1A2BE2CC4E18940779F1091 /* TopTabActivityState.swift */,
+				7281251E48C8A3971C450E9B /* WorkspaceTopTabActivityBar.swift */,
+				2CA2BF52B09E3B1A1F7D49BE /* WorkspaceTopTabActivityBarLayerView.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -16876,6 +16885,7 @@
 				2266CBB107FE4621370B99A4 /* TmuxWorkspacePaneOverlayStateBuilder.swift in Sources */,
 				E30760000000000000000002 /* TmuxWorkspacePaneOverlayView.swift in Sources */,
 					C01E00020000000000000001 /* TokenTheme+AppKit.swift in Sources */,
+				068FDF0269B95D0787A65AE6 /* TopTabActivityState.swift in Sources */,
 				D9A1B2C3D4E5000000000001 /* UITestDiagnosticsWriter.swift in Sources */,
 				234457BD526EDFF5A1AA558C /* UITestFixtureTeamsAuthClient.swift in Sources */,
 				A5001501 /* UITestRecorder.swift in Sources */,
@@ -17151,6 +17161,8 @@
 				78F17D618B657B6CF929E327 /* WorkspaceTodoPanelView.swift in Sources */,
 				39EF42EF23A2F751429718CE /* WorkspaceTodoState.swift in Sources */,
 				C8A5C9024AF2B3D4E8858CE5 /* WorkspaceTopTab.swift in Sources */,
+				30369877575395A8288099F6 /* WorkspaceTopTabActivityBar.swift in Sources */,
+				608373591FF5BE27EFACD29C /* WorkspaceTopTabActivityBarLayerView.swift in Sources */,
 				E29390D68AD8E06C5070CC52 /* WorkspaceTopTabStripView.swift in Sources */,
 				8672E0088672E0088672E008 /* WorkstreamEvent+FeedIngress.swift in Sources */,
 			);
