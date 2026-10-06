@@ -85,6 +85,7 @@ public final class ControlCommandCoordinator {
         if let result = handleCanvas(request) { return result }
         if let result = handleMobileHost(request) { return result }
         if let result = handleWorkspace(request) { return result }
+        if let result = handleTabState(request) { return result }
         if let result = handleSurface(request) { return result }
         if let result = handleSystem(request) { return result }
         if let result = handleProject(request) { return result }

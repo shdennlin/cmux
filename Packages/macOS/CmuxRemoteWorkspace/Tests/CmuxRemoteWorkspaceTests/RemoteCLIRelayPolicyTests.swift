@@ -252,6 +252,25 @@ struct RemoteCLIRelayPolicyTests {
         }
     }
 
+    /// Tab state is display-only and no remote flow needs it, so it stays off
+    /// the allowlist: a relay caller must not repaint the Mac's tabs.
+    @Test("surface.tab_state methods are denied through the relay", arguments: [
+        "surface.tab_state.set",
+        "surface.tab_state.clear",
+        "surface.tab_state.list",
+    ])
+    func deniesTabStateMethods(method: String) throws {
+        try withServer { port, unixServer in
+            let exchange = try runPolicyRelayExchange(
+                port: port,
+                relayID: relayID,
+                tokenHex: tokenHex,
+                commandLine: #"{"id":"ts","method":"\#(method)","params":{"state":"running"}}"#
+            )
+            expectDenial(exchange, unixServer, method)
+        }
+    }
+
     @Test("surface.send_text with a malformed surface selector is denied")
     func deniesUnmappedSurfaceSendText() throws {
         let alias = (remote: UUID(), local: UUID())

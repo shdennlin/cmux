@@ -152,6 +152,30 @@ struct ClearStatusCommand: SharedLegacyFacadeCommand {
     static let configuration = CommandConfiguration(commandName: "clear-status", helpNames: [])
 }
 
+struct SetTabStateCommand: SharedLegacyFacadeCommand {
+    @Argument var state: String?
+    @Option(name: .customLong("surface"), completion: surfaceCompletion) var surface: String?
+    @Option(name: .customLong("workspace"), completion: workspaceCompletion) var workspace: String?
+    @Option(name: .customLong("window"), completion: windowCompletion) var window: String?
+    @Argument(parsing: .allUnrecognized) var arguments: [String] = []
+    static let configuration = CommandConfiguration(commandName: "set-tab-state", helpNames: [])
+}
+
+struct ClearTabStateCommand: SharedLegacyFacadeCommand {
+    @Option(name: .customLong("surface"), completion: surfaceCompletion) var surface: String?
+    @Option(name: .customLong("workspace"), completion: workspaceCompletion) var workspace: String?
+    @Option(name: .customLong("window"), completion: windowCompletion) var window: String?
+    @Argument(parsing: .allUnrecognized) var arguments: [String] = []
+    static let configuration = CommandConfiguration(commandName: "clear-tab-state", helpNames: [])
+}
+
+struct ListTabStateCommand: SharedLegacyFacadeCommand {
+    @Option(name: .customLong("workspace"), completion: workspaceCompletion) var workspace: String?
+    @Option(name: .customLong("window"), completion: windowCompletion) var window: String?
+    @Argument(parsing: .allUnrecognized) var arguments: [String] = []
+    static let configuration = CommandConfiguration(commandName: "list-tab-state", helpNames: [])
+}
+
 /// Internal shell-integration entrypoints: a terminal's shell hooks forward one
 /// piece of sidebar metadata each. Hidden from help and completion.
 struct ReportPwdCommand: SharedLegacyFacadeCommand {
