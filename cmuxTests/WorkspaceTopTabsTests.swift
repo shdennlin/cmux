@@ -256,6 +256,31 @@ struct WorkspaceTopTabsTests {
         #expect(workspace.topTabActivityState(tab.id) == .needsInput)
     }
 
+    /// The daemon marks a finished agent idle through set-tab-state, and
+    /// external idle hides the bar, so done has to show through it.
+    @Test func externalIdleThatIsUnreadShowsDone() throws {
+        let workspace = Workspace()
+        let panel = try #require(workspace.focusedTerminalPanel)
+        let tab = workspace.topTabs[0]
+        #expect(workspace.setExternalTabState(.idle, panelId: panel.id))
+        #expect(workspace.topTabActivityState(tab.id) == nil)
+
+        workspace.markPanelUnread(panel.id)
+
+        #expect(workspace.topTabActivityState(tab.id) == .done)
+    }
+
+    @Test func externalRunningStaysRunningWhenUnread() throws {
+        let workspace = Workspace()
+        let panel = try #require(workspace.focusedTerminalPanel)
+        let tab = workspace.topTabs[0]
+        #expect(workspace.setExternalTabState(.running, panelId: panel.id))
+
+        workspace.markPanelUnread(panel.id)
+
+        #expect(workspace.topTabActivityState(tab.id) == .running)
+    }
+
     @Test func doneShowsOnABackgroundTab() throws {
         let workspace = Workspace()
         let backgroundPanel = try #require(workspace.focusedTerminalPanel)
@@ -299,6 +324,70 @@ struct WorkspaceTopTabsTests {
             #expect(entry.state.hex(isDark: false) == entry.light, "\(entry.state) in light")
             #expect(entry.state.hex(isDark: true) == entry.dark, "\(entry.state) in dark")
         }
+    }
+
+    // MARK: an external tool can set what a tab's bar shows (set-tab-state)
+
+    @Test func externalTabStateOverridesTheAgentLifecycleUntilCleared() throws {
+        let workspace = Workspace()
+        let panel = try #require(workspace.focusedTerminalPanel)
+        let tab = workspace.topTabs[0]
+        workspace.setAgentLifecycle(key: "claude_code", panelId: panel.id, lifecycle: .running)
+        #expect(workspace.topTabActivityState(tab.id) == .running)
+
+        #expect(workspace.setExternalTabState(.needsInput, panelId: panel.id))
+        #expect(workspace.topTabActivityState(tab.id) == .needsInput)
+
+        // Idle is an explicit "not working", so it hides a lifecycle stuck on running.
+        #expect(workspace.setExternalTabState(.idle, panelId: panel.id))
+        #expect(workspace.topTabActivityState(tab.id) == nil)
+
+        // Clearing lets go, and the built-in state shows again.
+        #expect(workspace.clearExternalTabState(panelId: panel.id))
+        #expect(workspace.topTabActivityState(tab.id) == .running)
+    }
+
+    @Test func lastExternalWriteWins() throws {
+        let workspace = Workspace()
+        let panel = try #require(workspace.focusedTerminalPanel)
+        let tab = workspace.topTabs[0]
+
+        #expect(workspace.setExternalTabState(.error, panelId: panel.id))
+        #expect(workspace.setExternalTabState(.running, panelId: panel.id))
+
+        #expect(workspace.topTabActivityState(tab.id) == .running)
+        #expect(workspace.externalTabState(panelId: panel.id) == .running)
+    }
+
+    @Test func externalTabStateNeedsALivePanel() {
+        let workspace = Workspace()
+        #expect(!workspace.setExternalTabState(.running, panelId: UUID()))
+        #expect(!workspace.clearExternalTabState(panelId: UUID()))
+    }
+
+    @Test func closingAPanelDropsItsExternalTabState() throws {
+        let workspace = Workspace()
+        let first = try #require(workspace.focusedTerminalPanel)
+        let second = try #require(workspace.newTerminalSplit(from: first.id, orientation: .horizontal, focus: false))
+        #expect(workspace.setExternalTabState(.error, panelId: second.id))
+
+        #expect(workspace.closePanel(second.id, force: true))
+
+        #expect(workspace.externalTabState(panelId: second.id) == nil)
+        #expect(workspace.externalTabStateEntries().isEmpty)
+    }
+
+    @Test func externalTabStateEntriesListEveryPanelThatHasOne() throws {
+        let workspace = Workspace()
+        let first = try #require(workspace.focusedTerminalPanel)
+        let second = try #require(workspace.newTerminalSplit(from: first.id, orientation: .horizontal, focus: false))
+        #expect(workspace.setExternalTabState(.running, panelId: first.id))
+        #expect(workspace.setExternalTabState(.idle, panelId: second.id))
+
+        let entries = workspace.externalTabStateEntries()
+        #expect(entries.count == 2)
+        #expect(entries.first { $0.panelId == first.id }?.state == .running)
+        #expect(entries.first { $0.panelId == second.id }?.state == .idle)
     }
 
     // MARK: a top tab shows the agent running in its panel
