@@ -166,6 +166,13 @@ extension Workspace {
         _ panelId: UUID,
         notificationStore: TerminalNotificationStore? = nil
     ) -> TopTabActivityState? {
+        // A tool that set a state owns the bar until it clears it. Its idle
+        // hides the bar, except for work that finished unseen: the tool says
+        // the agent is done, and the unread mark says nobody has looked.
+        if let external = externalTabStates.state(for: panelId) {
+            if let state = external.activityState { return state }
+            return panelHasUnread(panelId, notificationStore: notificationStore) ? .done : nil
+        }
         let lifecycle = (agentLifecycleStatesByPanelId[panelId] ?? [:])
             .filter { !AgentHibernationLifecycleStatusKeys.isManualKey($0.key) }
         let entries = (agentStatusEntriesByPanelId[panelId] ?? [:])
@@ -188,6 +195,35 @@ extension Workspace {
             return .done
         }
         return nil
+    }
+
+    /// Shows `state` on a panel's tab, as `cmux set-tab-state` does; the last
+    /// writer wins.
+    ///
+    /// - Returns: `false` when the panel is not in this workspace.
+    @discardableResult
+    func setExternalTabState(_ state: TopTabExternalState, panelId: UUID) -> Bool {
+        guard panels[panelId] != nil else { return false }
+        externalTabStates.set(state, for: panelId)
+        return true
+    }
+
+    /// Hands a panel's tab back to cmux's own agent state.
+    ///
+    /// - Returns: `false` when the panel is not in this workspace.
+    @discardableResult
+    func clearExternalTabState(panelId: UUID) -> Bool {
+        guard panels[panelId] != nil else { return false }
+        externalTabStates.remove(panelId)
+        return true
+    }
+
+    func externalTabState(panelId: UUID) -> TopTabExternalState? {
+        externalTabStates.state(for: panelId)
+    }
+
+    func externalTabStateEntries() -> [TopTabExternalStateStore.Entry] {
+        externalTabStates.entries
     }
 
     /// The activity bar a top tab shows: the loudest state among its panels.
