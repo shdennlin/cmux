@@ -27,6 +27,12 @@ public struct SidebarCatalogSection: SettingCatalogSection {
         userDefaultsKey: "sidebarWrapWorkspaceTitles"
     )
 
+    public let alwaysShowWorkspaceNumbers = DefaultsKey<Bool>(
+        id: "sidebar.alwaysShowWorkspaceNumbers",
+        defaultValue: false,
+        userDefaultsKey: "sidebarAlwaysShowWorkspaceNumbers"
+    )
+
     public let showWorkspaceDescription = DefaultsKey<Bool>(
         id: "sidebar.showWorkspaceDescription",
         defaultValue: true,

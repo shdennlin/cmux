@@ -12811,11 +12811,13 @@ struct VerticalTabsSidebar: View, Equatable {
     ) -> SidebarWorkspaceTableRowConfiguration {
         let environment = renderContext.environment
         let rowSnapshot = input.rowSnapshot(list: listSnapshot)
-        let hintText: String? = {
-            guard input.showsModifierShortcutHints || input.settings.alwaysShowShortcutHints,
-                  let digit = input.workspaceShortcutDigit else { return nil }
-            return "\(input.workspaceShortcutModifierSymbol)\(digit)"
-        }()
+        let numberHint = SidebarWorkspaceNumberHint.resolve(
+            showsModifierHints: input.showsModifierShortcutHints,
+            alwaysShowsPill: input.settings.alwaysShowShortcutHints,
+            alwaysShowsNumbers: input.settings.showsWorkspaceNumbers,
+            digit: input.workspaceShortcutDigit,
+            modifierSymbol: input.workspaceShortcutModifierSymbol
+        )
         let model = SidebarWorkspaceRowModel(
             workspaceId: input.workspaceId,
             index: input.index,
@@ -12835,7 +12837,8 @@ struct VerticalTabsSidebar: View, Equatable {
             bottomDropIndicatorVisible: input.bottomDropIndicatorVisible,
             isGrouped: input.groupId != nil,
             isFirstRow: input.index == 0,
-            shortcutHintText: hintText,
+            shortcutHintText: numberHint.trailingPill,
+            workspaceNumberText: numberHint.leadingLabel,
             showsShortcutHints: input.showsModifierShortcutHints,
             colorSchemeIsDark: environment.colorScheme == .dark,
             readabilityBackdropHex: environment.readabilityBackdropHex,
@@ -16441,14 +16444,20 @@ struct TabItemView: View, Equatable {
             && !(showsModifierShortcutHints || alwaysShowShortcutHints)
     }
 
-    private var workspaceShortcutLabel: String? {
-        guard let workspaceShortcutDigit else { return nil }
-        return "\(workspaceShortcutModifierSymbol)\(workspaceShortcutDigit)"
+    /// Same resolution as the AppKit row (`workspaceTableRowConfiguration`).
+    private var workspaceNumberHint: SidebarWorkspaceNumberHint {
+        SidebarWorkspaceNumberHint.resolve(
+            showsModifierHints: showsModifierShortcutHints,
+            alwaysShowsPill: alwaysShowShortcutHints,
+            alwaysShowsNumbers: settings.showsWorkspaceNumbers,
+            digit: workspaceShortcutDigit,
+            modifierSymbol: workspaceShortcutModifierSymbol
+        )
     }
 
-    private var showsWorkspaceShortcutHint: Bool {
-        (showsModifierShortcutHints || alwaysShowShortcutHints) && workspaceShortcutLabel != nil
-    }
+    private var workspaceShortcutLabel: String? { workspaceNumberHint.trailingPill }
+
+    private var showsWorkspaceShortcutHint: Bool { workspaceShortcutLabel != nil }
 
     @ViewBuilder
     private func remoteWorkspaceSection(
@@ -16583,6 +16592,16 @@ struct TabItemView: View, Equatable {
         let spinnerColor = usesInvertedActiveForeground ? selectedWorkspaceForegroundNSColor(opacity: 0.55) : .secondaryLabelColor
         let rowView = VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .sidebarTitleFirstLineCenter, spacing: titleRowSpacing) {
+
+                if let workspaceNumberLabel = workspaceNumberHint.leadingLabel {
+                    Text(workspaceNumberLabel)
+                        .font(magnifiedFont(scaledFontSize(10), weight: .semibold, monospacedDigit: true))
+                        .foregroundColor(activeSecondaryColor(0.8))
+                        .lineLimit(1)
+                        .fixedSize()
+                        .allowsHitTesting(false)
+                        .accessibilityHidden(true)
+                }
 
                 if leadingSlotActive {
                     SidebarWorkspaceLeadingStatusSlot(showsBadge: badgeOnLeading, showsSpinner: spinnerOnLeading, unreadCount: unreadCount, side: badgeOnLeading ? scaledUnreadBadgeSize : scaledLoadingSpinnerSize, spinnerSide: scaledLoadingSpinnerSize, badgeFont: badgeFont, badgeFillColor: activeUnreadBadgeFillColor, badgeTextColor: activeUnreadBadgeTextColor, spinnerColor: spinnerColor, spinnerTooltip: spinnerTooltip)
