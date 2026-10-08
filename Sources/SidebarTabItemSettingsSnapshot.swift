@@ -17,6 +17,11 @@ struct SidebarTabItemSettingsSnapshot: Equatable {
     let sidebarShortcutHintXOffset: Double
     let sidebarShortcutHintYOffset: Double
     let alwaysShowShortcutHints: Bool
+    /// `sidebar.alwaysShowWorkspaceNumbers`: draw each workspace's
+    /// Select-Workspace-by-number shortcut before its title, without holding
+    /// a modifier. Separate from `alwaysShowShortcutHints` (a debug flag that
+    /// also hides the close button).
+    let showsWorkspaceNumbers: Bool
     let sidebarFontScale: CGFloat
     let showsGitBranch: Bool
     let branchDirectory: SidebarWorkspaceBranchDirectorySettings
@@ -63,6 +68,7 @@ struct SidebarTabItemSettingsSnapshot: Equatable {
         sidebarShortcutHintXOffset = ShortcutHintDebugSettings.defaultSidebarHintX
         sidebarShortcutHintYOffset = ShortcutHintDebugSettings.defaultSidebarHintY
         alwaysShowShortcutHints = ShortcutHintDebugSettings(defaults: defaults).alwaysShowHints
+        showsWorkspaceNumbers = settings.value(for: sidebar.alwaysShowWorkspaceNumbers)
         sidebarFontScale = SidebarTabItemFontScale.scale(for: sidebarFontSize)
         showsGitBranch = Self.bool(defaults: defaults, key: "sidebarShowGitBranch", defaultValue: true)
         showsGitBranchIcon = Self.bool(defaults: defaults, key: "sidebarShowGitBranchIcon", defaultValue: false)

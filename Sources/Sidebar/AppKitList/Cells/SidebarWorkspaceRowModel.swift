@@ -41,6 +41,9 @@ struct SidebarWorkspaceRowModel: Equatable {
     var isFirstRow: Bool
     /// Resolved modifier-hold hint text (nil hides the pill).
     let shortcutHintText: String?
+    /// Always-visible "⌃1" label drawn before the title; nil hides it.
+    /// Resolved by `SidebarWorkspaceNumberHint`.
+    var workspaceNumberText: String? = nil
     let showsShortcutHints: Bool
     let colorSchemeIsDark: Bool
     /// Hex of the opaque terminal-matched backdrop (secondary text holds a
@@ -83,7 +86,8 @@ struct SidebarWorkspaceRowModel: Equatable {
     /// Equality over every field that can influence the measured row height.
     /// `index` feeds only the accessibility label and `isFirstRow` only the
     /// drop-indicator frame in the apply pass (`layoutContent(apply: true)`),
-    /// so neither changes what `layoutContent(apply: false)` returns. Closing
+    /// so neither changes what `layoutContent(apply: false)` returns. The same
+    /// holds for the digit in `workspaceNumberText` (see below). Closing
     /// a workspace shifts both for every row below it; height caching keyed on
     /// full equality would re-measure that whole tail and lose its entries
     /// exactly when a stale-width fallback needs them.
@@ -95,6 +99,11 @@ struct SidebarWorkspaceRowModel: Equatable {
         normalizedOther.index = 0
         normalizedSelf.isFirstRow = false
         normalizedOther.isFirstRow = false
+        // The final shortcut digit is monospaced, so renumbering preserves
+        // width. Keep the modifier/chord prefix: rebinding can change its
+        // width and therefore the height of a wrapped title.
+        normalizedSelf.workspaceNumberText = normalizedSelf.workspaceNumberText.map { String($0.dropLast()) }
+        normalizedOther.workspaceNumberText = normalizedOther.workspaceNumberText.map { String($0.dropLast()) }
         return normalizedSelf == normalizedOther
     }
 }

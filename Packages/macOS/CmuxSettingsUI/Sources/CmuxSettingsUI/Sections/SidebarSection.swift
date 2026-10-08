@@ -13,6 +13,7 @@ public struct SidebarSection: View {
     @State private var matchTerminal: DefaultsValueModel<Bool>
     @State var hideAll: DefaultsValueModel<Bool>
     @State private var wrapTitles: DefaultsValueModel<Bool>
+    @State private var alwaysShowNumbers: DefaultsValueModel<Bool>
     @State private var showDesc: DefaultsValueModel<Bool>
     @State private var workspaceDescriptionHex: DefaultsValueModel<String>
     @State private var branchVerticalLayout: DefaultsValueModel<Bool>
@@ -48,6 +49,7 @@ public struct SidebarSection: View {
         _matchTerminal = State(initialValue: DefaultsValueModel(store: defaultsStore, key: catalog.sidebarAppearance.matchTerminalBackground))
         _hideAll = State(initialValue: DefaultsValueModel(store: defaultsStore, key: catalog.sidebar.hideAllDetails))
         _wrapTitles = State(initialValue: DefaultsValueModel(store: defaultsStore, key: catalog.sidebar.wrapWorkspaceTitles))
+        _alwaysShowNumbers = State(initialValue: DefaultsValueModel(store: defaultsStore, key: catalog.sidebar.alwaysShowWorkspaceNumbers))
         _showDesc = State(initialValue: DefaultsValueModel(store: defaultsStore, key: catalog.sidebar.showWorkspaceDescription))
         _workspaceDescriptionHex = State(initialValue: DefaultsValueModel(store: defaultsStore, key: catalog.sidebar.workspaceDescriptionColorHex))
         _branchVerticalLayout = State(initialValue: DefaultsValueModel(store: defaultsStore, key: catalog.sidebar.branchVerticalLayout))
@@ -96,6 +98,7 @@ public struct SidebarSection: View {
             matchTerminal,
             hideAll,
             wrapTitles,
+            alwaysShowNumbers,
             showDesc,
             workspaceDescriptionHex,
             branchVerticalLayout,
@@ -280,6 +283,17 @@ public struct SidebarSection: View {
                 subtitle: String(localized: "settings.app.wrapWorkspaceTitles.subtitle", defaultValue: "Shows long workspace titles in full on multiple lines.")
             ) {
                 Toggle("", isOn: Binding(get: { wrapTitles.current }, set: { wrapTitles.set($0) }))
+                    .labelsHidden()
+                    .controlSize(.small)
+            }
+            SettingsCardDivider()
+
+            SettingsCardRow(
+                configurationReview: .json("sidebar.alwaysShowWorkspaceNumbers"),
+                String(localized: "settings.app.alwaysShowWorkspaceNumbers", defaultValue: "Always Show Workspace Numbers"),
+                subtitle: String(localized: "settings.app.alwaysShowWorkspaceNumbers.subtitle", defaultValue: "Shows each workspace's number shortcut before its title. Only the workspaces the shortcut can reach have one.")
+            ) {
+                Toggle("", isOn: Binding(get: { alwaysShowNumbers.current }, set: { alwaysShowNumbers.set($0) }))
                     .labelsHidden()
                     .controlSize(.small)
             }
