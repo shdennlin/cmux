@@ -1,3 +1,35 @@
+<!-- LOCAL FORK NOTICE — none of the section below is upstream cmux. Drop it before opening an upstream PR. -->
+
+> ### Local fork additions
+>
+> Branch `cmux-local` carries everything below; `main` stays a plain mirror of `origin/main`. One commit per feature:
+>
+> | feature | what it does | how to change it | upstream |
+> | --- | --- | --- | --- |
+> | border indicator | Workspace indicator draws a border instead of filling the row, so `set-status --color` tints and the unread badge accent survive selection | `indicatorStyle: "border"` in `cmux.json` | [#7460](https://github.com/manaflow-ai/cmux/issues/7460) |
+> | always show all | Sidebar setting that always shows every custom metadata row (no Show more / Show less) | Settings → Sidebar | [#8655](https://github.com/manaflow-ai/cmux/issues/8655) |
+> | surface slide | Arriving surface slides in when ⌘⇧[ / ⌘⇧] switches surfaces | `defaults write <app domain> cmux.surfaceSlide.duration -float 0.2` (also `.offset`, `.enabled`) | [#1988](https://github.com/manaflow-ai/cmux/issues/1988) |
+> | row deep link | A sidebar status entry's `--url` may be a `cmux://workspace/<id>/surface/<id>` deep link, so clicking the row jumps to that workspace and tab without leaving fullscreen | `cmux set-status <key> <text> --url "<this build's scheme>://workspace/…"` | [#2784](https://github.com/manaflow-ai/cmux/issues/2784), [#3390](https://github.com/manaflow-ai/cmux/issues/3390), [#9011](https://github.com/manaflow-ai/cmux/pull/9011) |
+> | hover underline | A linked status row is underlined only while the pointer is on that line | — | — |
+> | fork-rebuild.sh | `scripts/fork-rebuild.sh` builds, installs and verifies a tagged app, Debug or Release, optionally certificate-signed so macOS permissions survive rebuilds | `scripts/fork-rebuild.sh [tag] [--release]`, `--verify-only <tag>`; details in [BUILD-NOTES.md](BUILD-NOTES.md) | — |
+> | ctrl+tab focus last | Ctrl+Tab / Ctrl+Shift+Tab yield to any action bound to them, so Focus Last on Ctrl+Tab toggles between the last two places instead of cycling surfaces | `"shortcuts": { "focusHistoryLast": "ctrl+tab" }` in `cmux.json` | [#474](https://github.com/manaflow-ai/cmux/issues/474) |
+> | top tabs | Tabs above the split area, each owning its own split layout (Ghostty / iTerm2 style): ⌘T opens a tab, ⌘D splits only the current tab, the existing tab shortcuts and Ctrl+Tab act on top tabs; turning it on splits stacked surfaces into tabs and turning it off moves extra tabs into workspaces below. Renames `Workspace.bonsplitController` to `activeBonsplitController` (separate refactor commit; `scripts/fork/rename-bonsplit-controller.py` resolves its rebase conflicts) | Settings → App → Tabs Contain Splits, or `"workspaceTopTabs": true` under `app` in `cmux.json` | [#1362](https://github.com/manaflow-ai/cmux/issues/1362) |
+> | top tab activity bar | A thin bar under each top tab for the agent in its panels: a sweep while it runs, solid amber when it needs input, solid red when it failed; a tab shows its loudest pane, and Reduce Motion stills the sweep. It reads cmux's own agent state, which stays `running` after a turn is interrupted with Esc unless a tool corrects it with `set-tab-state` | Automatic with top tabs on | — |
+> | set-tab-state | `set-tab-state <running\|needs-input\|error\|idle>`, `clear-tab-state` and `list-tab-state` set what a tab's activity bar shows, ahead of cmux's agent state until cleared (`idle` hides the bar); display-only, per surface, last writer wins, and refused through the remote relay | `cmux set-tab-state running [--surface <id\|ref\|index>]`, `cmux list-tab-state --json` | [#9226](https://github.com/manaflow-ai/cmux/issues/9226), [#15246](https://github.com/manaflow-ai/cmux/issues/15246) |
+> | workspace numbers | Always shows the configured number shortcut before the workspace title, leaving the hover close button available; 1–8 reach the first eight workspaces and 9 reaches the last | Settings → Sidebar Appearance → Always Show Workspace Numbers, or `"alwaysShowWorkspaceNumbers": true` under `sidebar` in `cmux.json` | [#1096](https://github.com/manaflow-ai/cmux/issues/1096), [#7517](https://github.com/manaflow-ai/cmux/pull/7517) |
+>
+> The upstream column is where each feature would land if it goes up, not a claim that it answers the issue: `row deep link` admits only this build's own scheme, where [#2784](https://github.com/manaflow-ai/cmux/issues/2784) and [#3390](https://github.com/manaflow-ai/cmux/issues/3390) ask for arbitrary ones, and `always show all` is a switch where [#8655](https://github.com/manaflow-ai/cmux/issues/8655) asks for a configurable limit. [#1988](https://github.com/manaflow-ai/cmux/issues/1988) wants the trackpad gesture that `surface slide` would animate, not the animation. [#474](https://github.com/manaflow-ai/cmux/issues/474) was closed by #14700, which added Focus Last but left Ctrl+Tab unreachable for it; `ctrl+tab focus last` can go once upstream lets a binding beat the legacy stroke. `top tabs` covers #1362's model but has no CLI/socket verbs for top tabs, does not restore a whole closed tab, and leaves Canvas mode unavailable while a workspace has several tabs. `set-tab-state` sets one of four states, where [#9226](https://github.com/manaflow-ai/cmux/issues/9226) asks for surface-scoped pills with text and [#15246](https://github.com/manaflow-ai/cmux/issues/15246) sketches a `status` verb with text and color reachable through the CLI, the socket and an escape sequence; this has only the CLI and socket. `top tab activity bar` inherits [#4389](https://github.com/manaflow-ai/cmux/issues/4389): cmux's lifecycle stays running after an interrupted turn. `hover underline`, `fork-rebuild.sh` and `top tab activity bar` have no upstream issue; searched 2026-10-04 and 2026-10-06.
+>
+> `workspace numbers` is off by default, while #1096 asks for numbers by default. Related upstream PR #7517 keeps its hints in the trailing slot; this fork places them before the title in both sidebar renderers.
+>
+> Commit hashes are deliberately absent: following upstream rewrites every one of them, and this table went stale each time it carried them. `git log --oneline origin/main..cmux-local` is the live list, newest first, and the subjects match the rows above.
+>
+> Follow upstream with `git fetch origin && git rebase origin/main` on `cmux-local` — one conflict pass, and `git log origin/main..` is then exactly this fork's diff. Never commit on `main`: `scripts/merge-main.sh` and the rest of the tooling assume it equals upstream.
+>
+> To send one feature upstream, it is already its own commit: `git switch -c pr-<name> origin/main && git cherry-pick "$(git log --format=%H --grep '<subject fragment>' origin/main..cmux-local)"`.
+>
+> Builds and the installed app slots are in [BUILD-NOTES.md](BUILD-NOTES.md).
+
 <h1 align="center">cmux</h1>
 <p align="center">A Ghostty-based macOS terminal with vertical tabs and notifications for AI coding agents</p>
 
