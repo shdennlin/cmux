@@ -147,6 +147,7 @@ struct SettingsRowAnchorResolutionTests {
         "sidebar.stackBranchDirectory",
         "sidebar.watchGitStatus",
         "sidebar.wrapWorkspaceTitles",
+        "sidebar.alwaysShowWorkspaceNumbers",
         "sidebar.beta.conversations.enabled",
         "sidebar.beta.workspaceTodos.controls.enabled",
         "sidebar.beta.workspaceTodos.checklistStyle",

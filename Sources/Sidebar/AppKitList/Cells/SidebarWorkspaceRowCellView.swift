@@ -28,6 +28,8 @@ final class SidebarWorkspaceRowTableCellView: NSTableCellView {
     private let leadingBadge = SidebarRowUnreadBadgeView()
     private var leadingSpinner: GPUSpinnerNSView?
     private let pinImageView = NSImageView()
+    /// `sidebar.alwaysShowWorkspaceNumbers`: the "⌃1" shortcut before the title.
+    private let workspaceNumberView = SidebarWorkspaceNumberLabelView()
     private let muteImageView = NSImageView()
     private let mediaAudioView = NSImageView()
     private let mediaMicView = NSImageView()
@@ -332,6 +334,7 @@ final class SidebarWorkspaceRowTableCellView: NSTableCellView {
         statusGlyphButton.isHidden = true
         statusGlyphButton.onClick = { [weak self] in self?.toggleStatusPopover() }
         contentContainer.addSubview(statusGlyphButton)
+        contentContainer.addSubview(workspaceNumberView)
         contentContainer.addSubview(leadingBadge)
         contentContainer.addSubview(titleView)
         cloudImageView.setAccessibilityIdentifier("sidebarCloudBadge")
@@ -544,6 +547,11 @@ final class SidebarWorkspaceRowTableCellView: NSTableCellView {
         cloudImageView.configureSidebarWorkspaceAccessory(
             symbol: snapshot.remoteWorkspaceBadgeSymbol, label: model.settings.showsCloudDeviceIcons && !model.settings.hidesAllDetails ? snapshot.remoteWorkspaceBadgeLabel : nil,
             pointSize: model.scaled(10), tint: palette.secondary(0.7), weight: .regular
+        )
+        workspaceNumberView.configure(
+            text: model.workspaceNumberText,
+            fontSize: model.scaled(10),
+            color: palette.secondary(0.8)
         )
         pinImageView.configureSidebarWorkspaceAccessory(
             symbol: "pin.fill", label: snapshot.isPinned
@@ -773,6 +781,22 @@ final class SidebarWorkspaceRowTableCellView: NSTableCellView {
 
     var closeButtonPaintForTesting: (isHidden: Bool, alpha: CGFloat) {
         (closeButton.isHidden, closeButton.alphaValue)
+    }
+
+    /// Frame and text of the always-visible workspace number, or nil while it
+    /// is not shown. Valid after `layoutContent(apply: true)`.
+    var workspaceNumberPaintForTesting: (frame: NSRect, text: String)? {
+        workspaceNumberView.isHidden ? nil : (workspaceNumberView.frame, workspaceNumberView.stringValue)
+    }
+
+    var titleFrameForTesting: NSRect { titleView.frame }
+
+    /// Frame of the manual task-status glyph, or nil while it is hidden.
+    var statusGlyphFrameForTesting: NSRect? { statusGlyphButton.isHidden ? nil : statusGlyphButton.frame }
+
+    /// Frame of the compact agent-status glyph, or nil while it is hidden.
+    var compactStatusGlyphFrameForTesting: NSRect? {
+        compactStatusGlyphView.isHidden ? nil : compactStatusGlyphView.frame
     }
 #endif
 
@@ -1311,6 +1335,11 @@ final class SidebarWorkspaceRowTableCellView: NSTableCellView {
             )
         }
 
+        if !workspaceNumberView.isHidden {
+            let size = workspaceNumberView.fittingLabelSize
+            place(workspaceNumberView, size: size, centerY: firstLineCenter)
+            x += size.width + titleRowSpacing
+        }
         let leadingSlotActive = (!leadingBadge.isHidden) || (leadingSpinner?.isHidden == false)
         if leadingSlotActive {
             let side = !leadingBadge.isHidden ? badgeSide : spinnerSide

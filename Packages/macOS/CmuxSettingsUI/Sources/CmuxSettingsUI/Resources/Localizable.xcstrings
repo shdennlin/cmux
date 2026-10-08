@@ -14341,6 +14341,124 @@
           }
         }
       }
+    },
+    "settings.app.alwaysShowWorkspaceNumbers": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Always Show Workspace Numbers"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إظهار أرقام مساحات العمل دائمًا"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arbeitsbereichsnummern immer anzeigen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar siempre los números de los espacios de trabajo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toujours afficher les numéros des espaces de travail"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ワークスペース番号を常に表示"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "워크스페이스 번호 항상 표시"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "始终显示工作区编号"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一律顯示工作區編號"
+          }
+        }
+      }
+    },
+    "settings.app.alwaysShowWorkspaceNumbers.subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shows each workspace's number shortcut before its title. Only the workspaces the shortcut can reach have one."
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يعرض اختصار الرقم لكل مساحة عمل قبل عنوانها. لا تحمل رقمًا إلا مساحات العمل التي يمكن للاختصار الوصول إليها."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zeigt das Nummernkürzel jedes Arbeitsbereichs vor seinem Titel an. Nur Arbeitsbereiche, die das Kürzel erreichen kann, haben eine Nummer."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muestra el atajo numérico de cada espacio de trabajo antes de su título. Solo tienen número los espacios de trabajo a los que llega el atajo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Affiche le raccourci numérique de chaque espace de travail avant son titre. Seuls les espaces de travail que le raccourci peut atteindre en ont un."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "各ワークスペースのタイトルの前に番号ショートカットを表示します。ショートカットで移動できるワークスペースにのみ番号が付きます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "각 워크스페이스 제목 앞에 번호 단축키를 표시합니다. 단축키로 이동할 수 있는 워크스페이스에만 번호가 표시됩니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在每个工作区标题前显示其数字快捷键。只有快捷键能切换到的工作区才会显示编号。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在每個工作區標題前顯示其數字快速鍵。只有快速鍵能切換到的工作區才會顯示編號。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

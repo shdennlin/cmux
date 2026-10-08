@@ -150,6 +150,7 @@ extension CmuxSettingsFileStore {
                 "sidebar": [
                     "hideAllDetails": SettingCatalog().sidebar.hideAllDetails.defaultValue,
                     "wrapWorkspaceTitles": SidebarWorkspaceTitleWrapSettings.defaultWrap,
+                    "alwaysShowWorkspaceNumbers": SettingCatalog().sidebar.alwaysShowWorkspaceNumbers.defaultValue,
                     "showWorkspaceDescription": SettingCatalog().sidebar.showWorkspaceDescription.defaultValue,
                     "workspaceDescriptionColor": NSNull(),
                     "beta": [

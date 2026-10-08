@@ -119,6 +119,7 @@ extension CmuxSettingsFileStore {
         "sidebar.hideAllDetails",
         CmuxJSONFontSettings.sidebarPath,
         "sidebar.wrapWorkspaceTitles",
+        "sidebar.alwaysShowWorkspaceNumbers",
         "sidebar.showWorkspaceDescription",
         "sidebar.workspaceDescriptionColor",
         "sidebar.beta.conversations.enabled",

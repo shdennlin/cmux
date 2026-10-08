@@ -1573,6 +1573,11 @@
           "default": false,
           "description": "Allow workspace titles in the sidebar to wrap to multiple lines instead of truncating after one line."
         },
+        "alwaysShowWorkspaceNumbers": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show each workspace's number shortcut (for example ⌃1) before its title in the sidebar, without holding a modifier key. Only workspaces the shortcut reaches show one: 1-8 are the first eight, and 9 is the last."
+        },
         "showWorkspaceDescription": {
           "type": "boolean",
           "default": true,

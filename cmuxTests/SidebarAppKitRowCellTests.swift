@@ -2,6 +2,7 @@ import CmuxFoundation
 import AppKit
 import CmuxSettings
 import CmuxSidebar
+import CmuxWorkspaces
 import SwiftUI
 import Testing
 @testable import cmux_DEV
@@ -17,7 +18,9 @@ struct SidebarAppKitRowCellTests {
         isPinned: Bool = false,
         metadataEntries: [SidebarStatusEntry] = [],
         metadataBlocks: [SidebarMetadataBlock] = [],
-        compactStatusGlyph: SidebarCompactStatusGlyph? = nil
+        compactStatusGlyph: SidebarCompactStatusGlyph? = nil,
+        taskStatus: WorkspaceTaskStatus? = nil,
+        hasManualTaskStatus: Bool = false
     ) -> SidebarWorkspaceSnapshotBuilder.Snapshot {
         SidebarWorkspaceSnapshotBuilder.Snapshot(
             presentationKey: SidebarWorkspaceSnapshotFactory.presentationKey(
@@ -49,9 +52,9 @@ struct SidebarAppKitRowCellTests {
             listeningPorts: [],
             finderDirectoryPath: nil,
             mediaActivity: BrowserMediaActivity(),
-            taskStatus: nil,
+            taskStatus: taskStatus,
             todoStatusMenuModel: nil,
-            hasManualTaskStatus: false,
+            hasManualTaskStatus: hasManualTaskStatus,
             checklistItems: [],
             checklistCompletedCount: 0,
             checklistTotalCount: 0,
@@ -71,6 +74,10 @@ struct SidebarAppKitRowCellTests {
         metadataBlocks: [SidebarMetadataBlock] = [],
         compactStatusGlyph: SidebarCompactStatusGlyph? = nil,
         shortcutHintText: String? = nil,
+        workspaceNumberText: String? = nil,
+        taskStatus: WorkspaceTaskStatus? = nil,
+        hasManualTaskStatus: Bool = false,
+        todoControlsEnabled: Bool = false,
         isMarkdownExpanded: Bool = false,
         colorSchemeIsDark: Bool = true
     ) -> SidebarWorkspaceRowModel {
@@ -84,7 +91,9 @@ struct SidebarAppKitRowCellTests {
                 isPinned: isPinned,
                 metadataEntries: metadataEntries,
                 metadataBlocks: metadataBlocks,
-                compactStatusGlyph: compactStatusGlyph
+                compactStatusGlyph: compactStatusGlyph,
+                taskStatus: taskStatus,
+                hasManualTaskStatus: hasManualTaskStatus
             ),
             settings: resolvedSettings,
             isActive: isActive,
@@ -102,6 +111,7 @@ struct SidebarAppKitRowCellTests {
             isGrouped: false,
             isFirstRow: true,
             shortcutHintText: shortcutHintText,
+            workspaceNumberText: workspaceNumberText,
             showsShortcutHints: shortcutHintText != nil,
             colorSchemeIsDark: colorSchemeIsDark,
             globalFontMagnificationPercent: 100,
@@ -109,7 +119,7 @@ struct SidebarAppKitRowCellTests {
             checklistAddFieldActivationToken: 0,
             isChecklistPopoverPresented: false,
             editingChecklistItemId: nil,
-            todoControlsEnabled: false,
+            todoControlsEnabled: todoControlsEnabled,
             isMetadataExpanded: false,
             isMarkdownExpanded: isMarkdownExpanded
         )
@@ -2105,6 +2115,194 @@ struct SidebarAppKitRowCellTests {
             #expect(glass.frame == pill.bounds)
             #expect(pill.subviews.firstIndex(of: glass)! < pill.subviews.firstIndex(of: fill)!)
         }
+    }
+
+    // MARK: Always-visible workspace numbers (sidebar.alwaysShowWorkspaceNumbers)
+
+    @Test
+    func alwaysShowWorkspaceNumbersIsOffByDefaultAndFollowsTheStoredSetting() {
+        #expect(!SidebarTabItemSettingsSnapshot(defaults: Self.makeDefaults()).showsWorkspaceNumbers)
+
+        let defaults = Self.makeDefaults()
+        defaults.set(true, forKey: SidebarCatalogSection().alwaysShowWorkspaceNumbers.userDefaultsKey)
+        #expect(SidebarTabItemSettingsSnapshot(defaults: defaults).showsWorkspaceNumbers)
+    }
+
+    @Test
+    func workspaceNumberSitsBeforeTheTitleAndLeavesAnUnnumberedRowAlone() throws {
+        let plain = Self.makeModel()
+        let plainCell = Self.configuredCell(model: plain)
+        let plainWindow = Self.layoutCell(plainCell, model: plain)
+        let plainTitleMinX = plainCell.titleFrameForTesting.minX
+        #expect(plainCell.workspaceNumberPaintForTesting == nil)
+
+        let numbered = Self.makeModel(workspaceNumberText: "⌃1")
+        let cell = Self.configuredCell(model: numbered)
+        let window = Self.layoutCell(cell, model: numbered)
+        let number = try #require(cell.workspaceNumberPaintForTesting)
+
+        #expect(number.text == "⌃1")
+        // The number takes the slot the title used to start in, and the title
+        // starts after it.
+        #expect(number.frame.minX == plainTitleMinX)
+        #expect(number.frame.maxX <= cell.titleFrameForTesting.minX)
+        #expect(cell.titleFrameForTesting.minX > plainTitleMinX)
+        withExtendedLifetime((plainWindow, window)) {}
+    }
+
+    @Test
+    func closeButtonStillRevealsOnHoverWhileTheWorkspaceNumberShows() {
+        let cell = Self.configuredCell(model: Self.makeModel(workspaceNumberText: "⌃1"))
+
+        cell.enforcePointerHovering(true)
+        #expect(!cell.closeButtonPaintForTesting.isHidden)
+        #expect(cell.closeButtonPaintForTesting.alpha == 1)
+    }
+
+    /// The number takes the leading slot, so everything that used to start
+    /// there moves right of it. Nothing may be dropped or pushed out of the row.
+    @Test(arguments: [440.0, 240.0])
+    func workspaceNumberPushesTheStatusGlyphRightWithoutHidingIt(width: CGFloat) throws {
+        func laidOutCell(numberText: String?) -> (SidebarWorkspaceRowTableCellView, NSWindow) {
+            let model = Self.makeModel(
+                workspaceNumberText: numberText,
+                taskStatus: .review,
+                hasManualTaskStatus: true,
+                todoControlsEnabled: true
+            )
+            let cell = Self.configuredCell(model: model)
+            return (cell, Self.layoutCell(cell, model: model, width: width))
+        }
+
+        let (plainCell, plainWindow) = laidOutCell(numberText: nil)
+        let plainGlyph = try #require(plainCell.statusGlyphFrameForTesting)
+
+        let (cell, window) = laidOutCell(numberText: "⌃1")
+        let number = try #require(cell.workspaceNumberPaintForTesting)
+        let glyph = try #require(cell.statusGlyphFrameForTesting)
+
+        // The number now sits where the glyph used to start; the glyph follows
+        // it and the title follows the glyph.
+        #expect(number.frame.minX == plainGlyph.minX)
+        #expect(number.frame.maxX <= glyph.minX)
+        #expect(glyph.maxX <= cell.titleFrameForTesting.minX)
+        #expect(glyph.maxX <= width)
+        withExtendedLifetime((plainWindow, window)) {}
+    }
+
+    /// `sidebar.compactAgentStatus` draws the agent's state as a glyph at the
+    /// start of the title line, pulled partly into the row padding. The number
+    /// sits before it; it must never cover the glyph, whatever the agent state.
+    @Test(arguments: [440.0, 240.0])
+    func workspaceNumberNeverCoversTheAgentStatusGlyph(width: CGFloat) throws {
+        let kinds: [SidebarCompactStatusGlyph.Kind] = [
+            .running, .needsInput, .error, .idle, .unseen, .waiting,
+            .pullRequest(.open), .branch,
+        ]
+        for kind in kinds {
+            func laidOutCell(numberText: String?) -> (SidebarWorkspaceRowTableCellView, NSWindow) {
+                let model = Self.makeModel(
+                    compactStatusGlyph: SidebarCompactStatusGlyph(kind: kind, tooltip: "agent"),
+                    workspaceNumberText: numberText
+                )
+                let cell = Self.configuredCell(model: model)
+                return (cell, Self.layoutCell(cell, model: model, width: width))
+            }
+
+            let (plainCell, plainWindow) = laidOutCell(numberText: nil)
+            let plainGlyph = try #require(plainCell.compactStatusGlyphFrameForTesting, "\(kind) glyph hidden without a number")
+
+            let (cell, window) = laidOutCell(numberText: "⌃1")
+            let number = try #require(cell.workspaceNumberPaintForTesting)
+            let glyph = try #require(cell.compactStatusGlyphFrameForTesting, "\(kind) glyph hidden by the number")
+
+            #expect(number.frame.maxX <= glyph.minX, "\(kind): the number overlaps the glyph")
+            #expect(glyph.minX > plainGlyph.minX, "\(kind): the glyph did not move right of the number")
+            #expect(glyph.maxX <= cell.titleFrameForTesting.minX, "\(kind): the glyph overlaps the title")
+            #expect(glyph.maxX <= width)
+            withExtendedLifetime((plainWindow, window)) {}
+        }
+    }
+
+    @Test
+    func rowsDifferingOnlyInTheirWorkspaceDigitShareTheirMeasuredHeight() {
+        let workspaceId = UUID()
+        let first = Self.makeModel(workspaceId: workspaceId, workspaceNumberText: "⌃1")
+        let second = Self.makeModel(workspaceId: workspaceId, workspaceNumberText: "⌃2")
+
+        // Closing a workspace renumbers every row below it; that must not
+        // evict their cached heights.
+        #expect(first.hasHeightEquivalentContent(to: second))
+        // Showing a number at all narrows the title, so that does change height.
+        #expect(!first.hasHeightEquivalentContent(to: Self.makeModel(workspaceId: workspaceId)))
+    }
+
+    @Test
+    func changingTheWorkspaceNumberShortcutPrefixInvalidatesMeasuredHeight() {
+        let workspaceId = UUID()
+        let original = Self.makeModel(workspaceId: workspaceId, workspaceNumberText: "⌃1")
+        let changedModifiers = Self.makeModel(workspaceId: workspaceId, workspaceNumberText: "⌥⌘1")
+        let changedChord = Self.makeModel(workspaceId: workspaceId, workspaceNumberText: "⌘K ⌃1")
+
+        #expect(!original.hasHeightEquivalentContent(to: changedModifiers))
+        #expect(!original.hasHeightEquivalentContent(to: changedChord))
+    }
+
+    @Test
+    func alwaysShownNumberTakesTheModifierHoldPillsPlace() {
+        let hint = SidebarWorkspaceNumberHint.resolve(
+            showsModifierHints: true,
+            alwaysShowsPill: false,
+            alwaysShowsNumbers: true,
+            digit: 1,
+            modifierSymbol: "⌃"
+        )
+        #expect(hint == SidebarWorkspaceNumberHint(leadingLabel: "⌃1", trailingPill: nil))
+    }
+
+    @Test
+    func modifierHoldStillDrawsThePillWhenNumbersAreNotAlwaysShown() {
+        let held = SidebarWorkspaceNumberHint.resolve(
+            showsModifierHints: true,
+            alwaysShowsPill: false,
+            alwaysShowsNumbers: false,
+            digit: 3,
+            modifierSymbol: "⌃"
+        )
+        #expect(held == SidebarWorkspaceNumberHint(leadingLabel: nil, trailingPill: "⌃3"))
+
+        let idle = SidebarWorkspaceNumberHint.resolve(
+            showsModifierHints: false,
+            alwaysShowsPill: false,
+            alwaysShowsNumbers: false,
+            digit: 3,
+            modifierSymbol: "⌃"
+        )
+        #expect(idle == SidebarWorkspaceNumberHint(leadingLabel: nil, trailingPill: nil))
+    }
+
+    @Test(arguments: [false, true])
+    func rowWithoutADigitShowsNoNumber(alwaysShowsNumbers: Bool) {
+        let hint = SidebarWorkspaceNumberHint.resolve(
+            showsModifierHints: true,
+            alwaysShowsPill: true,
+            alwaysShowsNumbers: alwaysShowsNumbers,
+            digit: nil,
+            modifierSymbol: "⌃"
+        )
+        #expect(hint == SidebarWorkspaceNumberHint(leadingLabel: nil, trailingPill: nil))
+    }
+
+    @Test
+    func theNumberFollowsTheConfiguredModifier() {
+        let hint = SidebarWorkspaceNumberHint.resolve(
+            showsModifierHints: false,
+            alwaysShowsPill: false,
+            alwaysShowsNumbers: true,
+            digit: 9,
+            modifierSymbol: "⌥⌘"
+        )
+        #expect(hint.leadingLabel == "⌥⌘9")
     }
 
     @Test

@@ -647979,6 +647979,65 @@
           }
         }
       }
+    },
+    "settings.search.alias.setting.app.always-show-workspace-numbers": {
+      "extractionState": "manual",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "sidebar.alwaysShowWorkspaceNumbers workspace number shortcut digit hint sidebar ctrl cmd مساحة العمل رقم اختصار تلميح الشريط الجانبي"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "sidebar.alwaysShowWorkspaceNumbers workspace number shortcut digit hint sidebar ctrl cmd Arbeitsbereich Nummer Tastenkürzel Ziffer Hinweis Seitenleiste"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "sidebar.alwaysShowWorkspaceNumbers workspace number shortcut digit hint sidebar ctrl cmd"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "sidebar.alwaysShowWorkspaceNumbers workspace number shortcut digit hint sidebar ctrl cmd espacio de trabajo número atajo dígito indicación barra lateral"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "sidebar.alwaysShowWorkspaceNumbers workspace number shortcut digit hint sidebar ctrl cmd espace de travail numéro raccourci chiffre indice barre latérale"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "sidebar.alwaysShowWorkspaceNumbers workspace number shortcut digit hint sidebar ctrl cmd ワークスペース 番号 ショートカット 数字 ヒント サイドバー"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "sidebar.alwaysShowWorkspaceNumbers workspace number shortcut digit hint sidebar ctrl cmd 워크스페이스 번호 단축키 숫자 힌트 사이드바"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "sidebar.alwaysShowWorkspaceNumbers workspace number shortcut digit hint sidebar ctrl cmd 工作区 编号 数字 快捷键 提示 侧栏"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "sidebar.alwaysShowWorkspaceNumbers workspace number shortcut digit hint sidebar ctrl cmd 工作區 編號 數字 快速鍵 提示 側欄"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
