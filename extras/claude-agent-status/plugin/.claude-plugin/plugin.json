@@ -1,0 +1,9 @@
+{
+  "name": "cmux-agent-status",
+  "version": "0.1.0",
+  "description": "Reports this session's state to the cmux sidebar at turn boundaries, in process, instead of spawning a Python hook per tool call.",
+  "author": {
+    "name": "Shawn Lin",
+    "email": "shawndennislin@gmail.com"
+  }
+}
